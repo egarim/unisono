@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Unisono.Mcp</RootNamespace>
+    <Description>Unisono: hosts the tool registry as an MCP server (Streamable HTTP on HttpListener, no ASP.NET Core) inside a MAUI or desktop app.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Unisono.Core\Unisono.Core.csproj" />
+  </ItemGroup>
+</Project>

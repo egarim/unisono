@@ -1,0 +1,11 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+.DS_Store
+xcuserdata/
+*.xcarchive
+*.xcframework
+samples/**/Platforms/iOS/*.mobileprovision
