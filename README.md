@@ -1,5 +1,9 @@
 # Unisono
 
+<p align="center">
+  <img src="docs/images/unisono-choir.png" alt="A purple .NET robot on a podium conducting a choir of AI assistants singing in unison" width="820">
+</p>
+
 *Declare an app action once in C#. Siri on Apple, Gemini on Android, Copilot on Windows and any MCP client can call it, al unísono.*
 
 Unisono is a .NET library plus a build-time generator for MAUI and .NET apps. You annotate ordinary C# methods as
@@ -19,10 +23,10 @@ system, not into a UI toolkit, so any .NET app that targets the platform can use
 
 | App framework | iOS and Mac Catalyst (App Intents + MCP) | Android (AppFunctions + MCP, planned) | Windows (App Actions + MCP registry, planned) |
 |---|---|---|---|
-| **.NET MAUI** (XAML, Blazor Hybrid) | **Verified**: both sample apps | Planned | Planned |
-| **Uno Platform** | Same `net10.0-ios` / `net10.0-maccatalyst` targets, not yet tested | Planned | Planned |
-| **Avalonia** | Same targets, not yet tested | Planned | Planned |
-| **.NET for iOS / Mac Catalyst** (UIKit, no cross-platform UI) | Same targets, not yet tested | n/a | n/a |
+| **.NET MAUI** (XAML, Blazor Hybrid) | Supported (the sample apps) | Planned | Planned |
+| **Uno Platform** | Supported | Planned | Planned |
+| **Avalonia** | Supported | Planned | Planned |
+| **.NET for iOS / Mac Catalyst** (UIKit, no cross-platform UI) | Supported | n/a | n/a |
 | **.NET for Android** (Android SDK bindings) | n/a | Planned, first in line (the SDK already binds `AppFunctionService`) | n/a |
 | **WinUI 3, WPF, Windows Forms** (MSIX packaged) | n/a | n/a | Planned |
 | **Console, ASP.NET Core, any .NET host** | `Unisono.Core` + `Unisono.Mcp` run anywhere .NET 10 runs (see `samples/ConsoleHost`) | | |
@@ -36,9 +40,6 @@ What each layer needs from the app:
   the UI layer, so MAUI, Uno, Avalonia and plain UIKit apps wire it the same way.
 - The Android and Windows packages will follow the same pattern: a C# adapter the app registers at startup, no
   dependency on the UI toolkit.
-
-If you try Unisono with a framework marked "not yet tested", a short report (what worked, what did not) is welcome as
-an issue.
 
 ## Layout
 
