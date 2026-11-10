@@ -1,7 +1,7 @@
 # Unisono: declare an app action once in C#, and every assistant can call it
 
 *Draft for the launch of Unisono, a .NET library for MAUI and .NET apps. Written 2026-11-10, when milestones M0 and M1
-were working on iOS.*
+were working on iOS and the two-app demo had just run.*
 
 ## The problem
 
@@ -120,11 +120,20 @@ thin and, from the next milestone, generated. All logic stays in .NET.
 
 ## What comes next
 
-**A two-app demo.** A second small app, Notes, where a meeting note holds action items, next to TaskTracker, where work
-is tracked. Same handoff in every scenario: the note's action items become tasks, and the note is updated with what
-was created. First with a Shortcut chaining the two apps' intents, no agent involved. Then with an agent connected to
-both apps over MCP, driving both from one prompt. Then, on a device, Siri's own model picking tools from both apps.
-The demo is designed so that the last scenario needs no new tools, only annotations.
+**The two-app demo, already running.** A second small app, Notes, where a meeting note holds action items, next to
+TaskTracker, where work is tracked. Notes has five tools (create, find, get, append, extract action items), one `Note`
+entity and its own MCP endpoint, all on the same generic bridge; its Swift intents are the only per-app Swift. Same
+handoff in every scenario: the note's action items become tasks, and the note is updated with what was created.
+
+- *A Shortcut, no agent.* "Note to Tasks": Extract Action Items from the standup note, Repeat with Each, Create Task
+  in TaskTracker, Append to Note. Built in the Shortcuts app and verified on the simulator on 2026-11-10: three action
+  items became three tasks, and the note got its footer. Both intents ran with their apps in the background, which is
+  why this path needs no socket.
+- *An agent over MCP.* Both apps built for Mac Catalyst, side by side, each with its MCP endpoint up. A script that
+  does what an agent does (read the note, create the tasks, append the line) is verified; the same flow driven by an
+  agent from one prompt is a configuration step away.
+- *Siri's own model, on a device.* Still ahead: mark the intents as tools, describe them for a model, add an App Skill
+  for the handoff. The demo is designed so that this scenario needs no new tools, only annotations.
 
 **Generated Swift.** M1 proved the generic bridge with hand-written intents. M2 generates the Swift intents, entities
 and enums from the C# declarations at build time, so the per-app Swift goes to zero.
