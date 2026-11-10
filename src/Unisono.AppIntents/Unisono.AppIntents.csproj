@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Unisono.AppIntents</RootNamespace>
+    <SupportedOSPlatformVersion>17.0</SupportedOSPlatformVersion>
+    <Description>Unisono: connects an app's Swift App Intents to the ToolRegistry through one generic JSON bridge, and ships the MSBuild targets that put Metadata.appintents into the app bundle.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Unisono.Core\Unisono.Core.csproj" />
+    <ProjectReference Include="..\Unisono.AppIntents.Binding\Unisono.AppIntents.Binding.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="build\Unisono.AppIntents.targets" Pack="true" PackagePath="build" />
+    <None Include="native\UnisonoBridge.swift" Pack="true" PackagePath="native" />
+  </ItemGroup>
+</Project>

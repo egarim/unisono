@@ -88,80 +88,48 @@ Only `[SiriTool]`, `[AppEntity]`, `IEntityQuery<T>` are ours. The rest is the MC
 
 ## 5. The generic bridge (why it beats per-intent protocols)
 
-Redth's sample bridges each intent with its own `@objc` method (`createTaskWithTitle:priorityRawValue:…`). That works but means regenerating a binding per app. Instead, one fixed `@objc` protocol:
+Redth's sample bridges each intent with its own `@objc` method (`createTaskWithTitle:priorityRawValue:…`), which
+means a binding per app. Unisono uses one fixed `@objc` protocol instead (built in M1, 2026-11-10):
 
 ```swift
-// Ships in the NuGet, never regenerated
+// src/Unisono.AppIntents/native/UnisonoBridge.swift — identical in every app, compiled into the app's intents framework
 @objc(UnisonoHost) public protocol UnisonoHost: AnyObject {
-    /// argumentsJSON → resultJSON; error → (nil, message)
-    func invoke(_ tool: String, argumentsJSON: String,
-                completion: @escaping (String?, String?) -> Void)
-    func entities(_ type: String, ids: [String],
-                  completion: @escaping (String?) -> Void)       // JSON array
-    func search(_ type: String, text: String,
-                completion: @escaping (String?) -> Void)
-    func suggested(_ type: String, completion: @escaping (String?) -> Void)
+    func invoke(_ tool: String, argumentsJSON: String, completion: @escaping (String?, String?) -> Void)   // (resultJSON, error)
+    func entities(_ type: String, ids: [String], completion: @escaping (String?, String?) -> Void)        // JSON array
+    func searchEntities(_ type: String, text: String, completion: @escaping (String?, String?) -> Void)
+    func suggestedEntities(_ type: String, completion: @escaping (String?, String?) -> Void)
 }
-
-@objc(UnisonoBridge) public class UnisonoBridge: NSObject {
-    @objc public static let shared = UnisonoBridge()
-    @objc public weak var host: UnisonoHost?
-}
-
-// Swift helper used by generated code
-extension UnisonoHost {
-    func invokeAsync(_ tool: String, _ json: String) async throws -> String { … withCheckedThrowingContinuation … }
-}
+@objc(UnisonoBridge) public final class UnisonoBridge: NSObject { static let shared; weak var host: UnisonoHost? }
+enum UnisonoTools { invoke(_:_:returning:), invoke(_:_:), entities/search/suggested, encode/decode (ISO 8601 dates tolerant of .NET's 7 fractional digits and offset-less values) }
 ```
 
-C# implements `UnisonoHost` once (in the Core package's iOS target), deserialises `argumentsJSON` to the tool's parameter record, and calls the registry. `@objc` protocols cannot be `async`, hence completion blocks; the Swift side wraps them in `async` continuations so `perform()` stays idiomatic.
+C# implements `UnisonoHost` once (`Unisono.AppIntents`'s `RegistryHost`): parse the JSON object, call
+`ToolRegistry.InvokeAsync`, hand the JSON result to the completion block. Entity look-ups go to
+`IEntityQuery<T>` instances registered with `registry.AddEntityQuery("Task", …)`. `@objc` protocols cannot be
+`async`, hence completion blocks; `UnisonoTools` wraps them in continuations so `perform()` stays idiomatic.
 
-Generated intent (what `unisono-codegen` emits for `AddToCart`):
+Because the Objective-C names are fixed, the **binding is static** (`Unisono.AppIntents.Binding`, one
+`ApiDefinition.cs`, no native reference at all) and ships once. Each app's Swift is reduced to intents, entities,
+enums and the shortcuts provider, every `perform()` being three lines:
 
 ```swift
-import AppIntents
-
-@AppIntent(.tool)                       // only when [SiriTool(Tool = true)]
-struct AddToCartIntent: AppIntent {
-    static let title: LocalizedStringResource = "Add to Cart"
-    static let description = IntentDescription("Adds a product to the shopping cart.")
-    static let openAppWhenRun = false
-
-    @Parameter(title: "Item", description: "The product to add")
-    var item: ProductEntity
-    @Parameter(title: "Quantity", description: "How many to add, 1-99", default: 1)
-    var quantity: Int
-
-    func perform() async throws -> some IntentResult & ReturnsValue<CartLineEntity> & ProvidesDialog {
-        guard let host = UnisonoBridge.shared.host else { throw UnisonoError.appNotReady }
-        let args = AddToCartArgs(item: item.id, quantity: quantity)     // Codable, generated
-        let json = try await host.invokeAsync("add_to_cart", encode(args))
-        let line = try decode(CartLineEntity.self, json)
-        return .result(value: line, dialog: IntentDialog(full: line.dialog, supporting: line.title))
-    }
-}
-
-struct ProductEntity: AppEntity {                      // from [AppEntity] record
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Product"
-    static let defaultQuery = ProductEntityQuery()
-    var id: String
-    @Property(title: "Title", description: "Product name") var title: String
-    var displayRepresentation: DisplayRepresentation { .init(title: "\(title)") }
-}
-
-struct ProductEntityQuery: EntityStringQuery {         // calls host.entities/search/suggested
-    func entities(for identifiers: [String]) async throws -> [ProductEntity] { … }
-    func entities(matching string: String) async throws -> IntentItemCollection<ProductEntity> { … }
-    func suggestedEntities() async throws -> IntentItemCollection<ProductEntity> { … }
-}
-
-struct UnisonoShortcuts: AppShortcutsProvider {       // from Phrases
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: AddToCartIntent(), phrases: ["Add to my cart in \(.applicationName)"],
-                    shortTitle: "Add to Cart", systemImageName: "cart")
-    }
-}
+struct Args: Encodable { var title: String; var priority: TaskPriority; … }     // mirrors the C# tool's parameters
+let created = try await UnisonoTools.invoke("create_task", Args(…), returning: TaskDto.self)
+return .result(value: TaskEntity(created), dialog: "Created '\(created.title)'")
 ```
+
+The same JSON contract (invoke by name, look up entities by id/text/suggested) is what the Android
+(`AppFunctionService`) and Windows (`IActionProvider`) adapters implement, so "the bridge" is not Siri-specific; the
+Swift file is merely its first adapter.
+
+**Build simplification found in M1:** the .NET for iOS `_BuildXcodeProjects` target runs for any project with an
+`<XcodeProject>` item, not only binding projects. So the app project builds its own intents framework directly,
+the xcframework is linked automatically, and `Unisono.AppIntents.targets` copies `Metadata.appintents` into the
+bundle. The per-app binding project disappears entirely (the design in §4 and §7 originally assumed one).
+
+Donations (`IntentDonationManager`) need an intent instance built in Swift. M1 drops the per-intent donation
+bridge; M2's generated Swift adds a fixed-name `@objc(UnisonoGenerated) donate(intent:parametersJSON:)` entry
+point that the static binding can call.
 
 ## 6. Type mapping (one table drives both emitters)
 
@@ -223,7 +191,7 @@ Why a separate codegen executable instead of a Roslyn source generator: source g
 | # | Goal | Proof |
 |---|---|---|
 | M0 (**done 2026-11-10**, branch `m0/ios-prototype`) | Fork Redth's sample; add `Unisono.Mcp` with the HTTP transport and expose its 6 intents as MCP tools through one shared handler table | Verified on the iPhone 17 Pro simulator: `create_task` over MCP shows up in the Shortcuts "List Tasks" intent and the UI; "Create Task" from Shortcuts comes back from `search_tasks` over MCP. Learned: iOS suspends the MCP socket while the app is in the background; the installed iOS workload needs `-p:ValidateXcodeVersion=false` with Xcode 27. |
-| M1 | Generic JSON bridge + static binding NuGet | Redth's per-intent protocol deleted; Swift intents call `host.invoke` |
+| M1 (**2026-11-10**) | Generic JSON bridge + static binding | Redth's per-intent protocol deleted; Swift intents call `UnisonoTools.invoke`; per-app binding project removed because the app builds its own `XcodeProject` |
 | M2 | `unisono-codegen`: attributes → Swift intents/entities/enums/shortcuts + C# descriptor table | Zero hand-written Swift for a new tool |
 | M3 | MSBuild automation (or the `dotnet unisono generate` fallback), analyzers, Skills bundle | `dotnet new maui` + 1 NuGet + 1 attribute = working Siri action |
 | M4 | Siri AI: `.tool` trait, generable entities, `Transferable` entities, Siri Evaluations on 27.3 beta | Siri AI chooses the right tool from a free-form request; evaluation script passes repeatedly |

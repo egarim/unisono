@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+    <IsBindingProject>true</IsBindingProject>
+    <IsTrimmable>true</IsTrimmable>
+    <RootNamespace>Unisono.AppIntents</RootNamespace>
+    <SupportedOSPlatformVersion>17.0</SupportedOSPlatformVersion>
+    <Description>Unisono: static Objective-C binding of the generic Swift bridge (UnisonoHost / UnisonoBridge). The Swift side ships with Unisono.AppIntents and is compiled into each app's intents framework.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+  </ItemGroup>
+</Project>

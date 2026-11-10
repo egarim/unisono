@@ -1,9 +1,21 @@
 import AppIntents
 
-/// Represents a task as an AppEntity, making it available to Siri, Shortcuts, and Spotlight.
+/// Wire shape of a task as the C# `TaskDto` serialises it (camelCase keys).
+struct TaskDto: Codable {
+    var id: String
+    var title: String
+    var notes: String?
+    var priority: TaskPriority
+    var category: TaskCategory
+    var dueDate: Date?
+    var estimatedMinutes: Int?
+    var isCompleted: Bool
+    var createdAt: Date?
+}
+
+/// A task as Siri, Shortcuts and Spotlight see it.
 struct TaskEntity: AppEntity {
     static var defaultQuery = TaskEntityQuery()
-
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Task"
 
     var id: String
@@ -32,21 +44,17 @@ struct TaskEntity: AppEntity {
     var displayRepresentation: DisplayRepresentation {
         let priorityText = TaskPriority.caseDisplayRepresentations[priority]?.title ?? "Medium"
         let categoryText = TaskCategory.caseDisplayRepresentations[category]?.title ?? "Personal"
-        return DisplayRepresentation(
-            title: "\(title)",
-            subtitle: "\(priorityText) · \(categoryText)"
-        )
+        return DisplayRepresentation(title: "\(title)", subtitle: "\(priorityText) · \(categoryText)")
     }
 
-    /// Creates a TaskEntity from a BridgeTaskItem (data from C#).
-    init(from bridge: BridgeTaskItem) {
-        self.id = bridge.id
-        self.title = bridge.title
-        self.notes = bridge.notes.isEmpty ? nil : bridge.notes
-        self.priority = TaskPriority(rawValue: bridge.priorityRawValue) ?? .medium
-        self.category = TaskCategory(rawValue: bridge.categoryRawValue) ?? .personal
-        self.dueDate = bridge.dueDate
-        self.estimatedMinutes = bridge.estimatedMinutes >= 0 ? bridge.estimatedMinutes : nil
-        self.isCompleted = bridge.isCompleted
+    init(_ dto: TaskDto) {
+        self.id = dto.id
+        self.title = dto.title
+        self.notes = dto.notes
+        self.priority = dto.priority
+        self.category = dto.category
+        self.dueDate = dto.dueDate
+        self.estimatedMinutes = dto.estimatedMinutes
+        self.isCompleted = dto.isCompleted
     }
 }

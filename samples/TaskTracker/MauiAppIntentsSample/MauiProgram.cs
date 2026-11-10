@@ -29,7 +29,9 @@ public static class MauiProgram
 
 		// Unisono: the tool class, the registry built from it, and the in-app MCP server.
 		builder.Services.AddSingleton<TaskTools>();
-		builder.Services.AddSingleton(sp => new ToolRegistry().AddToolsFrom(sp.GetRequiredService<TaskTools>()));
+		builder.Services.AddSingleton(sp => new ToolRegistry()
+			.AddToolsFrom(sp.GetRequiredService<TaskTools>())
+			.AddEntityQuery("Task", new TaskEntityQuery(sp.GetRequiredService<ITaskService>())));
 		builder.Services.AddSingleton(sp => new UnisonoMcpHttpHost(
 			sp.GetRequiredService<ToolRegistry>(),
 			new UnisonoMcpHttpOptions

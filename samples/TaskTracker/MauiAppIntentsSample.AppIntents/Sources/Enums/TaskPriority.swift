@@ -1,11 +1,8 @@
 import AppIntents
 
-/// Represents task priority levels as an AppEnum for Siri/Shortcuts integration.
-enum TaskPriority: Int, AppEnum {
-    case low = 0
-    case medium = 1
-    case high = 2
-    case urgent = 3
+/// Task priority as an AppEnum. Raw values match the JSON the C# tools use ("low", "medium", ...).
+enum TaskPriority: String, AppEnum, Codable {
+    case low, medium, high, urgent
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Priority"
 

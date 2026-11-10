@@ -1,7 +1,6 @@
 import AppIntents
 
-/// Lists tasks with optional filters.
-/// Demonstrates: Optional AppEnum parameters, Bool parameter, returning multiple entities.
+/// Lists tasks with optional filters. Calls the C# tool `list_tasks`.
 struct ListTasksIntent: AppIntent, PredictableIntent {
     static var title: LocalizedStringResource = "List Tasks"
     static var description = IntentDescription("Lists tasks in TaskTracker, optionally filtered by category or priority")
@@ -25,41 +24,26 @@ struct ListTasksIntent: AppIntent, PredictableIntent {
     }
 
     static var predictionConfiguration: some IntentPredictionConfiguration {
-        IntentPrediction(parameters: (\.$category, \.$priority)) { category, priority in
-            DisplayRepresentation(
-                title: "Show my tasks",
-                subtitle: "List tasks in TaskTracker"
-            )
+        IntentPrediction(parameters: (\.$category, \.$priority)) { _, _ in
+            DisplayRepresentation(title: "Show my tasks", subtitle: "List tasks in TaskTracker")
         }
     }
 
+    struct Args: Encodable {
+        var category: TaskCategory?
+        var priority: TaskPriority?
+        var showCompleted: Bool
+    }
+
     func perform() async throws -> some IntentResult & ReturnsValue<[TaskEntity]> & ProvidesDialog {
-        guard let provider = TaskBridgeManager.shared.provider else {
-            throw IntentError.appNotReady
-        }
+        let args = Args(category: category, priority: priority, showCompleted: showCompleted)
+        let entities = try await UnisonoTools.invoke("list_tasks", args, returning: [TaskDto].self).map(TaskEntity.init)
 
-        let items = provider.getTasksByFilter(
-            categoryRawValue: category?.rawValue ?? -1,
-            priorityRawValue: priority?.rawValue ?? -1,
-            showCompleted: showCompleted
-        )
+        var parts: [String] = []
+        if let category { parts.append(String(localized: TaskCategory.caseDisplayRepresentations[category]?.title ?? "")) }
+        if let priority { parts.append(String(localized: TaskPriority.caseDisplayRepresentations[priority]?.title ?? "")) }
+        let filterText = parts.isEmpty ? "all" : parts.joined(separator: " ")
 
-        let entities = items.map { TaskEntity(from: $0) }
-
-        let filterDesc: String
-        if let cat = category, let pri = priority {
-            filterDesc = "\(TaskCategory.caseDisplayRepresentations[cat]?.title ?? "") \(TaskPriority.caseDisplayRepresentations[pri]?.title ?? "")"
-        } else if let cat = category {
-            filterDesc = "\(TaskCategory.caseDisplayRepresentations[cat]?.title ?? "")"
-        } else if let pri = priority {
-            filterDesc = "\(TaskPriority.caseDisplayRepresentations[pri]?.title ?? "")"
-        } else {
-            filterDesc = "all"
-        }
-
-        return .result(
-            value: entities,
-            dialog: "Found \(entities.count) \(filterDesc) task\(entities.count == 1 ? "" : "s")"
-        )
+        return .result(value: entities, dialog: "Found \(entities.count) \(filterText) task\(entities.count == 1 ? "" : "s")")
     }
 }

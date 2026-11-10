@@ -1,8 +1,7 @@
 using Foundation;
 using UIKit;
-using MauiAppIntentsSample.Binding;
-using MauiAppIntentsSample.Platforms.iOS;
 using Unisono;
+using Unisono.AppIntents;
 using Unisono.Mcp;
 
 namespace MauiAppIntentsSample;
@@ -30,8 +29,8 @@ public class AppDelegate : MauiUIApplicationDelegate
 			var registry = IPlatformApplication.Current?.Services.GetService<ToolRegistry>();
 			if (registry is not null)
 			{
-				TaskBridgeManager.Shared.Provider = new AppIntentsBridgeProvider(registry);
-				Console.WriteLine($"[Unisono] Siri bridge wired to tools: {string.Join(", ", registry.Names)}");
+				UnisonoAppIntents.Attach(registry);
+				Console.WriteLine($"[Unisono] Siri bridge attached. Tools: {string.Join(", ", registry.Names)}. Entities: {string.Join(", ", registry.EntityTypes)}");
 			}
 			else
 			{

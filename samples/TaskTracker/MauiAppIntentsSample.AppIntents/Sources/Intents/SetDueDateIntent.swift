@@ -1,7 +1,6 @@
 import AppIntents
 
-/// Sets or updates the due date for a task.
-/// Demonstrates: AppEntity parameter combined with Date parameter.
+/// Sets or updates the due date of a task. Calls the C# tool `set_due_date`.
 struct SetDueDateIntent: AppIntent {
     static var title: LocalizedStringResource = "Set Due Date"
     static var description = IntentDescription("Sets the due date for a task in TaskTracker")
@@ -17,20 +16,17 @@ struct SetDueDateIntent: AppIntent {
         Summary("Set due date of \(\.$target) to \(\.$dueDate)")
     }
 
-    func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let provider = TaskBridgeManager.shared.provider else {
-            throw IntentError.appNotReady
-        }
+    struct Args: Encodable {
+        var id: String
+        var dueDate: Date
+    }
 
-        let success = provider.setDueDate(dueDate, forTaskWithId: target.id)
-        if !success {
-            throw IntentError.taskNotFound
-        }
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        let success = try await UnisonoTools.invoke("set_due_date", Args(id: target.id, dueDate: dueDate), returning: Bool.self)
+        guard success else { throw IntentError.taskNotFound }
 
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        let dateStr = formatter.string(from: dueDate)
-
-        return .result(dialog: "Set due date of '\(target.title)' to \(dateStr)")
+        return .result(dialog: "Set due date of '\(target.title)' to \(formatter.string(from: dueDate))")
     }
 }

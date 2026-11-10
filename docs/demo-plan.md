@@ -28,7 +28,7 @@ updated with what was created.**
    "What is urgent this week?" (`list_tasks`) and "Mark the login bug done" (`search_tasks` + `complete_task`);
    the list updates live in the app.
 3. **In-app chat (optional):** a chat page using `Microsoft.Extensions.AI` with the same `registry.Functions`
-   as tools. Needs a model: DeepSeek, OpenRouter or the LiteLLM gateway. Stretch; cut if time is short.
+   as tools. Needs a model behind an OpenAI-compatible endpoint. Stretch; cut if time is short.
 
 *Runs on:* iPhone simulator, Mac Catalyst.
 
@@ -79,9 +79,10 @@ suspension reason. State the limit; point at S2 (Shortcuts) and S4 (Siri) as the
 The Notes app needs a second Swift intents layer. Hand-writing it Redth-style (one `@objc` method per intent) would
 be thrown away in M1, so the demo becomes the vehicle for M1:
 
-1. **M1: generic bridge.** One fixed `@objc` protocol (`invoke(tool, argumentsJSON, completion)` plus entity
-   lookups) shipped as a static binding; the Swift intents only encode parameters to JSON and call it.
-   TaskTracker's Swift moves onto it first (its behaviour is already verified, so regressions show immediately).
+1. **M1: generic bridge.** Done 2026-11-10. One fixed `@objc` protocol (`invoke(tool, argumentsJSON, completion)`
+   plus entity lookups) behind a static binding; the Swift intents only encode parameters to JSON and call it.
+   TaskTracker runs on it: List Tasks, Create Task and Complete Task (entity picker included) verified in Shortcuts,
+   MCP verified with curl, and the per-app binding project is gone (the app builds its own `XcodeProject`).
 2. **Notes app** on the generic bridge: 5 intents, 1 entity, 1 shortcuts provider in Swift, all tools in C#.
 3. **Mac Catalyst target** for both apps (S3). Fallback if the Swift framework will not build for Catalyst in time:
    two simulators.
@@ -93,5 +94,5 @@ be thrown away in M1, so the demo becomes the vehicle for M1:
 ## Open questions
 
 - Keep TaskTracker's name and look, or restyle both apps as a matching "Unisono" pair? (Restyling costs a day.)
-- Model for the optional in-app chat: DeepSeek directly, or the LiteLLM gateway (needs the mesh)?
+- Model for the optional in-app chat: which provider, and configured how (never committed; read from the environment)?
 - Recording: live demo, or a recorded walkthrough per scenario?

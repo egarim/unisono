@@ -22,6 +22,7 @@ namespace Unisono;
 public sealed class ToolRegistry
 {
     private readonly Dictionary<string, Entry> _tools = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, EntityAdapter> _entities = new(StringComparer.Ordinal);
 
     public ToolRegistry(JsonSerializerOptions? serializerOptions = null)
     {
@@ -41,6 +42,9 @@ public sealed class ToolRegistry
     public IReadOnlyCollection<AIFunction> Functions => _tools.Values.Select(e => e.Function).ToArray();
 
     public bool Contains(string name) => _tools.ContainsKey(name);
+
+    /// <summary>Entity type names registered with <see cref="AddEntityQuery{T}"/>.</summary>
+    public IReadOnlyCollection<string> EntityTypes => _entities.Keys.ToArray();
 
     public static JsonSerializerOptions CreateDefaultSerializerOptions()
     {
@@ -135,5 +139,43 @@ public sealed class ToolRegistry
         return node is null ? default : node.Deserialize<T>(SerializerOptions);
     }
 
+    /// <summary>
+    /// Registers how an entity type is looked up. <paramref name="typeName"/> is the name the native side uses
+    /// (for example "Task"); the results are serialised with <see cref="SerializerOptions"/>.
+    /// </summary>
+    public ToolRegistry AddEntityQuery<T>(string typeName, IEntityQuery<T> query)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(typeName);
+        ArgumentNullException.ThrowIfNull(query);
+
+        _entities[typeName] = new EntityAdapter(
+            async (ids, ct) => ToArray(await query.ByIdsAsync(ids, ct).ConfigureAwait(false)),
+            async (text, ct) => ToArray(await query.SearchAsync(text, ct).ConfigureAwait(false)),
+            async ct => ToArray(await query.SuggestedAsync(ct).ConfigureAwait(false)));
+        return this;
+
+        JsonArray ToArray(IReadOnlyList<T> items)
+            => JsonSerializer.SerializeToNode(items, SerializerOptions) as JsonArray ?? new JsonArray();
+    }
+
+    public ValueTask<JsonArray> EntitiesByIdsAsync(string typeName, IReadOnlyList<string> ids, CancellationToken cancellationToken = default)
+        => Entity(typeName).ByIds(ids, cancellationToken);
+
+    public ValueTask<JsonArray> SearchEntitiesAsync(string typeName, string text, CancellationToken cancellationToken = default)
+        => Entity(typeName).Search(text, cancellationToken);
+
+    public ValueTask<JsonArray> SuggestedEntitiesAsync(string typeName, CancellationToken cancellationToken = default)
+        => Entity(typeName).Suggested(cancellationToken);
+
+    private EntityAdapter Entity(string typeName)
+        => _entities.TryGetValue(typeName, out var adapter)
+            ? adapter
+            : throw new KeyNotFoundException($"Unisono: no entity query for '{typeName}'. Known types: {string.Join(", ", _entities.Keys)}");
+
     private sealed record Entry(AIFunction Function, McpServerTool McpTool);
+
+    private sealed record EntityAdapter(
+        Func<IReadOnlyList<string>, CancellationToken, ValueTask<JsonArray>> ByIds,
+        Func<string, CancellationToken, ValueTask<JsonArray>> Search,
+        Func<CancellationToken, ValueTask<JsonArray>> Suggested);
 }

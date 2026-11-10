@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7226C46FCD8F4DFBB52F1D79 /* BridgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97404E80CA84932A41D5976 /* BridgeModels.swift */; };
-		FD24C456386B4B059CA07A16 /* TaskDataBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FC6DC9427146D59CDC4DA0 /* TaskDataBridge.swift */; };
-		A1B2C3D4E5F64789ABCDEF01 /* IntentDonationBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C94D01E2F3A4B5 /* IntentDonationBridge.swift */; };
+		0A1B2C3D4E5F000000000001 /* UnisonoBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1B2C3D4E5F000000000002 /* UnisonoBridge.swift */; };
 		398BD605B526486BB390C549 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F05B21CBA03A466BA77688B6 /* TaskEntity.swift */; };
 		7D39510F6CF14C44A6A3650A /* TaskQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FFA4953832849C3A27BCBC9 /* TaskQuery.swift */; };
 		3D4E41C4A4A2495883DEB9EF /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1BCAF89D4274312B0ACE4BD /* TaskCategory.swift */; };
@@ -27,10 +25,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A1B2C3D4E5F000000000002 /* UnisonoBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnisonoBridge.swift; sourceTree = "<group>"; };
 		5001A73F892C432FB8EBFD71 /* MauiAppIntentsSampleIntents.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MauiAppIntentsSampleIntents.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C97404E80CA84932A41D5976 /* BridgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeModels.swift; sourceTree = "<group>"; };
-		F3FC6DC9427146D59CDC4DA0 /* TaskDataBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDataBridge.swift; sourceTree = "<group>"; };
-		D4E5F6A7B8C94D01E2F3A4B5 /* IntentDonationBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentDonationBridge.swift; sourceTree = "<group>"; };
 		F05B21CBA03A466BA77688B6 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		1FFA4953832849C3A27BCBC9 /* TaskQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskQuery.swift; sourceTree = "<group>"; };
 		B1BCAF89D4274312B0ACE4BD /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategory.swift; sourceTree = "<group>"; };
@@ -92,9 +88,7 @@
 		4836F1EEBCF544569D02B5E1 /* Bridge */ = {
 			isa = PBXGroup;
 			children = (
-				C97404E80CA84932A41D5976 /* BridgeModels.swift */,
-				F3FC6DC9427146D59CDC4DA0 /* TaskDataBridge.swift */,
-				D4E5F6A7B8C94D01E2F3A4B5 /* IntentDonationBridge.swift */,
+				0A1B2C3D4E5F000000000002 /* UnisonoBridge.swift */,
 			);
 			path = Bridge;
 			sourceTree = "<group>";
@@ -206,9 +200,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7226C46FCD8F4DFBB52F1D79 /* BridgeModels.swift in Sources */,
-				FD24C456386B4B059CA07A16 /* TaskDataBridge.swift in Sources */,
-				A1B2C3D4E5F64789ABCDEF01 /* IntentDonationBridge.swift in Sources */,
+				0A1B2C3D4E5F000000000001 /* UnisonoBridge.swift in Sources */,
 				398BD605B526486BB390C549 /* TaskEntity.swift in Sources */,
 				7D39510F6CF14C44A6A3650A /* TaskQuery.swift in Sources */,
 				3D4E41C4A4A2495883DEB9EF /* TaskCategory.swift in Sources */,

@@ -1,0 +1,34 @@
+<Project>
+  <!--
+    Unisono.AppIntents build glue for apps that build their Swift intents framework with an <XcodeProject> item.
+    1. After the Xcode project builds, pull Metadata.appintents out of the xcarchive (App Intents are discovered
+       from this folder, never at runtime).
+    2. Copy it into the app bundle so iOS finds the intents.
+    Paths are computed inside the targets: at import time $(IntermediateOutputPath) is not set yet.
+  -->
+  <Target Name="_UnisonoExtractAppIntentsMetadata"
+          AfterTargets="_BuildXcodeProjects"
+          Condition="'@(XcodeProject->Count())' != '0'">
+    <PropertyGroup>
+      <_UnisonoXcodeDir>$(IntermediateOutputPath)xcode</_UnisonoXcodeDir>
+      <_UnisonoMetadataDir>$(_UnisonoXcodeDir)/Metadata.appintents</_UnisonoMetadataDir>
+    </PropertyGroup>
+    <RemoveDir Directories="$(_UnisonoMetadataDir)" Condition="Exists('$(_UnisonoMetadataDir)')" />
+    <Exec Command="SRC=%24(find &quot;$(_UnisonoXcodeDir)&quot; -path '*/archives/*Metadata.appintents' -type d | head -1); if [ -n &quot;%24SRC&quot; ]; then cp -R &quot;%24SRC&quot; &quot;$(_UnisonoMetadataDir)&quot; &amp;&amp; echo &quot;Unisono: extracted Metadata.appintents&quot;; else echo &quot;Unisono: WARNING no Metadata.appintents in the xcarchive (does the Swift target import AppIntents?)&quot;; fi" />
+  </Target>
+
+  <Target Name="_UnisonoCopyAppIntentsMetadata"
+          AfterTargets="_CopyResourcesToBundle"
+          Condition="'@(XcodeProject->Count())' != '0'">
+    <PropertyGroup>
+      <_UnisonoMetadataDir>$(IntermediateOutputPath)xcode/Metadata.appintents</_UnisonoMetadataDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_UnisonoMetadataFiles Include="$(_UnisonoMetadataDir)/**/*" Condition="Exists('$(_UnisonoMetadataDir)')" />
+    </ItemGroup>
+    <!-- Keep the explicit slash: AppBundleDir may have no trailing separator, and metadata outside the bundle fails silently. -->
+    <Copy SourceFiles="@(_UnisonoMetadataFiles)" DestinationFolder="$(AppBundleDir)/Metadata.appintents/%(RecursiveDir)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
+    <Message Importance="high" Text="Unisono: copied Metadata.appintents into $(AppBundleDir)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
+    <Warning Text="Unisono: no Metadata.appintents was extracted; Siri and Shortcuts will not see this app's intents." Condition="'@(_UnisonoMetadataFiles)' == ''" />
+  </Target>
+</Project>

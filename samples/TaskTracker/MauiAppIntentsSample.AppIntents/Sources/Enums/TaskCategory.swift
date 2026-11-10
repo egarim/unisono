@@ -1,12 +1,8 @@
 import AppIntents
 
-/// Represents task categories as an AppEnum for Siri/Shortcuts integration.
-enum TaskCategory: Int, AppEnum {
-    case work = 0
-    case personal = 1
-    case shopping = 2
-    case health = 3
-    case fitness = 4
+/// Task category as an AppEnum. Raw values match the JSON the C# tools use.
+enum TaskCategory: String, AppEnum, Codable {
+    case work, personal, shopping, health, fitness
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Category"
 

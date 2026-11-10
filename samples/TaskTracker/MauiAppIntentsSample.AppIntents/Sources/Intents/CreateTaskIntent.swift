@@ -1,7 +1,6 @@
 import AppIntents
 
-/// Creates a new task with various parameter types.
-/// Demonstrates: String, AppEnum, optional Date, optional Int, optional String parameters.
+/// Creates a new task. Calls the C# tool `create_task` through the Unisono bridge.
 struct CreateTaskIntent: AppIntent, PredictableIntent {
     static var title: LocalizedStringResource = "Create Task"
     static var description = IntentDescription("Creates a new task in TaskTracker")
@@ -37,38 +36,27 @@ struct CreateTaskIntent: AppIntent, PredictableIntent {
 
     static var predictionConfiguration: some IntentPredictionConfiguration {
         IntentPrediction(parameters: (\.$priority, \.$category)) { priority, category in
-            DisplayRepresentation(
-                title: "Create a \(priority) \(category) task",
-                subtitle: "Add a new task to TaskTracker"
-            )
+            DisplayRepresentation(title: "Create a \(priority) \(category) task", subtitle: "Add a new task to TaskTracker")
         }
     }
 
+    /// Mirrors the parameters of the C# `create_task` tool.
+    struct Args: Encodable {
+        var title: String
+        var priority: TaskPriority
+        var category: TaskCategory
+        var dueDate: Date?
+        var estimatedMinutes: Int?
+        var notes: String?
+    }
+
     func perform() async throws -> some IntentResult & ReturnsValue<TaskEntity> & ProvidesDialog {
-        guard let provider = TaskBridgeManager.shared.provider else {
-            throw IntentError.appNotReady
-        }
-
-        // Request required values if not provided via Siri dialog
-        let title = taskTitle
-        let taskPriority = priority
-        let taskCategory = category
-
-        guard let created = provider.createTask(
-            title: title,
-            priorityRawValue: taskPriority.rawValue,
-            categoryRawValue: taskCategory.rawValue,
-            dueDate: dueDate,
-            estimatedMinutes: estimatedMinutes ?? -1,
-            notes: notes ?? ""
-        ) else {
-            throw IntentError.operationFailed
-        }
-
-        let entity = TaskEntity(from: created)
-        return .result(
-            value: entity,
-            dialog: "Created '\(title)' with \(TaskPriority.caseDisplayRepresentations[taskPriority]?.title ?? "medium") priority in \(TaskCategory.caseDisplayRepresentations[taskCategory]?.title ?? "personal")"
-        )
+        let args = Args(title: taskTitle, priority: priority, category: category,
+                        dueDate: dueDate, estimatedMinutes: estimatedMinutes, notes: notes)
+        let created = try await UnisonoTools.invoke("create_task", args, returning: TaskDto.self)
+        let entity = TaskEntity(created)
+        let priorityText = TaskPriority.caseDisplayRepresentations[priority]?.title ?? "medium"
+        let categoryText = TaskCategory.caseDisplayRepresentations[category]?.title ?? "personal"
+        return .result(value: entity, dialog: "Created '\(created.title)' with \(priorityText) priority in \(categoryText)")
     }
 }

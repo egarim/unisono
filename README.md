@@ -7,7 +7,7 @@ tools, with descriptions, the same way you would for MCP. Unisono projects those
 "app tool" surface (Swift App Intents on Apple, AppFunctions on Android, App Actions on Windows) and hosts the same
 tools as an MCP server inside the app. One registry, one handler per tool, several front doors.
 
-Status: **M0 prototype, iOS**. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
+Status: **M1 on iOS** (generic Swift bridge; per-app Swift is intents, entities and enums only). See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
 ## Layout
 
@@ -15,7 +15,9 @@ Status: **M0 prototype, iOS**. See `docs/dotnet-siri-mcp-framework-design.md` fo
 |---|---|
 | `src/Unisono.Core` | `ToolRegistry`: discovers `[McpServerTool]` methods, binds JSON arguments, invokes one handler per tool. |
 | `src/Unisono.Mcp` | `UnisonoMcpHttpHost`: the registry as an MCP server over Streamable HTTP on `HttpListener` (no ASP.NET Core), so it runs inside a MAUI app. |
-| `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, modified so the Swift intents and the MCP server both call the same `TaskTools` class. |
+| `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
+| `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
+| `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. The app project builds its own Swift framework through an `XcodeProject` item. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
 | `scripts/mcp-smoke.sh` | Drives any Unisono endpoint with curl: initialize, tools/list, tools/call, session delete. |
 

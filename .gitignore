@@ -9,3 +9,21 @@ xcuserdata/
 *.xcarchive
 *.xcframework
 samples/**/Platforms/iOS/*.mobileprovision
+
+# Never commit credentials or signing material (public repository)
+.env
+.env.*
+*.env
+secrets.json
+appsettings.*.local.json
+*.local.json
+*.pem
+*.p12
+*.pfx
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.keystore
+*.jks
+local.properties
+*.secret

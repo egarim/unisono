@@ -58,32 +58,23 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 	</ItemGroup>
 
-	<!-- Reference the Swift App Intents binding library -->
-	<ItemGroup>
-		<ProjectReference Include="..\MauiAppIntentsSample.Binding\MauiAppIntentsSample.Binding.csproj" />
-	</ItemGroup>
-
-	<!-- Unisono: tool registry + in-app MCP server -->
+	<!-- Unisono: tool registry, in-app MCP server, and the App Intents bridge -->
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\Unisono.Core\Unisono.Core.csproj" />
 		<ProjectReference Include="..\..\..\src\Unisono.Mcp\Unisono.Mcp.csproj" />
+		<ProjectReference Include="..\..\..\src\Unisono.AppIntents\Unisono.AppIntents.csproj" />
 	</ItemGroup>
 
-	<!-- Copy App Intents Metadata into the app bundle so iOS discovers the intents.
-	     The metadata is extracted by the binding project's ExtractAppIntentsMetadata target
-	     from the xcarchive output into its intermediate directory. -->
-	<Target Name="CopyAppIntentsMetadata" AfterTargets="_CopyResourcesToBundle">
-		<PropertyGroup>
-			<_BindingMetadataDir>..\MauiAppIntentsSample.Binding\obj\$(Configuration)\$(TargetFramework)\xcode\Metadata.appintents</_BindingMetadataDir>
-		</PropertyGroup>
-		<ItemGroup>
-			<_AppIntentsMetadata Include="$(_BindingMetadataDir)\**\*" Condition="Exists('$(_BindingMetadataDir)')" />
-		</ItemGroup>
-		<Copy SourceFiles="@(_AppIntentsMetadata)"
-			  DestinationFolder="$(AppBundleDir)/Metadata.appintents/%(RecursiveDir)"
-			  Condition="'@(_AppIntentsMetadata)' != ''" />
-		<Message Text="Copied App Intents Metadata to $(AppBundleDir)/Metadata.appintents" Importance="high"
-			  Condition="'@(_AppIntentsMetadata)' != ''" />
-	</Target>
+	<!-- The app's own Swift intents framework (intents, entities, enums + the copied UnisonoBridge.swift).
+	     The .NET SDK builds it with xcodebuild and links the resulting xcframework; Unisono's targets copy
+	     Metadata.appintents into the bundle. No per-app binding project is needed. -->
+	<ItemGroup>
+		<XcodeProject Include="..\MauiAppIntentsSample.AppIntents\MauiAppIntentsSampleIntents.xcodeproj">
+			<SchemeName>MauiAppIntentsSampleIntents</SchemeName>
+			<ForceLoad>true</ForceLoad>
+			<SmartLink>false</SmartLink>
+		</XcodeProject>
+	</ItemGroup>
+	<Import Project="..\..\..\src\Unisono.AppIntents\build\Unisono.AppIntents.targets" />
 
 </Project>

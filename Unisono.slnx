@@ -2,10 +2,11 @@
   <Folder Name="/src/">
     <Project Path="src/Unisono.Core/Unisono.Core.csproj" />
     <Project Path="src/Unisono.Mcp/Unisono.Mcp.csproj" />
+    <Project Path="src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj" />
+    <Project Path="src/Unisono.AppIntents/Unisono.AppIntents.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/ConsoleHost/ConsoleHost.csproj" />
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
-    <Project Path="samples/TaskTracker/MauiAppIntentsSample.Binding/MauiAppIntentsSample.Binding.csproj" />
   </Folder>
 </Solution>
