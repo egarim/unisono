@@ -9,10 +9,10 @@ struct CreateTaskIntent: AppIntent, PredictableIntent {
     @Parameter(title: "Title")
     var taskTitle: String
 
-    @Parameter(title: "Priority")
+    @Parameter(title: "Priority", default: .medium)
     var priority: TaskPriority
 
-    @Parameter(title: "Category")
+    @Parameter(title: "Category", default: .personal)
     var category: TaskCategory
 
     @Parameter(title: "Due Date")

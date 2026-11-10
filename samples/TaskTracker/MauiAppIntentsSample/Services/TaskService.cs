@@ -120,14 +120,15 @@ public class TaskService : ITaskService
 
     private void OnTasksChanged() => TasksChanged?.Invoke(this, EventArgs.Empty);
 
+    // Stable ids: Shortcuts and Siri store entity references by id, so seed data must keep the same ids across launches.
     private void SeedSampleData()
     {
         _tasks.AddRange([
-            new TaskItem { Title = "Review quarterly report", Priority = TaskPriorityLevel.High, Category = TaskCategoryType.Work, DueDate = DateTime.Today.AddDays(2), EstimatedMinutes = 60 },
-            new TaskItem { Title = "Buy groceries", Priority = TaskPriorityLevel.Medium, Category = TaskCategoryType.Shopping, Notes = "Milk, eggs, bread, vegetables" },
-            new TaskItem { Title = "Morning run", Priority = TaskPriorityLevel.Low, Category = TaskCategoryType.Fitness, EstimatedMinutes = 30 },
-            new TaskItem { Title = "Schedule dentist appointment", Priority = TaskPriorityLevel.Medium, Category = TaskCategoryType.Health, DueDate = DateTime.Today.AddDays(7) },
-            new TaskItem { Title = "Fix login page bug", Priority = TaskPriorityLevel.Urgent, Category = TaskCategoryType.Work, DueDate = DateTime.Today.AddDays(1), EstimatedMinutes = 120, Notes = "Users reporting 500 error on iOS Safari" },
+            new TaskItem { Id = "task-review-q4", Title = "Review quarterly report", Priority = TaskPriorityLevel.High, Category = TaskCategoryType.Work, DueDate = DateTime.Today.AddDays(2), EstimatedMinutes = 60 },
+            new TaskItem { Id = "task-groceries", Title = "Buy groceries", Priority = TaskPriorityLevel.Medium, Category = TaskCategoryType.Shopping, Notes = "Milk, eggs, bread, vegetables" },
+            new TaskItem { Id = "task-morning-run", Title = "Morning run", Priority = TaskPriorityLevel.Low, Category = TaskCategoryType.Fitness, EstimatedMinutes = 30 },
+            new TaskItem { Id = "task-dentist", Title = "Schedule dentist appointment", Priority = TaskPriorityLevel.Medium, Category = TaskCategoryType.Health, DueDate = DateTime.Today.AddDays(7) },
+            new TaskItem { Id = "task-login-bug", Title = "Fix login page bug", Priority = TaskPriorityLevel.Urgent, Category = TaskCategoryType.Work, DueDate = DateTime.Today.AddDays(1), EstimatedMinutes = 120, Notes = "Users reporting 500 error on iOS Safari" },
         ]);
     }
 }

@@ -52,6 +52,15 @@ Editor notes for the demo: a newly added action lands after "End Repeat"; long-p
 Priority and Category on Create Task, or the loop prompts for them on every item. "Show When Run" on Create Task
 makes each iteration pause on a result card; switch it off for a smooth run.
 
+Two findings from the recording session (2026-11-10), both fixed in the samples:
+- A Shortcut stores entity references by **id**. The seed data used random ids, so after relaunching Notes the
+  stored "Standup, Monday" reference went stale and the Shortcut asked for the note again. Seed data now has stable
+  ids (`note-standup-monday`, `task-login-bug`, …); real apps have this for free with persisted data.
+- Running **Create Task from its App Shortcut tile** failed after the title prompt with "This action could not be
+  run with the current user interface": required enum parameters without defaults cannot be asked for from a tile.
+  The Swift parameters now default to Medium / Personal, so the tile asks only for the title; inside a Shortcut the
+  values can still be set explicitly. Complete Task from the tile works and shows the entity picker.
+
 *Runs on:* iPhone simulator or device with both apps installed.
 
 ### S3. An agent orchestrating both apps over MCP

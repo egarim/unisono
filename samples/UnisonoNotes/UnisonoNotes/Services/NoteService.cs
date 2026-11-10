@@ -52,12 +52,14 @@ public class NoteService : INoteService
         return note;
     }
 
+    // Stable ids: Shortcuts and Siri store entity references by id, so seed data must keep the same ids across launches.
     private void Seed()
     {
         var today = DateTime.UtcNow;
         _notes.AddRange([
             new Note
             {
+                Id = "note-standup-monday",
                 Title = "Standup, Monday",
                 CreatedAt = today.AddHours(-2),
                 Body = """
@@ -77,6 +79,7 @@ public class NoteService : INoteService
             },
             new Note
             {
+                Id = "note-grocery-list",
                 Title = "Grocery list",
                 CreatedAt = today.AddDays(-1),
                 Body = """
@@ -88,6 +91,7 @@ public class NoteService : INoteService
             },
             new Note
             {
+                Id = "note-demo-ideas",
                 Title = "Ideas for the demo",
                 CreatedAt = today.AddDays(-2),
                 Body = """
