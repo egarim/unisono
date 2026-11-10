@@ -7,7 +7,9 @@ tools, with descriptions, the same way you would for MCP. Unisono projects those
 "app tool" surface (Swift App Intents on Apple, AppFunctions on Android, App Actions on Windows) and hosts the same
 tools as an MCP server inside the app. One registry, one handler per tool, several front doors.
 
-Status: **M1 on iOS** (generic Swift bridge; per-app Swift is intents, entities and enums only). See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
+Status: **M1 on iOS** (generic Swift bridge; per-app Swift is intents, entities and enums only), two demo apps, and the
+cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks → note updated) verified on the simulator.
+See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
 ## Layout
 

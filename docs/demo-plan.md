@@ -35,15 +35,24 @@ updated with what was created.**
 ### S2. Shortcut chaining between the two apps (no agent)
 *Shows:* Apple's own cross-app mechanism, entities crossing app boundaries, zero code in the Shortcut beyond wiring.
 
-A Shortcut "Note → Tasks":
-1. **Notes: "Extract Action Items"** (parameter: a `Note` entity, picked from the app's `EntityQuery`).
-2. **Repeat with each** item →
-3. **TaskTracker: "Create Task"** (title = item, priority = Medium, category = Work).
-4. **Notes: "Append to Note"** with "Created N tasks in TaskTracker on <date>".
+**Built and verified 2026-11-10 on the iPhone 17 Pro simulator** (shortcut "Note to Tasks", see `docs/images/`):
+1. **Unisono Notes: Extract Action Items** with Note = "Standup, Monday" (picked from the entity query's list).
+2. **Repeat with Each** over the result (Shortcuts wired the input automatically).
+3. inside the loop, **TaskTracker: Create Task** with Title = `Repeat Item`, Priority = Medium, Category = Work.
+4. **Unisono Notes: Append to Note**, Note = "Standup, Monday", Text = "Created tasks in TaskTracker via the Note to
+   Tasks shortcut".
 
-Then open TaskTracker: the tasks are there. Open the note: the footer is there.
+Run: "Found 3 action items in 'Standup, Monday'" → "Created 'Send the Q4 report to finance' with Medium priority in
+Work" (×3) → "Added it to 'Standup, Monday'". Checked over MCP afterwards: `list_tasks {category: work}` on
+TaskTracker lists the three new tasks with the action-item titles; `list_notes {query: Standup}` on Notes shows the
+appended line and a new `updatedAt`. Both intents ran while their apps were in the background, which is why the
+Shortcut path needs no socket.
 
-*Runs on:* iPhone simulator (both apps installed; intents run in the background, no socket needed).
+Editor notes for the demo: a newly added action lands after "End Repeat"; long-press and drag it into the loop. Set
+Priority and Category on Create Task, or the loop prompts for them on every item. "Show When Run" on Create Task
+makes each iteration pause on a result card; switch it off for a smooth run.
+
+*Runs on:* iPhone simulator or device with both apps installed.
 
 ### S3. An agent orchestrating both apps over MCP
 *Shows:* the developer story: agents drive apps through their declared tools; the same tools Siri sees.
@@ -92,6 +101,7 @@ be thrown away in M1, so the demo becomes the vehicle for M1:
 3. **Mac Catalyst target** for both apps (S3). Fallback if the Swift framework will not build for Catalyst in time:
    two simulators.
 4. **Shortcut for S2**, built in the Shortcuts app on the demo device/simulator; screenshots in `docs/`.
+   Done 2026-11-10 (see S2 above).
 5. **Claude Code configuration for S3** (`claude mcp add` for both endpoints) and the prompt script.
 6. **S1.3 in-app chat** if time allows.
 7. **S4 annotations** (`.tool`, `Transferable`, skill bundle) so a device test is a signing step away.
