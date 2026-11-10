@@ -1,0 +1,83 @@
+name: Release to NuGet
+
+# Publishes the Unisono packages with NuGet Trusted Publishing (OIDC): no stored API key.
+# Trigger: push a tag like v0.1.0-preview.1. The tag (without the leading v) becomes the package version.
+# One-time setup is described in docs/RELEASING.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Package version to publish (e.g. 0.1.0-preview.2); defaults to the tag"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  pack-and-publish:
+    # macOS: the App Intents packages target net10.0-ios / net10.0-maccatalyst and need the Apple workloads.
+    runs-on: macos-26
+    environment: release
+    permissions:
+      contents: read
+      id-token: write   # lets the job obtain a GitHub OIDC token for nuget.org
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # SourceLink needs the full history
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install Apple workloads
+        run: dotnet workload install ios maccatalyst
+
+      - name: Resolve version
+        id: ver
+        shell: bash
+        run: |
+          v="${{ github.event.inputs.version }}"
+          if [ -z "$v" ]; then v="${GITHUB_REF_NAME#v}"; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Publishing version $v"
+
+      - name: Pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          for p in src/Unisono.Core/Unisono.Core.csproj \
+                   src/Unisono.Mcp/Unisono.Mcp.csproj \
+                   src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj \
+                   src/Unisono.AppIntents/Unisono.AppIntents.csproj; do
+            dotnet pack "$p" -c Release -o artifacts/nupkg \
+              -p:Version="${{ steps.ver.outputs.version }}" \
+              -p:ContinuousIntegrationBuild=true -p:ValidateXcodeVersion=false
+          done
+          ls -la artifacts/nupkg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/nupkg/*
+
+      # Exchange the OIDC token for a one-hour nuget.org API key; request it right before pushing.
+      - name: NuGet login (Trusted Publishing)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}   # your nuget.org profile name, not an email
+
+      - name: Push
+        shell: bash
+        run: |
+          set -euo pipefail
+          for id in Unisono.Core Unisono.Mcp Unisono.AppIntents.Binding Unisono.AppIntents; do
+            dotnet nuget push "artifacts/nupkg/$id.${{ steps.ver.outputs.version }}.nupkg" \
+              --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
+              --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done

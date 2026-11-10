@@ -69,6 +69,7 @@ What each layer needs from the app:
 | `scripts/mcp-smoke.sh`, `scripts/mcp-call.py` | Drive any Unisono endpoint from the shell: initialize, tools/list, tools/call, session delete. |
 | `scripts/s3-orchestrate.py`, `scripts/s3-agent-demo.sh` | The two-app scenario: scripted, and with Claude Code as the agent. |
 | `scripts/make-banner.py` | Composes the README banner as SVG from the official dotnet-bot and drawn assistant characters. |
+| `.github/workflows/release.yml`, `docs/RELEASING.md` | Tagged releases to nuget.org through Trusted Publishing (OIDC, no stored key). |
 | `scripts/new-intents-xcodeproj.py` | Generates an app's Swift intents Xcode project from its `Sources/` folder, referencing the shared bridge file; the shape the M2 code generator will drive. |
 
 ## Build and run (iOS simulator)
