@@ -81,3 +81,7 @@ scripts/mcp-smoke.sh http://127.0.0.1:8788/mcp add '{"a":2,"b":3}'
 
 `samples/TaskTracker` started from [Redth/Maui.Apple.PlatformFeature.Samples](https://github.com/Redth/Maui.Apple.PlatformFeature.Samples) (MIT).
 Built on the [MCP C# SDK](https://github.com/modelcontextprotocol/csharp-sdk).
+
+## License
+
+MIT, see `LICENSE`. The TaskTracker sample keeps its original MIT notice in `samples/TaskTracker/LICENSE.redth`.
