@@ -22,13 +22,16 @@
           Condition="'@(XcodeProject->Count())' != '0'">
     <PropertyGroup>
       <_UnisonoMetadataDir>$(IntermediateOutputPath)xcode/Metadata.appintents</_UnisonoMetadataDir>
+      <!-- iOS bundles are flat; Mac Catalyst (and macOS) bundles keep resources under Contents/Resources. -->
+      <_UnisonoBundleResources>$(AppBundleDir)</_UnisonoBundleResources>
+      <_UnisonoBundleResources Condition="'$(TargetPlatformIdentifier)' == 'maccatalyst' Or '$(TargetPlatformIdentifier)' == 'macos'">$(AppBundleDir)/Contents/Resources</_UnisonoBundleResources>
     </PropertyGroup>
     <ItemGroup>
       <_UnisonoMetadataFiles Include="$(_UnisonoMetadataDir)/**/*" Condition="Exists('$(_UnisonoMetadataDir)')" />
     </ItemGroup>
     <!-- Keep the explicit slash: AppBundleDir may have no trailing separator, and metadata outside the bundle fails silently. -->
-    <Copy SourceFiles="@(_UnisonoMetadataFiles)" DestinationFolder="$(AppBundleDir)/Metadata.appintents/%(RecursiveDir)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
-    <Message Importance="high" Text="Unisono: copied Metadata.appintents into $(AppBundleDir)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
+    <Copy SourceFiles="@(_UnisonoMetadataFiles)" DestinationFolder="$(_UnisonoBundleResources)/Metadata.appintents/%(RecursiveDir)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
+    <Message Importance="high" Text="Unisono: copied Metadata.appintents into $(_UnisonoBundleResources)" Condition="'@(_UnisonoMetadataFiles)' != ''" />
     <Warning Text="Unisono: no Metadata.appintents was extracted; Siri and Shortcuts will not see this app's intents." Condition="'@(_UnisonoMetadataFiles)' == ''" />
   </Target>
 </Project>

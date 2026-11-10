@@ -25,6 +25,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ITaskService, TaskService>();
 #if IOS
 		builder.Services.AddSingleton<IIntentDonationService, Platforms.iOS.IntentDonationService>();
+#else
+		builder.Services.AddSingleton<IIntentDonationService, NoOpIntentDonationService>();
 #endif
 
 		// Unisono: the tool class, the registry built from it, and the in-app MCP server.

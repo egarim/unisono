@@ -9,6 +9,9 @@
         <!-- When App Sandbox is enabled, this value is required to open outgoing network connections. -->
         <key>com.apple.security.network.client</key>
         <true/>
+        <!-- Unisono: the in-app MCP server accepts connections on 127.0.0.1 -->
+        <key>com.apple.security.network.server</key>
+        <true/>
     </dict>
 </plist>
 

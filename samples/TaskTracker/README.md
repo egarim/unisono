@@ -35,3 +35,9 @@ then:
   profile. The simulator runs intents through the Shortcuts app.
 - On iPhone the MCP endpoint answers only while the app is in the foreground; intents also run in the background.
 - Donations (`IntentDonationManager`) are paused in this version and return in M2 with generated Swift.
+
+## Mac Catalyst
+
+The project also targets `net10.0-maccatalyst`; the Swift intents framework is built for Catalyst by the same generated
+Xcode project (`SUPPORTS_MACCATALYST`). The Catalyst entitlements include `com.apple.security.network.server` so the
+sandboxed app can accept MCP connections on 127.0.0.1, and `Metadata.appintents` lands in `Contents/Resources`.

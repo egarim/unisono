@@ -26,3 +26,9 @@ scripts/mcp-smoke.sh http://127.0.0.1:8789/mcp list_notes '{}'
 
 In the Shortcuts app, "Extract Action Items" asks for a note (the picker is served by the entity query over the
 bridge) and returns one text per open item, which a Shortcut can feed into TaskTracker's "Create Task".
+
+## Mac Catalyst
+
+The project also targets `net10.0-maccatalyst`; the Swift intents framework is built for Catalyst by the same generated
+Xcode project (`SUPPORTS_MACCATALYST`). The Catalyst entitlements include `com.apple.security.network.server` so the
+sandboxed app can accept MCP connections on 127.0.0.1, and `Metadata.appintents` lands in `Contents/Resources`.

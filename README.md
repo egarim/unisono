@@ -22,7 +22,8 @@ See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-
 | `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. The app project builds its own Swift framework through an `XcodeProject` item. |
 | `samples/UnisonoNotes` | Second demo app: notes whose `- [ ]` lines are action items; five tools, a `Note` entity, MCP on port 8789. With TaskTracker it tells the cross-app story (note → action items → tasks → note updated). Its Xcode project is generated. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
-| `scripts/mcp-smoke.sh` | Drives any Unisono endpoint with curl: initialize, tools/list, tools/call, session delete. |
+| `scripts/mcp-smoke.sh`, `scripts/mcp-call.py` | Drive any Unisono endpoint from the shell: initialize, tools/list, tools/call, session delete. |
+| `scripts/s3-orchestrate.py`, `scripts/s3-agent-demo.sh` | The two-app scenario: scripted, and with Claude Code as the agent. |
 | `scripts/new-intents-xcodeproj.py` | Generates an app's Swift intents Xcode project from its `Sources/` folder, referencing the shared bridge file; the shape the M2 code generator will drive. |
 
 ## Build and run (iOS simulator)
@@ -54,6 +55,19 @@ On macOS and Mac Catalyst the endpoint stays up as long as the app runs.
 
 Verified 2026-11-10 on an iPhone 17 Pro simulator: a task created over MCP showed up in the Shortcuts "List Tasks"
 intent and in the UI, and a task created through the "Create Task" intent came back from `search_tasks` over MCP.
+
+## Mac Catalyst (both apps side by side)
+
+```bash
+dotnet build samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj -f net10.0-maccatalyst -r maccatalyst-arm64 -p:ValidateXcodeVersion=false
+dotnet build samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj -f net10.0-maccatalyst -r maccatalyst-arm64 -p:ValidateXcodeVersion=false
+open samples/TaskTracker/MauiAppIntentsSample/bin/Debug/net10.0-maccatalyst/maccatalyst-arm64/TaskTracker.app
+open "samples/UnisonoNotes/UnisonoNotes/bin/Debug/net10.0-maccatalyst/maccatalyst-arm64/Unisono Notes.app"
+```
+
+On the Mac both MCP endpoints stay up while the apps run. `scripts/s3-orchestrate.py` drives the note → tasks → note
+flow across both without a model; `scripts/s3-agent-demo.sh` does it with Claude Code (`claude mcp add` both endpoints
+first). Stop the simulator copies of the apps first: they hold the same loopback ports.
 
 ## Desktop smoke test (no phone needed)
 
