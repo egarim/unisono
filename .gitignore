@@ -27,3 +27,6 @@ appsettings.*.local.json
 *.jks
 local.properties
 *.secret
+
+# local package output
+artifacts/

@@ -15,5 +15,6 @@
   <ItemGroup>
     <None Include="build\Unisono.AppIntents.targets" Pack="true" PackagePath="build" />
     <None Include="native\UnisonoBridge.swift" Pack="true" PackagePath="native" />
+    <None Include="..\..\scripts\new-intents-xcodeproj.py" Pack="true" PackagePath="tools" Visible="false" />
   </ItemGroup>
 </Project>

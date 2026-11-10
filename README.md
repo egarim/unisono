@@ -16,6 +16,20 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
+## Install
+
+Packages on nuget.org (prerelease while the API settles):
+
+```bash
+dotnet add package Unisono.Core --prerelease         # the tool registry, any .NET 10 app
+dotnet add package Unisono.Mcp --prerelease          # in-app MCP server (Streamable HTTP, no ASP.NET Core)
+dotnet add package Unisono.AppIntents --prerelease   # Siri and Shortcuts bridge for net10.0-ios / net10.0-maccatalyst
+```
+
+`Unisono.AppIntents` pulls in `Unisono.AppIntents.Binding` and ships `native/UnisonoBridge.swift`, the
+`build/Unisono.AppIntents.targets` glue and `tools/new-intents-xcodeproj.py`; see its package README for the three
+steps an app needs.
+
 ## Works with
 
 Unisono is not tied to MAUI. The core packages are plain .NET, and the platform packages hook into the operating

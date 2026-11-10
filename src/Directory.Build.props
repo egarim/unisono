@@ -1,0 +1,28 @@
+<Project>
+  <!-- Shared NuGet metadata for every Unisono package. Bump Version here for a release. -->
+  <PropertyGroup>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Jose Ojeda</Authors>
+    <Company>Jose Ojeda</Company>
+    <Copyright>Copyright (c) 2026 Jose Ojeda</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/egarim/unisono</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/egarim/unisono</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>maui;ios;maccatalyst;appintents;siri;shortcuts;mcp;agents;ai;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+    <None Include="$(MSBuildThisFileDirectory)..\docs\images\unisono-icon.png" Pack="true" PackagePath="\icon.png" Visible="false" />
+  </ItemGroup>
+</Project>
