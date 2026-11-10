@@ -8,5 +8,6 @@
   <Folder Name="/samples/">
     <Project Path="samples/ConsoleHost/ConsoleHost.csproj" />
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
+    <Project Path="samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj" />
   </Folder>
 </Solution>

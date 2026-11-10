@@ -18,8 +18,10 @@ Status: **M1 on iOS** (generic Swift bridge; per-app Swift is intents, entities 
 | `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
 | `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
 | `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. The app project builds its own Swift framework through an `XcodeProject` item. |
+| `samples/UnisonoNotes` | Second demo app: notes whose `- [ ]` lines are action items; five tools, a `Note` entity, MCP on port 8789. With TaskTracker it tells the cross-app story (note → action items → tasks → note updated). Its Xcode project is generated. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
 | `scripts/mcp-smoke.sh` | Drives any Unisono endpoint with curl: initialize, tools/list, tools/call, session delete. |
+| `scripts/new-intents-xcodeproj.py` | Generates an app's Swift intents Xcode project from its `Sources/` folder, referencing the shared bridge file; the shape the M2 code generator will drive. |
 
 ## Build and run (iOS simulator)
 
