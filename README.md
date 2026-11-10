@@ -4,6 +4,13 @@
   <img src="docs/images/unisono-choir.svg" alt="The .NET bot on a podium conducting a choir of AI assistants singing in unison" width="820">
 </p>
 
+<p align="center">
+  <a href="https://www.nuget.org/packages/Unisono.Core"><img src="https://img.shields.io/nuget/vpre/Unisono.Core?label=Unisono.Core" alt="Unisono.Core on NuGet"></a>
+  <a href="https://www.nuget.org/packages/Unisono.Mcp"><img src="https://img.shields.io/nuget/vpre/Unisono.Mcp?label=Unisono.Mcp" alt="Unisono.Mcp on NuGet"></a>
+  <a href="https://www.nuget.org/packages/Unisono.AppIntents"><img src="https://img.shields.io/nuget/vpre/Unisono.AppIntents?label=Unisono.AppIntents" alt="Unisono.AppIntents on NuGet"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/egarim/unisono" alt="MIT license"></a>
+</p>
+
 *Declare an app action once in C#. Siri on Apple, Gemini on Android, Copilot on Windows and any MCP client can call it, al unísono.*
 
 Unisono is a .NET library plus a build-time generator for MAUI and .NET apps. You annotate ordinary C# methods as
