@@ -150,6 +150,6 @@ own pair.
 **Elsewhere.** Alexa+ is an MCP client to a hosted server, so the same registry in a server build covers it. The tool
 definitions do not change; only the hosting does.
 
-The repository will be public soon, with the TaskTracker sample, the generic bridge, the in-app MCP host and a smoke
-script that drives any Unisono endpoint from a shell. If you build .NET apps and want them to answer when an assistant
+The repository is public at https://github.com/egarim/unisono, with the TaskTracker and Notes samples, the generic
+bridge, the in-app MCP host and a smoke script that drives any Unisono endpoint from a shell. If you build .NET apps and want them to answer when an assistant
 calls, this is for you. Tell me which front door you need first.
