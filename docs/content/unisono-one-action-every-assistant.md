@@ -113,6 +113,18 @@ Two honest limits, both platform facts rather than Unisono's:
 *Unísono* is Spanish for "in unison". Siri, Gemini, Copilot and the agents all call the same action, al unísono. The
 identifier is the plain ASCII `Unisono`; in prose it keeps its accent.
 
+## Install
+
+The packages are on NuGet as a prerelease while the API settles:
+
+```bash
+dotnet add package Unisono.Core --prerelease         # the tool registry, any .NET 10 app
+dotnet add package Unisono.Mcp --prerelease          # the in-app MCP server
+dotnet add package Unisono.AppIntents --prerelease   # the Siri and Shortcuts bridge, iOS and Mac Catalyst
+```
+
+`Unisono.AppIntents` brings the static binding with it; nobody installs that one directly.
+
 ## What it is not
 
 It is not a Swift or Kotlin interop layer, and it does not try to make Siri or Gemini run C#. The native layers stay
