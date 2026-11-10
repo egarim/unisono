@@ -12,6 +12,34 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
+## Works with
+
+Unisono is not tied to MAUI. The core packages are plain .NET, and the platform packages hook into the operating
+system, not into a UI toolkit, so any .NET app that targets the platform can use them.
+
+| App framework | iOS and Mac Catalyst (App Intents + MCP) | Android (AppFunctions + MCP, planned) | Windows (App Actions + MCP registry, planned) |
+|---|---|---|---|
+| **.NET MAUI** (XAML, Blazor Hybrid) | **Verified**: both sample apps | Planned | Planned |
+| **Uno Platform** | Same `net10.0-ios` / `net10.0-maccatalyst` targets, not yet tested | Planned | Planned |
+| **Avalonia** | Same targets, not yet tested | Planned | Planned |
+| **.NET for iOS / Mac Catalyst** (UIKit, no cross-platform UI) | Same targets, not yet tested | n/a | n/a |
+| **.NET for Android** (Android SDK bindings) | n/a | Planned, first in line (the SDK already binds `AppFunctionService`) | n/a |
+| **WinUI 3, WPF, Windows Forms** (MSIX packaged) | n/a | n/a | Planned |
+| **Console, ASP.NET Core, any .NET host** | `Unisono.Core` + `Unisono.Mcp` run anywhere .NET 10 runs (see `samples/ConsoleHost`) | | |
+
+What each layer needs from the app:
+
+- `Unisono.Core` and `Unisono.Mcp` need nothing platform-specific: a `netstandard2.0`/`net10.0` dependency, a registry
+  built from your tool classes, and a call to start the MCP host.
+- `Unisono.AppIntents` needs an app that builds for `net10.0-ios` or `net10.0-maccatalyst`, one `<XcodeProject>` item
+  for the Swift intents framework, and a call to `UnisonoAppIntents.Attach(registry)` at launch. It does not touch
+  the UI layer, so MAUI, Uno, Avalonia and plain UIKit apps wire it the same way.
+- The Android and Windows packages will follow the same pattern: a C# adapter the app registers at startup, no
+  dependency on the UI toolkit.
+
+If you try Unisono with a framework marked "not yet tested", a short report (what worked, what did not) is welcome as
+an issue.
+
 ## Layout
 
 | Path | What |
