@@ -129,6 +129,7 @@ The packages are on NuGet as a prerelease while the API settles:
 dotnet add package Unisono.Core --prerelease         # the tool registry, any .NET 10 app
 dotnet add package Unisono.Mcp --prerelease          # the in-app MCP server
 dotnet add package Unisono.AppIntents --prerelease   # the Siri and Shortcuts bridge, iOS and Mac Catalyst
+dotnet add package Unisono.AppFunctions --prerelease # Android AppFunctions, from 0.1.0-preview.2
 ```
 
 `Unisono.AppIntents` brings the static binding with it; nobody installs that one directly.
