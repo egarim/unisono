@@ -23,6 +23,18 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
+## Watch
+
+The implementation, start to finish (5:13):
+
+<a href="https://youtu.be/D4R3yVb4BN8"><img src="https://img.youtube.com/vi/D4R3yVb4BN8/hqdefault.jpg" alt="Unisono: one C# method, every assistant. The implementation, start to finish" width="480"></a>
+
+Short versions:
+
+| [<img src="https://img.youtube.com/vi/n9hDwpLQEjY/hqdefault.jpg" alt="Unisono teaser" width="180">](https://youtube.com/shorts/n9hDwpLQEjY) | [<img src="https://img.youtube.com/vi/j3_bj6egoa4/hqdefault.jpg" alt="Declare an app action once in C#" width="180">](https://youtube.com/shorts/j3_bj6egoa4) | [<img src="https://img.youtube.com/vi/S8vMX_PXACg/hqdefault.jpg" alt="The proof: one C# method answers Siri and an MCP agent" width="180">](https://youtube.com/shorts/S8vMX_PXACg) | [<img src="https://img.youtube.com/vi/Fqzu4tACAtw/hqdefault.jpg" alt="What comes next" width="180">](https://youtube.com/shorts/Fqzu4tACAtw) |
+|:---:|:---:|:---:|:---:|
+| [Teaser](https://youtube.com/shorts/n9hDwpLQEjY) (0:18) | [One action, every assistant](https://youtube.com/shorts/j3_bj6egoa4) (0:48) | [The proof](https://youtube.com/shorts/S8vMX_PXACg) (0:59) | [What comes next](https://youtube.com/shorts/Fqzu4tACAtw) (0:59) |
+
 ## Install
 
 Packages on nuget.org (prerelease while the API settles):

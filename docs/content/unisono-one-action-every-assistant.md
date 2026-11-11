@@ -113,6 +113,14 @@ Two honest limits, both platform facts rather than Unisono's:
 *Unísono* is Spanish for "in unison". Siri, Gemini, Copilot and the agents all call the same action, al unísono. The
 identifier is the plain ASCII `Unisono`; in prose it keeps its accent.
 
+## Watch
+
+- [The implementation, start to finish](https://youtu.be/D4R3yVb4BN8) (5:13)
+- [Teaser](https://youtube.com/shorts/n9hDwpLQEjY) (0:18)
+- [One action, every assistant](https://youtube.com/shorts/j3_bj6egoa4) (0:48)
+- [The proof: one C# method answers Siri and an MCP agent](https://youtube.com/shorts/S8vMX_PXACg) (0:59)
+- [What comes next](https://youtube.com/shorts/Fqzu4tACAtw) (0:59)
+
 ## Install
 
 The packages are on NuGet as a prerelease while the API settles:
