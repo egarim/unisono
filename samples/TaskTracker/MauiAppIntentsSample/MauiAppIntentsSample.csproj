@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>MauiAppIntentsSample</RootNamespace>
@@ -31,6 +31,7 @@
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">17.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">17.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
@@ -59,23 +60,27 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 	</ItemGroup>
 
-	<!-- Unisono: tool registry, in-app MCP server, and the App Intents bridge -->
+	<!-- Unisono: the tool registry and the in-app MCP server on every platform; the App Intents bridge on Apple. -->
+	<PropertyGroup>
+		<_UnisonoPlatform>$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))</_UnisonoPlatform>
+		<_UnisonoApple Condition="'$(_UnisonoPlatform)' == 'ios' Or '$(_UnisonoPlatform)' == 'maccatalyst'">true</_UnisonoApple>
+	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\Unisono.Core\Unisono.Core.csproj" />
 		<ProjectReference Include="..\..\..\src\Unisono.Mcp\Unisono.Mcp.csproj" />
-		<ProjectReference Include="..\..\..\src\Unisono.AppIntents\Unisono.AppIntents.csproj" />
+		<ProjectReference Include="..\..\..\src\Unisono.AppIntents\Unisono.AppIntents.csproj" Condition="'$(_UnisonoApple)' == 'true'" />
 	</ItemGroup>
 
-	<!-- The app's own Swift intents framework (intents, entities, enums + the copied UnisonoBridge.swift).
+	<!-- Apple only: the app's own Swift intents framework (intents, entities, enums + the copied UnisonoBridge.swift).
 	     The .NET SDK builds it with xcodebuild and links the resulting xcframework; Unisono's targets copy
 	     Metadata.appintents into the bundle. No per-app binding project is needed. -->
-	<ItemGroup>
+	<ItemGroup Condition="'$(_UnisonoApple)' == 'true'">
 		<XcodeProject Include="..\MauiAppIntentsSample.AppIntents\MauiAppIntentsSampleIntents.xcodeproj">
 			<SchemeName>MauiAppIntentsSampleIntents</SchemeName>
 			<ForceLoad>true</ForceLoad>
 			<SmartLink>false</SmartLink>
 		</XcodeProject>
 	</ItemGroup>
-	<Import Project="..\..\..\src\Unisono.AppIntents\build\Unisono.AppIntents.targets" />
+	<Import Project="..\..\..\src\Unisono.AppIntents\build\Unisono.AppIntents.targets" Condition="'$(_UnisonoApple)' == 'true'" />
 
 </Project>

@@ -43,3 +43,19 @@ then:
 The project also targets `net10.0-maccatalyst`; the Swift intents framework is built for Catalyst by the same generated
 Xcode project (`SUPPORTS_MACCATALYST`). The Catalyst entitlements include `com.apple.security.network.server` so the
 sandboxed app can accept MCP connections on 127.0.0.1, and `Metadata.appintents` lands in `Contents/Resources`.
+
+## Android
+
+The project also targets `net10.0-android`. There is no App Intents bridge there (the Apple-only project reference,
+the Xcode project and the Unisono.AppIntents targets are conditioned on iOS and Catalyst), but the same registry and
+the same `UnisonoMcpHttpHost` run on the phone: `Platforms/Android/MainApplication.cs` starts the server in
+`OnCreate`, on the loopback address like everywhere else. From a Mac with a phone or emulator attached:
+
+```bash
+dotnet build -f net10.0-android -t:Install     # Debug uses fast deployment: deploy with the Install target, not adb install
+adb forward tcp:8787 tcp:8787
+python3 ../../scripts/mcp-call.py http://127.0.0.1:8787/mcp list call create_task '{"title":"From the Mac"}'
+```
+
+The MCP calls reach the app only while it is open, as on iPhone. Verified on a Pixel 7 (Android 17) and on the
+API 36 emulator path described in `docs/demo-plan.md`.
