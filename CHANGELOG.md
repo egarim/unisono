@@ -2,7 +2,7 @@
 
 All notable changes to the Unisono packages. Versions follow SemVer; previews carry a `-preview.N` suffix.
 
-## 0.1.0-preview.2 (unreleased)
+## 0.1.0-preview.2 (2026-11-12)
 
 - New `Unisono.AppFunctions` (`net10.0-android`): `UnisonoAppFunctionService`, an `AppFunctionService` that
   dispatches Android AppFunctions (the surface Gemini and `cmd app_function` call) to the same registry;
