@@ -18,7 +18,8 @@ permissions:
 
 jobs:
   pack-and-publish:
-    # macOS: the App Intents packages target net10.0-ios / net10.0-maccatalyst and need the Apple workloads.
+    # macOS: the App Intents packages target net10.0-ios / net10.0-maccatalyst and need the Apple workloads;
+    # Unisono.AppFunctions targets net10.0-android and needs the android workload (the runner has a JDK).
     runs-on: macos-26
     environment: release
     permissions:
@@ -35,7 +36,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Install Apple workloads
-        run: dotnet workload install ios maccatalyst
+        run: dotnet workload install ios maccatalyst android
 
       - name: Resolve version
         id: ver
@@ -53,7 +54,8 @@ jobs:
           for p in src/Unisono.Core/Unisono.Core.csproj \
                    src/Unisono.Mcp/Unisono.Mcp.csproj \
                    src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj \
-                   src/Unisono.AppIntents/Unisono.AppIntents.csproj; do
+                   src/Unisono.AppIntents/Unisono.AppIntents.csproj \
+                   src/Unisono.AppFunctions/Unisono.AppFunctions.csproj; do
             dotnet pack "$p" -c Release -o artifacts/nupkg \
               -p:Version="${{ steps.ver.outputs.version }}" \
               -p:ContinuousIntegrationBuild=true -p:ValidateXcodeVersion=false
@@ -76,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for id in Unisono.Core Unisono.Mcp Unisono.AppIntents.Binding Unisono.AppIntents; do
+          for id in Unisono.Core Unisono.Mcp Unisono.AppIntents.Binding Unisono.AppIntents Unisono.AppFunctions; do
             dotnet nuget push "artifacts/nupkg/$id.${{ steps.ver.outputs.version }}.nupkg" \
               --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
               --source https://api.nuget.org/v3/index.json --skip-duplicate

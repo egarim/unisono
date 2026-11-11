@@ -82,5 +82,21 @@ adb forward tcp:8787 tcp:8787
 python3 ../../scripts/mcp-call.py http://127.0.0.1:8787/mcp list call create_task '{"title":"From the Mac"}'
 ```
 
-The MCP calls reach the app only while it is open, as on iPhone. Verified on a Pixel 7 (Android 17) and on the
-API 36 emulator path described in `docs/demo-plan.md`.
+The MCP calls reach the app only while it is open, as on iPhone. Verified on a Pixel 7 (Android 17).
+
+**AppFunctions (the Gemini front door).** The same registry is exposed as Android AppFunctions through
+`Platforms/Android/TaskTrackerAppFunctionService.cs` (a `UnisonoAppFunctionService`), the `<service>` entry in
+`Platforms/Android/AndroidManifest.xml` and `Platforms/Android/Assets/app_functions.xml`, which lists one function per
+tool and is written by `scripts/new-appfunctions-xml.py` from the running app. The platform tools prove it on an
+API 36+ device (the API 36 emulator image has no `cmd app_function`; a Pixel 7 on Android 17 does):
+
+```bash
+adb shell cmd app_function list-app-functions --package com.companyname.mauiappintentssample
+adb shell "cmd app_function execute-app-function --package com.companyname.mauiappintentssample --function create_task --parameters '{\"title\":\"Buy oat milk\",\"priority\":\"high\"}'"
+adb shell "cmd app_function execute-app-function --package com.companyname.mauiappintentssample --function complete_task --parameters '{\"id\":\"task-groceries\"}'"
+```
+
+Quote the whole command for the phone's shell as above, or JSON values with spaces lose their quotes. The result
+comes back under `androidAppfunctionsReturnValue` as typed properties (a nested document for a task, arrays for
+lists); the shell's converter treats a top-level `id` key as the document id, which Unisono hands to the tool's `id`
+parameter. Regenerate the XML after adding tools: `python3 ../../scripts/new-appfunctions-xml.py http://127.0.0.1:8787/mcp Platforms/Android/Assets/app_functions.xml`.

@@ -37,7 +37,7 @@ one-hour key from nuget.org over OpenID Connect, so no API key is stored anywher
    git push origin v0.1.0-preview.1
    ```
 
-3. Watch the **Release to NuGet** run. It packs the four packages with the tag's version, uploads them as a workflow
+3. Watch the **Release to NuGet** run. It packs the five packages with the tag's version, uploads them as a workflow
    artifact, logs in with OIDC and pushes `.nupkg` + `.snupkg`. Indexing on nuget.org takes a few minutes.
 
 `workflow_dispatch` runs the same job by hand with an explicit version (for example to republish after a failed push):
@@ -56,7 +56,8 @@ unzip -l artifacts/nupkg/Unisono.Core.*.nupkg
 ## Notes
 
 - The App Intents packages target `net10.0-ios` and `net10.0-maccatalyst`, so the job runs on a macOS runner and
-  installs the `ios` and `maccatalyst` workloads. `ValidateXcodeVersion=false` tolerates a runner Xcode that is a
+  installs the `ios` and `maccatalyst` workloads; `Unisono.AppFunctions` targets `net10.0-android` and needs the
+  `android` workload. `ValidateXcodeVersion=false` tolerates a runner Xcode that is a
   minor version away from the workload's expectation.
 - The metadata follows Microsoft's package authoring guidance: license expression (MIT), README, 128 px icon,
   project and repository URLs with SourceLink, tags, release notes, SemVer prerelease suffixes.

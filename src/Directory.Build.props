@@ -1,7 +1,7 @@
 <Project>
   <!-- Shared NuGet metadata for every Unisono package. Bump Version here for a release. -->
   <PropertyGroup>
-    <Version>0.1.0-preview.1</Version>
+    <Version>0.1.0-preview.2</Version>
     <Authors>Jose Ojeda</Authors>
     <Company>Jose Ojeda</Company>
     <Copyright>Copyright (c) 2026 Jose Ojeda</Copyright>
