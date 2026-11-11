@@ -28,5 +28,19 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<!-- Siri hears "task tracker" as two words; these are the spoken names it may match to this app. -->
+	<key>CFBundleSpokenName</key>
+	<string>Task Tracker</string>
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Task Tracker</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Tasks</string>
+		</dict>
+	</array>
 </dict>
 </plist>

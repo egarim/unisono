@@ -2,11 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.security.application-groups</key>
-	<array>
-		<string>group.com.companyname.mauiappintentssample</string>
-	</array>
-	<key>com.apple.developer.siri</key>
-	<true/>
+	<!-- App Intents and App Shortcuts need no entitlement; keep this empty so a wildcard development profile can sign
+	     device builds. (com.apple.developer.siri is a SiriKit key and would require a profile with the Siri capability.) -->
 </dict>
 </plist>

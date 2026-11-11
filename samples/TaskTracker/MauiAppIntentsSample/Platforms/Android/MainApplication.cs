@@ -1,5 +1,7 @@
 using Android.App;
 using Android.Runtime;
+using Unisono;
+using Unisono.AppFunctions;
 using Unisono.Mcp;
 
 namespace MauiAppIntentsSample;
@@ -18,9 +20,22 @@ public class MainApplication : MauiApplication
 	{
 		base.OnCreate();
 
-		// One registry, one more front door: the in-app MCP server on the phone's loopback.
-		// From a Mac: `adb forward tcp:8787 tcp:8787`, then talk to http://127.0.0.1:8787/mcp.
+		// One registry, two front doors on Android: AppFunctions for Gemini and the platform tools, and the in-app
+		// MCP server on the phone's loopback (from a Mac: `adb forward tcp:8787 tcp:8787`, then http://127.0.0.1:8787/mcp).
+		AttachAppFunctions();
 		StartMcpServer();
+	}
+
+	private static void AttachAppFunctions()
+	{
+		var registry = IPlatformApplication.Current?.Services.GetService<ToolRegistry>();
+		if (registry is null)
+		{
+			Android.Util.Log.Warn("Unisono", "ToolRegistry not found in DI container; AppFunctions not attached.");
+			return;
+		}
+		UnisonoAppFunctions.Attach(registry);
+		Android.Util.Log.Info("Unisono", $"AppFunctions attached. Tools: {string.Join(", ", registry.Names)}");
 	}
 
 	private static void StartMcpServer()

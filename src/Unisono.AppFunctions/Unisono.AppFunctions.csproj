@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>24.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Unisono.AppFunctions</RootNamespace>
+    <Description>Unisono on Android: exposes the tools in a ToolRegistry as Android AppFunctions (the surface Gemini and other assistants call) through an AppFunctionService over the same C# handlers that serve MCP.</Description>
+    <PackageTags>$(PackageTags);android;appfunctions;gemini</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Unisono.Core\Unisono.Core.csproj" />
+  </ItemGroup>
+
+</Project>

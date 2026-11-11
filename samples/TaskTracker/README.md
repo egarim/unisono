@@ -31,12 +31,31 @@ then:
 
 - Intents are discovered from `Metadata.appintents` inside the app bundle, produced by Xcode when the Swift framework
   builds. Unisono's targets copy it; if it is missing, intents fail silently.
-- Siri voice needs a physical device, the `com.apple.developer.siri` entitlement and a non-wildcard provisioning
-  profile. The simulator runs intents through the Shortcuts app.
+- Siri by voice needs a physical device; the simulator runs intents through the Shortcuts app. No Siri entitlement
+  is needed for App Intents (that key belongs to SiriKit) and a wildcard development profile is enough: see "Real
+  iPhone" below.
 - On iPhone the MCP endpoint answers only while the app is in the foreground; intents also run in the background.
 - Donations (`IntentDonationManager`) are paused in this version and return in M2 with generated Swift.
 - Shortcuts stores entity references by id: keep ids stable across launches (the seed data does) or stored references
   go stale. Required enum parameters need `default:` values if an intent should be runnable from an App Shortcut tile.
+
+## Real iPhone
+
+Build for the device with the development identity and profile on the Mac (a team wildcard profile works), then
+install and launch once with `devicectl`:
+
+```bash
+dotnet build -f net10.0-ios -r ios-arm64 -p:ValidateXcodeVersion=false \
+  -p:CodesignKey="Apple Development: <name> (<id>)" -p:CodesignProvision=<profile uuid>
+xcrun devicectl device install app --device <udid> bin/Debug/net10.0-ios/ios-arm64/MauiAppIntentsSample.app
+xcrun devicectl device process launch --device <udid> com.companyname.mauiappintentssample
+```
+
+Verified on an iPhone 15 Pro Max (iOS 26.7): the six App Shortcuts appear in the Shortcuts app after the first
+launch. Siri matches the app by its spoken name, so `Info.plist` carries `CFBundleSpokenName` and
+`INAlternativeAppNames` ("Task Tracker", "Tasks"); with only the one-word display name Siri answered "I don't see an
+app for that". When only `Info.plist` changes, delete `obj/.../AppManifest.plist` before rebuilding, or the .NET
+build keeps the old manifest.
 
 ## Mac Catalyst
 

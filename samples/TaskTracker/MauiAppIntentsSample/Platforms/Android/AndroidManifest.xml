@@ -1,6 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
+	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true">
+		<!-- Unisono AppFunctions: the service the system binds to run this app's functions (Gemini, `cmd app_function`).
+		     Declared in full here; the [Service(Name)] attribute on TaskTrackerAppFunctionService only fixes the Java
+		     class name. The property names the XML asset (Platforms/Android/Assets/app_functions.xml) that lists the functions. -->
+		<service android:name="com.unisono.samples.tasktracker.TaskTrackerAppFunctionService"
+		         android:exported="true"
+		         android:permission="android.permission.BIND_APP_FUNCTION_SERVICE">
+			<intent-filter>
+				<action android:name="android.app.appfunctions.AppFunctionService" />
+			</intent-filter>
+			<property android:name="android.app.appfunctions" android:value="app_functions.xml" />
+		</service>
+	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 </manifest>
