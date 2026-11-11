@@ -12,7 +12,7 @@
     <function_id>get_task</function_id>
     <enabled_by_default>true</enabled_by_default>
   </appfunction>
-  <!-- Lists tasks, newest first, optionally filtered by category and priority. Completed tasks are hidden unless showCompleted is true. Parameters: category, priority, showCompleted -->
+  <!-- Lists tasks, newest first, optionally filtered by category, priority and due window. Completed tasks are hidden unless showCompleted is true. Parameters: category, priority, showCompleted, due -->
   <appfunction>
     <function_id>list_tasks</function_id>
     <enabled_by_default>true</enabled_by_default>
@@ -30,6 +30,16 @@
   <!-- Sets or changes the due date of a task. Returns false if the task does not exist. Parameters: id, dueDate -->
   <appfunction>
     <function_id>set_due_date</function_id>
+    <enabled_by_default>true</enabled_by_default>
+  </appfunction>
+  <!-- Deletes a task permanently. Returns false if the task does not exist. Parameters: id -->
+  <appfunction>
+    <function_id>delete_task</function_id>
+    <enabled_by_default>true</enabled_by_default>
+  </appfunction>
+  <!-- Deletes every completed task and returns how many were removed. Parameters: none -->
+  <appfunction>
+    <function_id>delete_completed_tasks</function_id>
     <enabled_by_default>true</enabled_by_default>
   </appfunction>
 </appfunctions>

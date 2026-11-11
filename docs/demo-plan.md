@@ -9,7 +9,7 @@ assistant or agent can reach an app's actions, and how actions flow between two 
 |---|---|---|
 | Role in the story | Where information arrives (meeting notes, standups) | Where work gets tracked |
 | Entities | `Note` (id, title, body, created) | `Task` (id, title, priority, category, due date…) |
-| Tools (= intents = MCP tools) | `create_note`, `list_notes(query?)`, `get_note(id)`, `append_to_note(id, text)`, `extract_action_items(id)` → `[string]` | `create_task`, `get_task`, `list_tasks`, `search_tasks`, `complete_task`, `set_due_date` |
+| Tools (= intents = MCP tools) | `create_note`, `list_notes(query?)`, `get_note(id)`, `append_to_note(id, text)`, `extract_action_items(id)` → `[string]` | `create_task`, `get_task`, `list_tasks(category?, priority?, showCompleted?, due?)`, `search_tasks`, `complete_task`, `set_due_date`, `delete_task`, `delete_completed_tasks` |
 | MCP endpoint (Mac / simulator) | `http://127.0.0.1:8789/mcp` | `http://127.0.0.1:8787/mcp` |
 
 `extract_action_items` is deterministic (lines starting with `- [ ]`, `TODO:` or `Action:`), so the Shortcut-only

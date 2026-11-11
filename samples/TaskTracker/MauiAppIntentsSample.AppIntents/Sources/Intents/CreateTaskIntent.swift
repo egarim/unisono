@@ -15,8 +15,8 @@ struct CreateTaskIntent: AppIntent, PredictableIntent {
     @Parameter(title: "Category", default: .personal)
     var category: TaskCategory
 
-    @Parameter(title: "Due Date")
-    var dueDate: Date?
+    @Parameter(title: "Due Date", requestValueDialog: "When is it due?")
+    var dueDate: Date
 
     @Parameter(title: "Estimated Minutes", inclusiveRange: (1, 480))
     var estimatedMinutes: Int?
@@ -45,7 +45,7 @@ struct CreateTaskIntent: AppIntent, PredictableIntent {
         var title: String
         var priority: TaskPriority
         var category: TaskCategory
-        var dueDate: Date?
+        var dueDate: Date
         var estimatedMinutes: Int?
         var notes: String?
     }
@@ -57,6 +57,7 @@ struct CreateTaskIntent: AppIntent, PredictableIntent {
         let entity = TaskEntity(created)
         let priorityText = TaskPriority.caseDisplayRepresentations[priority]?.title ?? "medium"
         let categoryText = TaskCategory.caseDisplayRepresentations[category]?.title ?? "personal"
-        return .result(value: entity, dialog: "Created '\(created.title)' with \(priorityText) priority in \(categoryText)")
+        let dueText = dueDate.formatted(date: .abbreviated, time: .omitted)
+        return .result(value: entity, dialog: "Created '\(created.title)' with \(priorityText) priority in \(categoryText), due \(dueText)")
     }
 }

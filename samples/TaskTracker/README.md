@@ -36,6 +36,10 @@ then:
   iPhone" below.
 - On iPhone the MCP endpoint answers only while the app is in the foreground; intents also run in the background.
 - Donations (`IntentDonationManager`) are paused in this version and return in M2 with generated Swift.
+- `Create Task` asks for the due date when none is given ("When is it due?"), so Siri resolves "today" or "tomorrow at
+  five"; a Shortcut that calls it must pass a date or it prompts. `List Tasks` takes a due window (any, today,
+  tomorrow, this week, overdue) and the App Shortcut phrase "Show my tasks for today in Task Tracker" fills it.
+  `Delete Task` and `Delete Completed Tasks` ask for confirmation first.
 - Shortcuts stores entity references by id: keep ids stable across launches (the seed data does) or stored references
   go stale. Required enum parameters need `default:` values if an intent should be runnable from an App Shortcut tile.
 

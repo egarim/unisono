@@ -9,10 +9,13 @@
 /* Begin PBXBuildFile section */
 		2CEAF991CB9F5FF9940F5652 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F286A767F21B0C5ADA393947 /* TaskEntity.swift */; };
 		34E0A434C59FCC13334AA109 /* TaskQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7F508ADE8DB55ECB778A02 /* TaskQuery.swift */; };
+		85CED202EF5A1E709BD3B35C /* DueFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D510C04862BE4360E34F76F9 /* DueFilter.swift */; };
 		09A1C1B2942F7FA31C949570 /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51F33787FA45E8907784662 /* TaskCategory.swift */; };
 		8BE62A357F9571DDC3732C69 /* TaskPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE87C66E66E782BCB2AEFD8 /* TaskPriority.swift */; };
 		7DF2AAE2D55DE099B6129C06 /* CompleteTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F8C46F074A308C6E7B942C /* CompleteTaskIntent.swift */; };
 		4A4043A6101891BEBA92AF75 /* CreateTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4248D082D67A4B92CB8E9F98 /* CreateTaskIntent.swift */; };
+		F69422A65286218904990EFA /* DeleteCompletedTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDFEAC9E348DE8AF0A6BDF0 /* DeleteCompletedTasksIntent.swift */; };
+		9E25F2201432BAF24C4D8F3E /* DeleteTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B0F2B39CA29144A9317CA7 /* DeleteTaskIntent.swift */; };
 		F7D03719A9E335153F8B3D20 /* IntentError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F48A0C422023D9F9E5078B5 /* IntentError.swift */; };
 		D878E5AE5A181FE5EFC3CF33 /* ListTasksIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4825AE240E6BB8C2FF485B68 /* ListTasksIntent.swift */; };
 		98DCDFBFA08114C7A1F51CD3 /* OpenTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70D51E789CD75905668712FD /* OpenTaskIntent.swift */; };
@@ -28,10 +31,13 @@
 		F5BF48AA40CAD7891EB709FC /* MauiAppIntentsSampleIntents.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MauiAppIntentsSampleIntents.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F286A767F21B0C5ADA393947 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		8C7F508ADE8DB55ECB778A02 /* TaskQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskQuery.swift; sourceTree = "<group>"; };
+		D510C04862BE4360E34F76F9 /* DueFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueFilter.swift; sourceTree = "<group>"; };
 		A51F33787FA45E8907784662 /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCategory.swift; sourceTree = "<group>"; };
 		FAE87C66E66E782BCB2AEFD8 /* TaskPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPriority.swift; sourceTree = "<group>"; };
 		E4F8C46F074A308C6E7B942C /* CompleteTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteTaskIntent.swift; sourceTree = "<group>"; };
 		4248D082D67A4B92CB8E9F98 /* CreateTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTaskIntent.swift; sourceTree = "<group>"; };
+		0EDFEAC9E348DE8AF0A6BDF0 /* DeleteCompletedTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteCompletedTasksIntent.swift; sourceTree = "<group>"; };
+		08B0F2B39CA29144A9317CA7 /* DeleteTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteTaskIntent.swift; sourceTree = "<group>"; };
 		1F48A0C422023D9F9E5078B5 /* IntentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentError.swift; sourceTree = "<group>"; };
 		4825AE240E6BB8C2FF485B68 /* ListTasksIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTasksIntent.swift; sourceTree = "<group>"; };
 		70D51E789CD75905668712FD /* OpenTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenTaskIntent.swift; sourceTree = "<group>"; };
@@ -89,6 +95,7 @@
 		DA70EF06F91D01724D67A6F0 /* Enums */ = {
 			isa = PBXGroup;
 			children = (
+				D510C04862BE4360E34F76F9 /* DueFilter.swift */,
 				A51F33787FA45E8907784662 /* TaskCategory.swift */,
 				FAE87C66E66E782BCB2AEFD8 /* TaskPriority.swift */,
 			);
@@ -100,6 +107,8 @@
 			children = (
 				E4F8C46F074A308C6E7B942C /* CompleteTaskIntent.swift */,
 				4248D082D67A4B92CB8E9F98 /* CreateTaskIntent.swift */,
+				0EDFEAC9E348DE8AF0A6BDF0 /* DeleteCompletedTasksIntent.swift */,
+				08B0F2B39CA29144A9317CA7 /* DeleteTaskIntent.swift */,
 				1F48A0C422023D9F9E5078B5 /* IntentError.swift */,
 				4825AE240E6BB8C2FF485B68 /* ListTasksIntent.swift */,
 				70D51E789CD75905668712FD /* OpenTaskIntent.swift */,
@@ -202,10 +211,13 @@
 			files = (
 				2CEAF991CB9F5FF9940F5652 /* TaskEntity.swift in Sources */,
 				34E0A434C59FCC13334AA109 /* TaskQuery.swift in Sources */,
+				85CED202EF5A1E709BD3B35C /* DueFilter.swift in Sources */,
 				09A1C1B2942F7FA31C949570 /* TaskCategory.swift in Sources */,
 				8BE62A357F9571DDC3732C69 /* TaskPriority.swift in Sources */,
 				7DF2AAE2D55DE099B6129C06 /* CompleteTaskIntent.swift in Sources */,
 				4A4043A6101891BEBA92AF75 /* CreateTaskIntent.swift in Sources */,
+				F69422A65286218904990EFA /* DeleteCompletedTasksIntent.swift in Sources */,
+				9E25F2201432BAF24C4D8F3E /* DeleteTaskIntent.swift in Sources */,
 				F7D03719A9E335153F8B3D20 /* IntentError.swift in Sources */,
 				D878E5AE5A181FE5EFC3CF33 /* ListTasksIntent.swift in Sources */,
 				98DCDFBFA08114C7A1F51CD3 /* OpenTaskIntent.swift in Sources */,
