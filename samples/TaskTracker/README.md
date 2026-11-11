@@ -54,8 +54,10 @@ xcrun devicectl device process launch --device <udid> com.companyname.mauiappint
 Verified on an iPhone 15 Pro Max (iOS 26.7): the six App Shortcuts appear in the Shortcuts app after the first
 launch. Siri matches the app by its spoken name, so `Info.plist` carries `CFBundleSpokenName` and
 `INAlternativeAppNames` ("Task Tracker", "Tasks"); with only the one-word display name Siri answered "I don't see an
-app for that". When only `Info.plist` changes, delete `obj/.../AppManifest.plist` before rebuilding, or the .NET
-build keeps the old manifest.
+app for that". With those keys, Siri runs the intents by voice while TaskTracker is in the foreground; from the home
+screen it still did not resolve the app name right after installing (Siri's app vocabulary indexes on its own
+schedule; toggling Settings → Apps → TaskTracker → Siri, or a restart, is the usual nudge). When only `Info.plist`
+changes, delete `obj/.../AppManifest.plist` before rebuilding, or the .NET build keeps the old manifest.
 
 ## Mac Catalyst
 
