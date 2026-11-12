@@ -165,6 +165,13 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
         return a.ConstructorArguments[ctorIndex].Value as string;
     }
 
+    /// <summary>Enum members as (name, underlying value), in declaration order, from the literal fields.</summary>
+    static List<(string Name, long Value)> EnumMembers(Type t)
+        => t.GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(f => f.IsLiteral)
+            .Select(f => (f.Name, Convert.ToInt64(f.GetRawConstantValue())))
+            .ToList();
+
     static bool IsNullable(Type t) => t.IsGenericType && t.GetGenericTypeDefinition().Name == "Nullable`1";
     static Type Unwrap(Type t) => IsNullable(t) ? t.GetGenericArguments()[0] : t;
 
@@ -295,9 +302,10 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
         var t = Unwrap(p.Type);
         if (t.IsEnum)
         {
-            var names = t.GetEnumNames(); var values = t.GetEnumValues();
-            for (var i = 0; i < names.Length; i++)
-                if (Convert.ToInt64(values.GetValue(i)) == Convert.ToInt64(p.Default)) return "." + Ident(Camel(names[i]));
+            // MetadataLoadContext types reject GetEnumValues/GetEnumNames; the literal fields carry the same facts.
+            var wanted = Convert.ToInt64(p.Default);
+            foreach (var (name, value) in EnumMembers(t))
+                if (value == wanted) return "." + Ident(Camel(name));
             return null;
         }
         return p.Default switch
@@ -318,7 +326,7 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
         foreach (var (name, t) in _enums.OrderBy(e => e.Key, StringComparer.Ordinal))
         {
             if (_handWritten.Contains(name)) continue;
-            var members = t.GetEnumNames();
+            var members = EnumMembers(t).Select(m => m.Name).ToArray();
             sb.Append("/// Generated from the C# enum ").Append(t.FullName).Append(". Raw values match camelCase JSON.\n");
             sb.Append("enum ").Append(name).Append(": String, AppEnum, Codable {\n");
             sb.Append("    case ").Append(string.Join(", ", members.Select(m => Ident(Camel(m))))).Append('\n');
