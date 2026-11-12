@@ -163,8 +163,13 @@ Platform notes: on iPhone the endpoint answers only while the app is in the fore
 
 ## Step 5. Front door: Siri and Shortcuts (iOS and Mac Catalyst)
 
-Apple discovers App Intents only from Swift code compiled into the app, so this front door has a small Swift part.
-The Swift does no work of its own: every intent forwards to the C# tool by name.
+Apple discovers App Intents only from Swift compiled into the app, so this front door has a small Swift part. The
+Swift does no work of its own: every intent forwards to the C# tool by name. You write that Swift in one folder;
+the package builds it. There is no Xcode project to make, no script to run and no project entry to add.
+
+> Needs `Unisono.AppIntents` from the release after 0.1.0-preview.2. Until that release is on nuget.org, reference
+> `src/Unisono.AppIntents` from a clone of this repository and import its `build/Unisono.AppIntents.targets`, as the
+> samples do.
 
 **5.1 Attach the bridge at launch.** In `Platforms/iOS/AppDelegate.cs` (and the Mac Catalyst one):
 
@@ -178,18 +183,11 @@ public override bool FinishedLaunching(UIApplication application, NSDictionary? 
 }
 ```
 
-**5.2 Create the Swift folder.** Next to the app project, make `TaskTracker.AppIntents/Sources/` with sub-folders such
-as `Intents`, `Entities`, `Enums` and `Shortcuts`. Copy the bridge from the package into it:
+**5.2 Write the Swift in an `AppIntents/` folder next to the `.csproj`.** Sub-folders are up to you; the samples use
+`Intents`, `Entities`, `Enums` and `Shortcuts`. Three kinds of file go there.
 
-```bash
-mkdir -p TaskTracker.AppIntents/Sources/Bridge
-cp ~/.nuget/packages/unisono.appintents/0.1.0-preview.2/native/UnisonoBridge.swift TaskTracker.AppIntents/Sources/Bridge/
-```
-
-`UnisonoBridge.swift` is the same file in every app. Copy it again when you update the package.
-
-**5.3 Mirror the wire types.** One `Codable` struct per C# result type, with the camelCase names from step 2, and one
-`AppEnum` per C# enum whose raw values match the JSON strings:
+The wire types: one `Codable` struct per C# result type, with the camelCase names from step 2, and one `AppEnum` per
+C# enum whose raw values match the JSON strings.
 
 ```swift
 import AppIntents
@@ -211,7 +209,7 @@ enum TaskPriority: String, AppEnum, Codable {
 }
 ```
 
-**5.4 Write one intent per action.** The `Args` struct carries the C# parameter names; `perform()` is one call:
+One intent per action. The `Args` struct carries the C# parameter names, and `perform()` is one call:
 
 ```swift
 struct CreateTaskIntent: AppIntent {
@@ -231,13 +229,8 @@ struct CreateTaskIntent: AppIntent {
 }
 ```
 
-If you registered an entity query in step 3, add an `AppEntity` and an `EntityStringQuery` that call
-`UnisonoTools.entities`, `UnisonoTools.search` and `UnisonoTools.suggested` with the same type name (`"Task"`). Then
-an intent can take `@Parameter var target: TaskEntity` and Siri asks "Which one?" from your C# data. See
-`samples/TaskTracker/MauiAppIntentsSample.AppIntents/Sources/Entities/` for both files.
-
-**5.5 Give Siri phrases.** An `AppShortcutsProvider` makes the intents available by voice without any setup by the
-user. Each phrase must contain the app name:
+The Siri phrases: an `AppShortcutsProvider` makes the intents available by voice without any setup by the user. Each
+phrase must contain the app name:
 
 ```swift
 struct TaskTrackerShortcuts: AppShortcutsProvider {
@@ -250,29 +243,16 @@ struct TaskTrackerShortcuts: AppShortcutsProvider {
 }
 ```
 
-**5.6 Generate the Xcode project.** The package ships a generator for the framework that holds this Swift:
+If you registered an entity query in step 3, add an `AppEntity` and an `EntityStringQuery` that call
+`UnisonoTools.entities`, `UnisonoTools.search` and `UnisonoTools.suggested` with the same type name (`"Task"`). Then
+an intent can take `@Parameter var target: TaskEntity` and Siri asks "Which one?" from your C# data. See
+`samples/TaskTracker/MauiAppIntentsSample/AppIntents/Entities/` for both files.
 
-```bash
-python3 ~/.nuget/packages/unisono.appintents/0.1.0-preview.2/tools/new-intents-xcodeproj.py TaskTracker.AppIntents \
-  --name TaskTrackerIntents --bundle-id com.example.tasktracker.intents --maccatalyst
-```
+`UnisonoTools` comes from the package's bridge file, which the build adds next to your Swift. On every build the
+package copies the folder and the bridge under `obj/`, writes an Xcode framework project for them, has the .NET SDK
+build it, and puts `Metadata.appintents`, the index Siri reads, into the app bundle.
 
-Re-run it whenever you add or remove a Swift file. It writes the same project for the same files.
-
-**5.7 Let the .NET build compile it.** Add the Xcode project to the app's `.csproj`, Apple targets only. The package's
-build targets then copy `Metadata.appintents` (the index Siri reads) into the app bundle:
-
-```xml
-<ItemGroup Condition="'$(_Platform)' == 'ios' Or '$(_Platform)' == 'maccatalyst'">
-  <XcodeProject Include="..\TaskTracker.AppIntents\TaskTrackerIntents.xcodeproj">
-    <SchemeName>TaskTrackerIntents</SchemeName>
-    <ForceLoad>true</ForceLoad>
-    <SmartLink>false</SmartLink>
-  </XcodeProject>
-</ItemGroup>
-```
-
-**5.8 Help Siri find the app by name.** If the display name is one made-up word, add the spoken names to `Info.plist`:
+**5.3 Help Siri find the app by name.** If the display name is one made-up word, add the spoken names to `Info.plist`:
 
 ```xml
 <key>CFBundleSpokenName</key>
@@ -283,9 +263,22 @@ build targets then copy `Metadata.appintents` (the index Siri reads) into the ap
 </array>
 ```
 
-**5.9 Try it.** Install the app and open it once. The Shortcuts app lists the actions and App Shortcuts at once; run
+**5.4 Try it.** Install the app and open it once. The Shortcuts app lists the actions and App Shortcuts at once; run
 one there first. Siri by voice needs a real device, and it does not need the SiriKit entitlement. Right after
 installing, Siri may only find the app while it is in the foreground, until its vocabulary index catches up.
+
+The defaults rarely need changing. These MSBuild properties adjust them:
+
+| Property | Default |
+|---|---|
+| `UnisonoAppIntentsDir` | `AppIntents` next to the `.csproj` |
+| `UnisonoIntentsModuleName` | the assembly name followed by `Intents` |
+| `UnisonoIntentsBundleId` | the `ApplicationId` followed by `.intents` |
+| `UnisonoIntentsDeploymentTarget` | the app's `SupportedOSPlatformVersion` |
+| `UnisonoGenerateXcodeProject` | `true`; set `false` to manage the Xcode project yourself |
+
+An app that declares its own `<XcodeProject>` item is left alone. A later version writes the Swift in 5.2 from your
+C# tools as well, which leaves only 5.1.
 
 ## Step 6. Front door: Android AppFunctions (API 36+)
 
@@ -352,8 +345,8 @@ adb shell "cmd app_function execute-app-function --package com.example.tasktrack
 1. Add the C# method with `[McpServerTool]` and `[Description]`. MCP clients see it on the next launch, with nothing
    else to do.
 2. **Android:** re-run `new-appfunctions-xml.py` and rebuild.
-3. **Apple:** add one Swift intent that calls the new tool name, a phrase in the shortcuts provider if Siri should
-   offer it by voice, and re-run the Xcode project generator.
+3. **Apple:** add one Swift intent to `AppIntents/` that calls the new tool name, and a phrase in the shortcuts
+   provider if Siri should offer it by voice. The next build picks it up.
 
 ## Where to look next
 
