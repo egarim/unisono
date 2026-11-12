@@ -339,5 +339,8 @@ adb shell "cmd app_function execute-app-function --package com.example.tasktrack
 
 - `samples/TaskTracker`: everything above in one MAUI app, with eight tools, an entity query and all three front doors.
 - `samples/UnisonoNotes`: a second app with no Swift at all, used for the cross-app Shortcut and the agent demos.
+- `samples/Pupuseria`: a bigger ordering app with seven tools, an entity to pick, a destructive "place order" that
+  Siri confirms, mostly generated intents with three hand-written ones, and animations that play on every tool call
+  whichever assistant made it.
 - `samples/ConsoleHost`: the smallest host, two tools over MCP with no phone.
 - The package READMEs under `src/` and the design notes in `docs/dotnet-siri-mcp-framework-design.md`.
