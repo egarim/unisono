@@ -233,7 +233,8 @@ find the app while it is in the foreground, until its vocabulary index catches u
 
 ### Customising (optional)
 
-The generated Swift is plain on purpose: short replies such as "Create Task: done." and one phrase per action. To
+The generated Swift is plain on purpose: short replies such as "Create Task: done." and, unless the tool carries
+`[UnisonoPhrases("Where is my order", "Check my order", ...)]`, one phrase per action. To
 change one piece, put Swift in an `AppIntents/` folder next to the `.csproj`. A type with the same name as a generated
 one replaces it, and anything else is added:
 
@@ -332,8 +333,9 @@ adb shell "cmd app_function execute-app-function --package com.example.tasktrack
 1. Add the C# method with `[McpServerTool]` and `[Description]`. MCP clients see it on the next launch, with nothing
    else to do.
 2. **Android:** re-run `new-appfunctions-xml.py` and rebuild.
-3. **Apple:** nothing. The next build generates the intent and its phrase. If the app has its own
-   `AppShortcutsProvider`, add the phrase there.
+3. **Apple:** nothing. The next build generates the intent and its phrases. Put `[UnisonoPhrases(...)]` on the method
+   with the ways people say it; Siri matches App Shortcut phrases nearly literally, so variants matter. If the app has
+   its own `AppShortcutsProvider`, add the phrases there instead.
 
 ## Where to look next
 

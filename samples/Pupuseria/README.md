@@ -27,8 +27,10 @@ about later. The UI is meant to be funny; the architecture is the same as the ot
 - **Siri and Shortcuts** get App Intents generated at build time (`ListMenuIntent`, `BuildAPupusaIntent`,
   `GetCartIntent`, `ClearCartIntent`, the `PupusaEntity` picker, all seven enums as AppEnums). Three intents are
   hand-written in `AppIntents/` because Siri should read Botilio's lines back: `AddToOrderIntent` ("How many?"),
-  `PlaceOrderIntent` (confirms the real total first) and `GetOrderStatusIntent`; `PupuseriaShortcuts.swift` owns the
-  phrases: "Order two revueltas in Pupusería", "Where is my order in Pupusería", "Échale in Pupusería".
+  `PlaceOrderIntent` (confirms the real total first) and `GetOrderStatusIntent`. The phrases live on the C# tools:
+  `[UnisonoPhrases("Where is my order", "Check my order", "Are my pupusas ready", ...)]` on `GetOrderStatus` gives Siri
+  fifteen ways to ask, and `"Order {pupusa}"` on `AddToOrder` lets "Order revueltas in Pupusería" carry the pupusa.
+  Siri matches App Shortcut phrases nearly literally, so the variants are what make it feel natural.
 - **Android AppFunctions** list the same seven functions (`Platforms/Android/Assets/app_functions.xml`,
   `PupuseriaAppFunctionService`) for Gemini and the platform tools.
 

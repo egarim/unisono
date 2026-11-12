@@ -8,10 +8,13 @@ All notable changes to the Unisono packages. Versions follow SemVer; previews ca
   AppEnums, Codable DTOs, AppEntity + query per `IEntityQuery<T>`, default App Shortcut phrases) and writes and builds
   the Xcode framework project itself. An app calls `UnisonoAppIntents.Attach(registry)` and nothing else; Swift in an
   `AppIntents/` folder customises or extends the generated code by name. The Xcode project generator script, the
-  `<XcodeProject>` item and the bridge copy are gone. New `[UnisonoEntity]` hint in `Unisono.Core`.
+  `<XcodeProject>` item and the bridge copy are gone. New in `Unisono.Core`: `[UnisonoEntity]` (which entity a string
+  parameter is) and `[UnisonoPhrases]` (the Siri phrases, tile title and icon of a tool, with `{app}` and `{parameter}`
+  tokens), so no Swift is needed for either.
 - Samples: Notes has no hand-written Swift; TaskTracker keeps its custom intents and gains a generated Get Task.
 - New sample `samples/Pupuseria`: Pupusería.net, an ordering app with Botilio the robot pupusero, animations on every
-  tool call, generated and hand-written Siri intents side by side, MCP on port 8790 and AppFunctions on Android.
+  tool call, generated and hand-written Siri intents side by side, phrases declared in C# ("Where is my order",
+  "Check my order", "Are my pupusas ready"...), MCP on port 8790 and AppFunctions on Android.
 
 ## 0.1.0-preview.2 (2026-11-12)
 

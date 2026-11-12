@@ -28,6 +28,7 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
     {
         public string Name = ""; public string Title = ""; public string Description = ""; public bool Destructive;
         public List<ParamInfo> Parameters = new(); public Type? ReturnType; public string SwiftName = "";
+        public List<string> Phrases = new(); public string? ShortTitle; public string? SystemImage;
     }
     sealed class ParamInfo
     {
@@ -91,6 +92,14 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
                         Description = AttrString(m.GetCustomAttributesData(), "DescriptionAttribute", 0) ?? "",
                     };
                     tool.SwiftName = Pascal(tool.Title) + "Intent";
+                    var phrasesAttr = m.GetCustomAttributesData().FirstOrDefault(a => a.AttributeType.Name == "UnisonoPhrasesAttribute");
+                    if (phrasesAttr is not null)
+                    {
+                        if (phrasesAttr.ConstructorArguments.Count > 0 && phrasesAttr.ConstructorArguments[0].Value is IReadOnlyCollection<CustomAttributeTypedArgument> list)
+                            tool.Phrases = list.Select(a => a.Value as string).Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+                        tool.ShortTitle = NamedArg(phrasesAttr, "ShortTitle") as string;
+                        tool.SystemImage = NamedArg(phrasesAttr, "SystemImage") as string;
+                    }
                     tool.Parameters = m.GetParameters().Where(p => p.ParameterType.Name != "CancellationToken").Select(p => new ParamInfo
                     {
                         Name = p.Name ?? "value",
@@ -429,14 +438,9 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
         var summaryParts = new List<string>();
         foreach (var p in tool.Parameters)
         {
-            var varName = Camel(p.Name);
-            if (IntentMembers.Contains(varName)) varName += "Value";
-            varName = Ident(varName);
+            var varName = Ident(SwiftVarName(tool, p));
             if (p.EntityType is not null)
             {
-                var entityVar = Camel(p.EntityType);
-                if (tool.Parameters.Any(o => o != p && Camel(o.Name) == entityVar) || IntentMembers.Contains(entityVar)) entityVar += "Entity";
-                varName = Ident(entityVar);
                 paramLines.Add($"    @Parameter(title: {SwiftString(Humanize(p.EntityType))})\n    var {varName}: {p.EntityType}Entity");
                 argFields.Add($"var {Ident(Camel(p.Name))}: String");
                 argAssignments.Add($"{Ident(Camel(p.Name))}: {varName}.id");
@@ -535,6 +539,35 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
 
     EntityInfo? EntityFor(Type t) => _entities.FirstOrDefault(e => e.Dto.Name == t.Name);
 
+    /// <summary>The Swift property name a C# parameter gets in the generated intent (entities are named after their type).</summary>
+    static string SwiftVarName(ToolInfo tool, ParamInfo p)
+    {
+        if (p.EntityType is not null)
+        {
+            var entityVar = Camel(p.EntityType);
+            if (tool.Parameters.Any(o => o != p && Camel(o.Name) == entityVar) || IntentMembers.Contains(entityVar)) entityVar += "Entity";
+            return entityVar;
+        }
+        var varName = Camel(p.Name);
+        if (IntentMembers.Contains(varName)) varName += "Value";
+        return varName;
+    }
+
+    /// <summary>Turns "{app}" and "{parameterName}" tokens into App Shortcut phrase syntax; adds the app name when missing.</summary>
+    static string SwiftPhrase(ToolInfo tool, string phrase)
+    {
+        var s = phrase.Trim();
+        foreach (var p in tool.Parameters)
+        {
+            var swift = "\\(\\.$" + SwiftVarName(tool, p) + ")";
+            s = s.Replace("{" + p.Name + "}", swift);
+            if (p.EntityType is not null) s = s.Replace("{" + Camel(p.EntityType) + "}", swift);
+        }
+        s = s.Replace("{app}", "\\(.applicationName)");
+        if (!s.Contains("\\(.applicationName)")) s += " in \\(.applicationName)";
+        return s;
+    }
+
     string? GenerateShortcuts(List<ToolInfo> tools, List<ToolInfo> generated)
     {
         if (_handWrittenProvider) return null;
@@ -546,12 +579,14 @@ public class UnisonoGenerateSwift : Microsoft.Build.Utilities.Task
             intents = intents.Take(MaxAppShortcuts).ToList();
         }
         var sb = new StringBuilder(Header());
-        sb.Append("/// Generated phrases: \"<title> in <app name>\" for every intent. Declare an AppShortcutsProvider in AppIntents/ to replace this.\n");
+        sb.Append("/// Generated phrases: from [UnisonoPhrases] on each tool, else \"<title> in <app name>\". Declare an AppShortcutsProvider in AppIntents/ to replace this.\n");
         sb.Append("struct UnisonoGeneratedShortcuts: AppShortcutsProvider {\n    @AppShortcutsBuilder\n    static var appShortcuts: [AppShortcut] {\n");
         foreach (var t in intents)
         {
-            sb.Append("        AppShortcut(\n            intent: ").Append(t.SwiftName).Append("(),\n            phrases: [\"").Append(t.Title).Append(" in \\(.applicationName)\"],\n");
-            sb.Append("            shortTitle: ").Append(SwiftString(t.Title)).Append(",\n            systemImageName: ").Append(SwiftString(ImageFor(t.Title))).Append("\n        )\n");
+            var phrases = t.Phrases.Count > 0 ? t.Phrases.Select(ph => SwiftPhrase(t, ph)).ToList() : new List<string> { t.Title + " in \\(.applicationName)" };
+            sb.Append("        AppShortcut(\n            intent: ").Append(t.SwiftName).Append("(),\n            phrases: [\n");
+            sb.Append(string.Join(",\n", phrases.Select(ph => "                \"" + ph.Replace("\"", "\\\"") + "\""))).Append("\n            ],\n");
+            sb.Append("            shortTitle: ").Append(SwiftString(t.ShortTitle ?? t.Title)).Append(",\n            systemImageName: ").Append(SwiftString(t.SystemImage ?? ImageFor(t.Title))).Append("\n        )\n");
         }
         sb.Append("    }\n}\n");
         return sb.ToString();
