@@ -67,15 +67,6 @@
 		<ProjectReference Include="..\..\..\src\Unisono.AppIntents\Unisono.AppIntents.csproj" />
 	</ItemGroup>
 
-	<!-- The app's Swift intents framework, generated with scripts/new-intents-xcodeproj.py; the .NET SDK builds
-	     it with xcodebuild and Unisono's targets copy Metadata.appintents into the bundle. -->
-	<ItemGroup>
-		<XcodeProject Include="..\UnisonoNotes.AppIntents\UnisonoNotesIntents.xcodeproj">
-			<SchemeName>UnisonoNotesIntents</SchemeName>
-			<ForceLoad>true</ForceLoad>
-			<SmartLink>false</SmartLink>
-		</XcodeProject>
-	</ItemGroup>
 	<Import Project="..\..\..\src\Unisono.AppIntents\build\Unisono.AppIntents.targets" />
 
 </Project>

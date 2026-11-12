@@ -8,22 +8,25 @@ Targets `net10.0-ios` and `net10.0-maccatalyst`; works with .NET MAUI, Uno Platf
 dotnet add package Unisono.AppIntents --prerelease
 ```
 
-What the package contains:
+Two things an app does:
 
-- `UnisonoAppIntents.Attach(registry)`: the C# end of the bridge; call it once at launch.
-- `native/UnisonoBridge.swift`: the Swift end (fixed `UnisonoHost` protocol, `UnisonoBridge` singleton and
-  `UnisonoTools` helpers). Reference or copy it into your Swift intents framework next to your intents, entities and
-  enums; every `perform()` becomes a few lines:
+1. `UnisonoAppIntents.Attach(registry)` once at launch (the C# end of the bridge).
+2. Put its Swift intents, entities, enums and `AppShortcutsProvider` in an `AppIntents/` folder next to the csproj.
+   Every `perform()` is a few lines against the bridge:
 
-  ```swift
-  let created = try await UnisonoTools.invoke("create_task", Args(title: taskTitle), returning: TaskDto.self)
-  return .result(value: TaskEntity(created), dialog: "Created '\(created.title)'")
-  ```
+   ```swift
+   let created = try await UnisonoTools.invoke("create_task", Args(title: taskTitle), returning: TaskDto.self)
+   return .result(value: TaskEntity(created), dialog: "Created '\(created.title)'")
+   ```
 
-- `build/Unisono.AppIntents.targets`: imported automatically; after your `<XcodeProject>` item builds the Swift
-  framework, it copies `Metadata.appintents` into the app bundle (flat on iOS, `Contents/Resources` on Mac Catalyst).
-- `tools/new-intents-xcodeproj.py`: generates the Xcode project for your intents framework from a `Sources/` folder,
-  referencing the bridge file (`--shared`) and optionally enabling Mac Catalyst.
+The package's MSBuild targets do the rest on every build: they mirror that folder and the package's
+`native/UnisonoBridge.swift` under `obj/`, write an Xcode framework project for them (deterministic, Mac Catalyst
+enabled), hand it to the .NET SDK's `<XcodeProject>` build, and copy the resulting `Metadata.appintents` into the app
+bundle (flat on iOS, `Contents/Resources` on Mac Catalyst), which is where iOS discovers App Intents.
 
-The Swift file lives in the package at `~/.nuget/packages/unisono.appintents/<version>/native/UnisonoBridge.swift`.
+Knobs (MSBuild properties): `UnisonoAppIntentsDir` (default `AppIntents` next to the csproj), `UnisonoIntentsModuleName`
+(default `<AssemblyName>Intents`), `UnisonoIntentsBundleId` (default `<ApplicationId>.intents`),
+`UnisonoIntentsDeploymentTarget` (default the app's `SupportedOSPlatformVersion`), `UnisonoGenerateXcodeProject=false`
+to opt out. An app that declares its own `<XcodeProject>` item is left alone.
+
 Full walkthrough, the TaskTracker and Notes samples and the cross-app demos: https://github.com/egarim/unisono

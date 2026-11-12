@@ -9,7 +9,7 @@ client** (Claude Code, Claude Desktop, …), with one C# handler per action. It 
 | Path | What |
 |---|---|
 | `MauiAppIntentsSample/` | The MAUI app. `Tools/TaskTools.cs` declares the six tools with `[McpServerTool]` + `[Description]`; `Tools/TaskEntityQuery.cs` resolves `Task` entities. `MauiProgram.cs` builds the `ToolRegistry` and the MCP host; `Platforms/iOS/AppDelegate.cs` attaches the Siri bridge and starts MCP. |
-| `MauiAppIntentsSample.AppIntents/` | Swift framework with the App Intents, entities, enums and the shortcuts provider. Every `perform()` encodes its parameters to JSON and calls `UnisonoTools.invoke`; `Bridge/UnisonoBridge.swift` is a copy of `src/Unisono.AppIntents/native/UnisonoBridge.swift`. The app project builds it through an `<XcodeProject>` item. |
+| `MauiAppIntentsSample/AppIntents/` | Swift App Intents, entities, enums and the shortcuts provider. Every `perform()` encodes its parameters to JSON and calls `UnisonoTools.invoke`. The Unisono.AppIntents targets mirror this folder and the package's `UnisonoBridge.swift` under `obj/`, write the Xcode framework project and build it; no Xcode project or `<XcodeProject>` item is checked in. |
 
 There is no per-app binding project: the C# side of the bridge is the static `Unisono.AppIntents.Binding`.
 
