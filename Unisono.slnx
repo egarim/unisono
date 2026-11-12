@@ -4,6 +4,7 @@
     <Project Path="src/Unisono.Mcp/Unisono.Mcp.csproj" />
     <Project Path="src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj" />
     <Project Path="src/Unisono.AppIntents/Unisono.AppIntents.csproj" />
+    <Project Path="src/Unisono.AppIntents.Build/Unisono.AppIntents.Build.csproj" />
     <Project Path="src/Unisono.AppFunctions/Unisono.AppFunctions.csproj" />
   </Folder>
   <Folder Name="/samples/">

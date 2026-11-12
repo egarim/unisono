@@ -10,7 +10,7 @@ created.** See `docs/demo-plan.md`.
 | Path | What |
 |---|---|
 | `UnisonoNotes/` | The MAUI app (iOS target). `Tools/NoteTools.cs` declares `create_note`, `list_notes`, `get_note`, `append_to_note` and `extract_action_items`; `Tools/NoteEntityQuery.cs` resolves `Note` entities; `Models/Note.cs` holds the one action-item rule the tools and the UI share. MCP listens on port 8789 (TaskTracker uses 8787). |
-| `UnisonoNotes/AppIntents/` | Swift intents (Create Note, Find Notes, Extract Action Items, Append to Note, Open Note), the `Note` entity and query, and the shortcuts phrases. The bridge file is **referenced** from the package (`src/Unisono.AppIntents/native/`), never copied, and the Xcode project is written by the Unisono.AppIntents targets at build time under `obj/`. |
+| (no Swift) | Notes has no hand-written Swift. The Unisono.AppIntents build generates `CreateNoteIntent`, `FindNotesIntent`, `GetNoteIntent`, `AppendToNoteIntent`, `ExtractActionItemsIntent`, the `NoteEntity` with its query (from `NoteEntityQuery : IEntityQuery<NoteDto>`) and the App Shortcut phrases from `Tools/NoteTools.cs`; see `obj/.../unisono/xcode/generated-src/` after a build. |
 
 ## Build and run
 

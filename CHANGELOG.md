@@ -2,6 +2,15 @@
 
 All notable changes to the Unisono packages. Versions follow SemVer; previews carry a `-preview.N` suffix.
 
+## 0.1.0-preview.3 (unreleased)
+
+- `Unisono.AppIntents` now generates the Swift App Intents layer from the app's C# tools at build time (intents,
+  AppEnums, Codable DTOs, AppEntity + query per `IEntityQuery<T>`, default App Shortcut phrases) and writes and builds
+  the Xcode framework project itself. An app calls `UnisonoAppIntents.Attach(registry)` and nothing else; Swift in an
+  `AppIntents/` folder customises or extends the generated code by name. The Xcode project generator script, the
+  `<XcodeProject>` item and the bridge copy are gone. New `[UnisonoEntity]` hint in `Unisono.Core`.
+- Samples: Notes has no hand-written Swift; TaskTracker keeps its custom intents and gains a generated Get Task.
+
 ## 0.1.0-preview.2 (2026-11-12)
 
 - New `Unisono.AppFunctions` (`net10.0-android`): `UnisonoAppFunctionService`, an `AppFunctionService` that

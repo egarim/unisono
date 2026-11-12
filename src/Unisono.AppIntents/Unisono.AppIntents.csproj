@@ -15,5 +15,17 @@
   <ItemGroup>
     <None Include="build\Unisono.AppIntents.targets" Pack="true" PackagePath="build" />
     <None Include="native\UnisonoBridge.swift" Pack="true" PackagePath="native" />
+    <!-- The MSBuild tasks (Xcode project writer, Swift generator) ship under tools/; built first, never referenced. -->
+    <ProjectReference Include="..\Unisono.AppIntents.Build\Unisono.AppIntents.Build.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SetTargetFramework="TargetFramework=net10.0" />
   </ItemGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_UnisonoPackBuildTasks</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <Target Name="_UnisonoPackBuildTasks" Condition="'$(TargetFramework)' == 'net10.0-ios'">
+    <ItemGroup>
+      <_UnisonoBuildTaskFiles Include="..\Unisono.AppIntents.Build\bin\$(Configuration)\net10.0\*.dll" />
+      <TfmSpecificPackageFile Include="@(_UnisonoBuildTaskFiles)" PackagePath="tools/%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
+
 </Project>
