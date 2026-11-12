@@ -50,6 +50,10 @@ dotnet add package Unisono.AppFunctions --prerelease # Android AppFunctions (Gem
 `build/Unisono.AppIntents.targets` glue and `tools/new-intents-xcodeproj.py`; see its package README for the three
 steps an app needs.
 
+**New here? Follow the [step-by-step guide](docs/getting-started.md).** There is no new attribute to learn: the tools
+are ordinary C# methods marked with the MCP C# SDK's own `[McpServerTool]` and `[Description]`, and the guide wires
+them to MCP, Siri and Shortcuts, and Android AppFunctions one front door at a time.
+
 ## Works with
 
 Unisono is not tied to MAUI. The core packages are plain .NET, and the platform packages hook into the operating
