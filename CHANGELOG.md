@@ -10,6 +10,8 @@ All notable changes to the Unisono packages. Versions follow SemVer; previews ca
   `AppIntents/` folder customises or extends the generated code by name. The Xcode project generator script, the
   `<XcodeProject>` item and the bridge copy are gone. New `[UnisonoEntity]` hint in `Unisono.Core`.
 - Samples: Notes has no hand-written Swift; TaskTracker keeps its custom intents and gains a generated Get Task.
+- New sample `samples/Pupuseria`: Pupusería.net, an ordering app with Botilio the robot pupusero, animations on every
+  tool call, generated and hand-written Siri intents side by side, MCP on port 8790 and AppFunctions on Android.
 
 ## 0.1.0-preview.2 (2026-11-12)
 

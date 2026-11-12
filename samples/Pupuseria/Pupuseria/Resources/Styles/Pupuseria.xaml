@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <!-- Masa cream, cheese yellow, salsa red, curtido green and pink, comal black; the blue is the flag's. -->
+    <Color x:Key="Masa">#FFF6E5</Color>
+    <Color x:Key="MasaDark">#F1E3C8</Color>
+    <Color x:Key="Ink">#2A211C</Color>
+    <Color x:Key="InkSoft">#5C4E42</Color>
+    <Color x:Key="Muted">#7A6A5C</Color>
+    <Color x:Key="Line">#E9D9BF</Color>
+    <Color x:Key="Cheese">#F2B134</Color>
+    <Color x:Key="CheeseDark">#E89B1F</Color>
+    <Color x:Key="CheeseSoft">#FBE7B6</Color>
+    <Color x:Key="Salsa">#C8432B</Color>
+    <Color x:Key="Curtido">#5E9E4A</Color>
+    <Color x:Key="Cabbage">#D96A9A</Color>
+    <Color x:Key="Comal">#2B2A28</Color>
+    <Color x:Key="ComalSoft">#3A3734</Color>
+    <Color x:Key="Flag">#1C4FB8</Color>
+    <Color x:Key="Bean">#5B2E1E</Color>
+
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="White" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="Padding" Value="12,10" />
+    </Style>
+    <Style x:Key="Display" TargetType="Label">
+        <Setter Property="FontFamily" Value="FredokaBold" />
+        <Setter Property="TextColor" Value="{StaticResource Ink}" />
+    </Style>
+    <Style x:Key="Body" TargetType="Label">
+        <Setter Property="FontFamily" Value="Nunito" />
+        <Setter Property="TextColor" Value="{StaticResource InkSoft}" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style x:Key="Eyebrow" TargetType="Label">
+        <Setter Property="FontFamily" Value="NunitoExtraBold" />
+        <Setter Property="TextColor" Value="{StaticResource Muted}" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="CharacterSpacing" Value="0.6" />
+    </Style>
+    <Style x:Key="Pill" TargetType="Button">
+        <Setter Property="FontFamily" Value="NunitoExtraBold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="HeightRequest" Value="40" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="BackgroundColor" Value="White" />
+        <Setter Property="TextColor" Value="{StaticResource Ink}" />
+        <Setter Property="BorderColor" Value="{StaticResource Line}" />
+        <Setter Property="BorderWidth" Value="2" />
+    </Style>
+    <Style x:Key="PillOn" TargetType="Button" BasedOn="{StaticResource Pill}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Ink}" />
+        <Setter Property="TextColor" Value="{StaticResource Masa}" />
+        <Setter Property="BorderColor" Value="{StaticResource Ink}" />
+    </Style>
+    <Style x:Key="Primary" TargetType="Button">
+        <Setter Property="FontFamily" Value="FredokaBold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Salsa}" />
+        <Setter Property="TextColor" Value="White" />
+    </Style>
+    <Style x:Key="Round" TargetType="Button">
+        <Setter Property="FontFamily" Value="NunitoExtraBold" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="WidthRequest" Value="36" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Salsa}" />
+        <Setter Property="TextColor" Value="White" />
+    </Style>
+</ResourceDictionary>

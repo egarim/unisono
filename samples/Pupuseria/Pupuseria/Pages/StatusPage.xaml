@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pupuseria.Pages.StatusPage"
+             BackgroundColor="{StaticResource Comal}"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto,290,*,Auto" Padding="20,52,20,8" RowSpacing="10">
+        <VerticalStackLayout>
+            <Label x:Name="Eyebrow" Text="NO ORDER YET" Style="{StaticResource Eyebrow}" TextColor="#BFAE93" />
+            <Label x:Name="Headline" Text="The comal is hot and lonely." Style="{StaticResource Display}" FontSize="26" TextColor="{StaticResource Masa}" LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1" BackgroundColor="{StaticResource ComalSoft}" StrokeThickness="0" StrokeShape="RoundRectangle 24" Padding="0">
+            <AbsoluteLayout>
+                <Image Source="comal.png" AbsoluteLayout.LayoutBounds="24,150,300,100" AbsoluteLayout.LayoutFlags="None" Aspect="AspectFit" />
+                <Image x:Name="Flame1" Source="flame.png" AbsoluteLayout.LayoutBounds="120,232,28,36" AbsoluteLayout.LayoutFlags="None" AnchorY="1" />
+                <Image x:Name="Flame2" Source="flame.png" AbsoluteLayout.LayoutBounds="162,238,28,36" AbsoluteLayout.LayoutFlags="None" AnchorY="1" />
+                <Image x:Name="Flame3" Source="flame.png" AbsoluteLayout.LayoutBounds="206,232,28,36" AbsoluteLayout.LayoutFlags="None" AnchorY="1" />
+                <Image x:Name="Pupusa1" Source="pupusa_revuelta.png" AbsoluteLayout.LayoutBounds="110,160,70,56" AbsoluteLayout.LayoutFlags="None" />
+                <Image x:Name="Pupusa2" Source="pupusa_loroco.png" AbsoluteLayout.LayoutBounds="186,176,70,56" AbsoluteLayout.LayoutFlags="None" />
+                <Image x:Name="Pupusa3" Source="pupusa_cooked.png" AbsoluteLayout.LayoutBounds="246,152,64,52" AbsoluteLayout.LayoutFlags="None" />
+                <Image x:Name="Steam1" Source="steam.png" AbsoluteLayout.LayoutBounds="140,118,16,36" AbsoluteLayout.LayoutFlags="None" Opacity="0" />
+                <Image x:Name="Steam2" Source="steam.png" AbsoluteLayout.LayoutBounds="216,132,16,36" AbsoluteLayout.LayoutFlags="None" Opacity="0" />
+                <Image x:Name="Steam3" Source="steam.png" AbsoluteLayout.LayoutBounds="276,110,16,36" AbsoluteLayout.LayoutFlags="None" Opacity="0" />
+                <Grid AbsoluteLayout.LayoutBounds="6,96,120,150" AbsoluteLayout.LayoutFlags="None">
+                    <Image Source="botilio.png" Aspect="AspectFit" />
+                    <Image Source="toque.png" WidthRequest="68" HeightRequest="42" HorizontalOptions="Start" VerticalOptions="Start" Margin="5,0,0,0" />
+                    <Image x:Name="Spatula" Source="spatula.png" WidthRequest="54" HeightRequest="60" HorizontalOptions="End" VerticalOptions="Start" Margin="0,14,-10,0" AnchorX="0.5" AnchorY="0.75" />
+                </Grid>
+                <Border x:Name="Bubble" BackgroundColor="{StaticResource Masa}" StrokeThickness="0" StrokeShape="RoundRectangle 14,14,14,4" Padding="10,8" AbsoluteLayout.LayoutBounds="150,14,180,AutoSize" AbsoluteLayout.LayoutFlags="None" AnchorX="1" AnchorY="0">
+                    <Label x:Name="BubbleText" Text="Botilio: nothing on the comal. Say the word." FontFamily="Nunito" FontSize="12" TextColor="{StaticResource Ink}" LineBreakMode="WordWrap" />
+                </Border>
+            </AbsoluteLayout>
+        </Border>
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="0">
+                <VerticalStackLayout x:Name="Steps" Spacing="0" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,16,0,0">
+                    <Border BackgroundColor="{StaticResource Masa}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14,12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="LLEGA EN" Style="{StaticResource Eyebrow}" />
+                            <Label x:Name="Eta" Text="—" Style="{StaticResource Display}" FontSize="30" />
+                            <Label Text="The comal does not rush. Neither should you." Style="{StaticResource Body}" FontSize="11" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource ComalSoft}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14,12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="PRO TIP" Style="{StaticResource Eyebrow}" TextColor="#BFAE93" />
+                            <Label x:Name="Tip" Text="Eat with your hands. Forks are for tourists." FontFamily="Nunito" FontSize="12" TextColor="{StaticResource Masa}" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Text="Pedir otra vez" FontFamily="NunitoExtraBold" FontSize="14" CornerRadius="16" HeightRequest="50" BackgroundColor="Transparent" BorderColor="#5A5651" BorderWidth="2" TextColor="{StaticResource Masa}" Clicked="OnAgain" />
+            <Button Grid.Column="1" x:Name="AdvanceButton" Text="Botilio, apúrate" FontFamily="NunitoExtraBold" FontSize="14" CornerRadius="16" HeightRequest="50" BackgroundColor="{StaticResource Cheese}" TextColor="{StaticResource Ink}" Clicked="OnHurry" />
+        </Grid>
+    </Grid>
+</ContentPage>

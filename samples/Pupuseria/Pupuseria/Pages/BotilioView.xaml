@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pupuseria.Pages.BotilioView">
+    <Grid ColumnDefinitions="132,*" ColumnSpacing="8" VerticalOptions="End">
+        <Grid x:Name="Figure" WidthRequest="132" HeightRequest="164">
+            <Image Source="botilio.png" Aspect="AspectFit" WidthRequest="132" HeightRequest="164" />
+            <Image Source="toque.png" WidthRequest="74" HeightRequest="46" HorizontalOptions="Start" VerticalOptions="Start" Margin="6,2,0,0" />
+            <Image x:Name="Spatula" Source="spatula.png" WidthRequest="54" HeightRequest="60" HorizontalOptions="End" VerticalOptions="Start" Margin="0,16,-6,0" AnchorX="0.5" AnchorY="0.75" />
+            <Image x:Name="Held" Source="pupusa_queso.png" WidthRequest="40" HeightRequest="34" HorizontalOptions="End" VerticalOptions="Start" Margin="0,10,4,0" />
+        </Grid>
+        <Border x:Name="Bubble" Grid.Column="1" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18,18,4,18" Padding="14,12" Margin="0,0,0,18" VerticalOptions="End" AnchorX="0" AnchorY="1">
+            <VerticalStackLayout Spacing="4">
+                <Label x:Name="Title" FontFamily="FredokaSemiBold" FontSize="17" TextColor="#2A211C" LineBreakMode="WordWrap" />
+                <Label x:Name="Line" FontFamily="Nunito" FontSize="13" TextColor="#5C4E42" LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

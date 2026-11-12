@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pages="clr-namespace:Pupuseria.Pages"
+             x:Class="Pupuseria.Pages.MenuPage"
+             BackgroundColor="{StaticResource Masa}"
+             Shell.NavBarIsVisible="False">
+    <Grid>
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="20,52,20,8" RowSpacing="8">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Image Source="logo.png" WidthRequest="40" HeightRequest="40" />
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <HorizontalStackLayout>
+                        <Label Text="pupusería" Style="{StaticResource Display}" FontSize="22" />
+                        <Label Text=".net" Style="{StaticResource Display}" FontSize="22" TextColor="{StaticResource Flag}" />
+                    </HorizontalStackLayout>
+                    <Label Text="PUPUSAS FROM THE CLOUD. NO FORKS." Style="{StaticResource Eyebrow}" />
+                </VerticalStackLayout>
+                <Grid Grid.Column="2" x:Name="CartButton" WidthRequest="48" HeightRequest="48">
+                    <Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 22" WidthRequest="44" HeightRequest="44" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="cart.png" WidthRequest="22" HeightRequest="22" />
+                    </Border>
+                    <Border x:Name="Badge" BackgroundColor="{StaticResource Salsa}" StrokeThickness="0" StrokeShape="RoundRectangle 11" WidthRequest="22" HeightRequest="22" HorizontalOptions="End" VerticalOptions="Start" AnchorX="0.5" AnchorY="0.5">
+                        <Label x:Name="BadgeCount" Text="0" TextColor="White" FontFamily="NunitoExtraBold" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnCartTapped" /></Grid.GestureRecognizers>
+                </Grid>
+            </Grid>
+
+            <pages:BotilioView x:Name="Botilio" Grid.Row="1" Margin="-8,0,0,0" />
+
+            <HorizontalStackLayout Grid.Row="2" Spacing="10" VerticalOptions="Center">
+                <Label Text="MASA" Style="{StaticResource Eyebrow}" VerticalOptions="Center" />
+                <Border BackgroundColor="{StaticResource MasaDark}" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="3">
+                    <HorizontalStackLayout>
+                        <Button x:Name="MaizButton" Text="Maíz" Style="{StaticResource PillOn}" HeightRequest="34" Clicked="OnMaiz" />
+                        <Button x:Name="ArrozButton" Text="Arroz" Style="{StaticResource Pill}" HeightRequest="34" BackgroundColor="Transparent" BorderWidth="0" Clicked="OnArroz" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Label x:Name="MasaHint" Text="The original, slightly crispy." Style="{StaticResource Body}" FontSize="11" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <ScrollView Grid.Row="3">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="El menú" Style="{StaticResource Display}" FontSize="20" />
+                        <Label Grid.Column="1" Text="Curtido y salsa: gratis. Siempre." Style="{StaticResource Body}" FontSize="12" VerticalOptions="End" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="MenuList" Spacing="10" />
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Border x:Name="CartBar" Grid.Row="4" BackgroundColor="{StaticResource Ink}" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="18,12" Margin="0,4,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout>
+                        <Label Text="¡Échale! · Ver pedido" FontFamily="FredokaBold" FontSize="17" TextColor="{StaticResource Masa}" />
+                        <Label x:Name="CartSummary" Text="The cart is empty. Botilio is waiting." FontFamily="Nunito" FontSize="12" TextColor="#D9C8AD" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="1" x:Name="CartTotal" Text="$0.00" FontFamily="FredokaBold" FontSize="20" TextColor="{StaticResource Cheese}" VerticalOptions="Center" />
+                </Grid>
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCartTapped" /></Border.GestureRecognizers>
+            </Border>
+        </Grid>
+
+        <Image x:Name="Flyer" Source="pupusa_queso.png" WidthRequest="48" HeightRequest="40" IsVisible="False" HorizontalOptions="Start" VerticalOptions="Start" InputTransparent="True" />
+
+        <Border x:Name="Banner" BackgroundColor="#15131A" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14,10" Margin="20,54,20,0" HorizontalOptions="Fill" VerticalOptions="Start" TranslationY="-120" Opacity="0" InputTransparent="True">
+            <HorizontalStackLayout Spacing="10">
+                <Image Source="spatula.png" WidthRequest="22" HeightRequest="24" />
+                <VerticalStackLayout>
+                    <Label x:Name="BannerTool" Text="add_to_order" FontFamily="NunitoExtraBold" FontSize="12" TextColor="{StaticResource Cheese}" />
+                    <Label x:Name="BannerText" Text="" FontFamily="Nunito" FontSize="13" TextColor="White" />
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

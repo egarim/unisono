@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pupuseria.Pages.CartPage"
+             BackgroundColor="{StaticResource Masa}"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,52,20,8" RowSpacing="8">
+        <VerticalStackLayout>
+            <Label Text="Tu pedido" Style="{StaticResource Display}" FontSize="24" />
+            <Label x:Name="Subtitle" Text="Nothing yet. A quiet Tuesday." Style="{StaticResource Body}" FontSize="12" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="12">
+                <VerticalStackLayout x:Name="Lines" Spacing="8" />
+                <HorizontalStackLayout Spacing="8">
+                    <Image Source="curtido.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                    <Label Text="Curtido y salsa: $0.00. We are not monsters." Style="{StaticResource Body}" FontSize="12" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="ENTREGA" Style="{StaticResource Eyebrow}" />
+                    <Border BackgroundColor="{StaticResource MasaDark}" StrokeThickness="0" StrokeShape="RoundRectangle 22" Padding="3">
+                        <Grid ColumnDefinitions="*,*">
+                            <Button x:Name="PickupButton" Text="Paso a recoger" Style="{StaticResource Pill}" Clicked="OnPickup" />
+                            <Button x:Name="DeliveryButton" Grid.Column="1" Text="A domicilio" Style="{StaticResource PillOn}" Clicked="OnDelivery" />
+                        </Grid>
+                    </Border>
+                    <Border x:Name="AddressCard" Style="{StaticResource Card}" StrokeShape="RoundRectangle 14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Image Source="pin.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="DIRECCIÓN" Style="{StaticResource Eyebrow}" />
+                                <Entry x:Name="Address" Text="Colonia Escalón, San Salvador · timbre 2 veces" FontFamily="NunitoBold" FontSize="13" TextColor="{StaticResource Ink}" BackgroundColor="Transparent" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="PAGO" Style="{StaticResource Eyebrow}" />
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                        <Button x:Name="CashButton" Text="Efectivo" Style="{StaticResource Pill}" Clicked="OnCash" />
+                        <Button x:Name="CardButton" Grid.Column="1" Text="Tarjeta" Style="{StaticResource PillOn}" Clicked="OnCard" />
+                        <Button x:Name="BitcoinButton" Grid.Column="2" Text="Bitcoin, sí" Style="{StaticResource Pill}" ImageSource="bitcoin.png" ContentLayout="Left, 6" Clicked="OnBitcoin" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Subtotal" Style="{StaticResource Body}" /><Label Grid.Column="1" x:Name="SubtotalLabel" Text="$0.00" Style="{StaticResource Body}" FontFamily="NunitoBold" TextColor="{StaticResource Ink}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto"><Label x:Name="DeliveryLabel" Text="Envío (Botilio pedals)" Style="{StaticResource Body}" /><Label Grid.Column="1" x:Name="DeliveryFeeLabel" Text="$1.00" Style="{StaticResource Body}" FontFamily="NunitoBold" TextColor="{StaticResource Ink}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Propina para Botilio · robots save for parts" Style="{StaticResource Body}" VerticalOptions="Center" />
+                        <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                            <Button x:Name="Tip0" Text="$0" Style="{StaticResource Pill}" Clicked="OnTip0" />
+                            <Button x:Name="Tip1" Text="$1" Style="{StaticResource PillOn}" Clicked="OnTip1" />
+                            <Button x:Name="Tip2" Text="$2" Style="{StaticResource Pill}" Clicked="OnTip2" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <BoxView HeightRequest="2" Color="{StaticResource Line}" Margin="0,4" />
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Total" Style="{StaticResource Display}" FontSize="18" /><Label Grid.Column="1" x:Name="TotalLabel" Text="$0.00" Style="{StaticResource Display}" FontSize="24" /></Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button Grid.Row="2" x:Name="PlaceButton" Text="¡Échale! · place the order" Style="{StaticResource Primary}" Clicked="OnPlace" />
+    </Grid>
+</ContentPage>

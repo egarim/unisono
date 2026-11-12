@@ -11,5 +11,6 @@
     <Project Path="samples/ConsoleHost/ConsoleHost.csproj" />
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
     <Project Path="samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj" />
+    <Project Path="samples/Pupuseria/Pupuseria/Pupuseria.csproj" />
   </Folder>
 </Solution>

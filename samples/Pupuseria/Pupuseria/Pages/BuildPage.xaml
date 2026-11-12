@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pupuseria.Pages.BuildPage"
+             BackgroundColor="{StaticResource Masa}"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,52,20,8" RowSpacing="8">
+        <VerticalStackLayout>
+            <Label Text="Arma tu pupusa" Style="{StaticResource Display}" FontSize="24" />
+            <Label Text="Go wild. Loroco plus chicharrón is legal." Style="{StaticResource Body}" FontSize="12" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="14">
+                <Grid ColumnDefinitions="150,*" ColumnSpacing="12">
+                    <Border Style="{StaticResource Card}" StrokeShape="RoundRectangle 20" HeightRequest="120" Padding="0">
+                        <Grid>
+                            <Label Text="EN VIVO" Style="{StaticResource Eyebrow}" FontSize="10" Margin="10,8,0,0" HorizontalOptions="Start" VerticalOptions="Start" />
+                            <Grid x:Name="Preview" WidthRequest="130" HeightRequest="100" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Image Source="pupusa_base.png" Aspect="AspectFit" />
+                                <Image x:Name="OvQueso" Source="fill_queso.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvFrijol" Source="fill_frijol.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvChicharron" Source="fill_chicharron.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvLoroco" Source="fill_loroco.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvAyote" Source="fill_ayote.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvCamaron" Source="fill_camaron.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvEspinaca" Source="fill_espinaca.png" Aspect="AspectFit" IsVisible="False" />
+                                <Image x:Name="OvJalapeno" Source="fill_jalapeno.png" Aspect="AspectFit" IsVisible="False" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                        <Label Text="La Tuya" Style="{StaticResource Display}" FontSize="18" />
+                        <Label x:Name="PreviewText" Text="Maíz · nothing yet" Style="{StaticResource Body}" />
+                        <Border Style="{StaticResource Card}" StrokeShape="RoundRectangle 12" Padding="10,8">
+                            <Label x:Name="Verdict" Text="Botilio: pick something. Even cheese counts." Style="{StaticResource Body}" FontSize="12" TextColor="{StaticResource Ink}" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="MASA" Style="{StaticResource Eyebrow}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button x:Name="MaizButton" Text="Maíz · the original" Style="{StaticResource PillOn}" CornerRadius="14" HeightRequest="48" Clicked="OnMaiz" />
+                        <Button x:Name="ArrozButton" Grid.Column="1" Text="Arroz · Olocuilta style" Style="{StaticResource Pill}" CornerRadius="14" HeightRequest="48" Clicked="OnArroz" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="RELLENOS" Style="{StaticResource Eyebrow}" />
+                        <Label Grid.Column="1" Text="pick up to 3, or 4 if nobody is watching" Style="{StaticResource Body}" FontSize="11" />
+                    </Grid>
+                    <FlexLayout x:Name="Chips" Wrap="Wrap" JustifyContent="Start" AlignItems="Start" />
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="CUÁNTAS" Style="{StaticResource Eyebrow}" />
+                        <Label Text="3 is a snack · 6 is a meal · 10 is respect" Style="{StaticResource Body}" FontSize="12" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="1" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 24" Padding="3">
+                        <HorizontalStackLayout>
+                            <Button Text="−" Style="{StaticResource Round}" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="{StaticResource MasaDark}" TextColor="{StaticResource Ink}" Clicked="OnLess" />
+                            <Label x:Name="Qty" Text="1" FontFamily="FredokaBold" FontSize="22" TextColor="{StaticResource Ink}" WidthRequest="52" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                            <Button Text="+" Style="{StaticResource Round}" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="{StaticResource Ink}" TextColor="{StaticResource Masa}" Clicked="OnMore" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+                <Label x:Name="QtyVerdict" Text="One pupusa. A tasting. We respect curiosity." Style="{StaticResource Body}" FontSize="12" TextColor="{StaticResource Salsa}" FontFamily="NunitoBold" Margin="0,-8,0,0" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="6">
+                            <HorizontalStackLayout Spacing="6"><Image Source="curtido.png" WidthRequest="18" HeightRequest="18" /><Label Text="CURTIDO" Style="{StaticResource Eyebrow}" VerticalOptions="Center" /></HorizontalStackLayout>
+                            <VerticalStackLayout x:Name="CurtidoChoices" Spacing="4" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="6">
+                            <HorizontalStackLayout Spacing="6"><Image Source="salsa.png" WidthRequest="18" HeightRequest="18" /><Label Text="SALSA" Style="{StaticResource Eyebrow}" VerticalOptions="Center" /></HorizontalStackLayout>
+                            <VerticalStackLayout x:Name="SalsaChoices" Spacing="4" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button Grid.Row="2" x:Name="AddButton" Text="Agregar 1 al pedido · $1.25" Style="{StaticResource Primary}" Clicked="OnAdd" />
+    </Grid>
+</ContentPage>
