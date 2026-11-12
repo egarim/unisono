@@ -8,8 +8,9 @@ a complete, working version in the repo to compare against.
 
 No. You mark your methods with the **same attributes the official MCP C# SDK uses**: `[McpServerToolType]` on the
 class, `[McpServerTool]` on each method and `[Description]` on the method and its parameters. If you already wrote MCP
-tools in C#, those classes work with Unisono unchanged. Unisono has one optional attribute of its own,
-`[UnisonoEntity]`, for the rare case in step 3 where it cannot tell which kind of object an id refers to.
+tools in C#, those classes work with Unisono unchanged. Unisono adds two optional attributes of its own:
+`[UnisonoPhrases]` lists the ways people ask Siri for an action (step 2), and `[UnisonoEntity]` covers the rare case in
+step 3 where Unisono cannot tell which kind of object an id refers to.
 
 What Unisono adds is everything around those methods:
 
@@ -97,6 +98,22 @@ What matters here:
   and the Android service read the same JSON.
 - `[McpServerToolType]` is not required by Unisono, which registers an instance you hand it. Keeping it lets the
   same class also work with the MCP SDK's own assembly scanning.
+
+**Siri phrases (optional).** Siri matches an action's phrases nearly literally: if the app knows "Where is my order",
+then "Check my order" does nothing. List the ways people say it with `[UnisonoPhrases]` on the same method:
+
+```csharp
+[McpServerTool(Name = "create_task", Title = "Create Task", Destructive = false)]
+[Description("Creates a new task in TaskTracker and returns it.")]
+[UnisonoPhrases("Create a task", "Add a task", "New task", "Create a {priority} task",
+    ShortTitle = "New Task", SystemImage = "plus.circle")]
+public TaskDto CreateTask(/* as above */)
+```
+
+Each phrase gets " in *app name*" added unless it already says `{app}`. A `{parameter}` token puts a parameter into the
+phrase; Apple allows that only for enum and entity parameters, so "Create a high task" works and "Create a task called
+X" does not. Without the attribute, the action gets one phrase, "*Title* in *app name*". The phrases live in C# next to
+the tool; there is no Swift to edit.
 
 ## Step 3. Build one registry
 
@@ -229,18 +246,18 @@ find the app while it is in the foreground, until its vocabulary index catches u
 | each enum a tool uses | a list to pick from |
 | a returned entity, list, text, number or yes/no | a result that later Shortcuts steps can use; any other record only reports "done" |
 | each `IEntityQuery<T>` (step 3) | an entity Siri can search and pick; a string parameter named `taskId`, or `id` when the app has one entity type, becomes "Which task?" |
-| each tool | the phrase "*Title* in *app name*", for example "Create Task in Task Tracker" (iOS allows ten per app) |
+| each tool | an App Shortcut with the phrases from `[UnisonoPhrases]`, or "*Title* in *app name*" without it (iOS allows ten App Shortcuts per app) |
 
 ### Customising (optional)
 
-The generated Swift is plain on purpose: short replies such as "Create Task: done." and, unless the tool carries
-`[UnisonoPhrases("Where is my order", "Check my order", ...)]`, one phrase per action. To
-change one piece, put Swift in an `AppIntents/` folder next to the `.csproj`. A type with the same name as a generated
+The generated replies are plain on purpose, such as "Create Task: done." To change one piece, put Swift in an
+`AppIntents/` folder next to the `.csproj`. A type with the same name as a generated
 one replaces it, and anything else is added:
 
 - An intent is named after the tool's title: "Create Task" becomes `CreateTaskIntent`. Write a struct with that name
   for your own reply text, a different prompt, or an intent that opens the app.
-- An `AppShortcutsProvider` of your own replaces all the generated phrases, because iOS allows one per app.
+- An `AppShortcutsProvider` of your own replaces all the generated phrases, because iOS allows one per app. Most apps
+  do not need one: `[UnisonoPhrases]` in step 2 covers the phrases.
 - Entities are `TaskEntity` and `TaskEntityQuery` for the entity "Task".
 
 A hand-written intent calls the same bridge the generated one does:
