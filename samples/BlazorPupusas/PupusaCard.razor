@@ -1,0 +1,16 @@
+<main class="card">
+    <h1>🫓 Pupusa Party — Blazor</h1>
+    <p>Same C# idea, now with a Razor component.</p>
+    <label for="quantity">Pupusas</label>
+    <input id="quantity" type="number" min="0" @bind="Quantity" @bind:event="oninput" />
+    <label for="price">Price (USD)</label>
+    <input id="price" type="number" min="0" step="0.01" @bind="Price" @bind:event="oninput" />
+    <h2>Total: @Total.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</h2>
+    <p class="note">Browser-side demo; MCP tool calls require the future host bridge.</p>
+</main>
+
+@code {
+    private int Quantity { get; set; } = 3;
+    private decimal Price { get; set; } = 1.75m;
+    private decimal Total => Math.Max(0, Quantity) * Math.Max(0, Price);
+}
