@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Unisono.Core/Unisono.Core.csproj" />
     <Project Path="src/Unisono.Mcp/Unisono.Mcp.csproj" />
+    <Project Path="src/Unisono.McpApps/Unisono.McpApps.csproj" />
     <Project Path="src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj" />
     <Project Path="src/Unisono.AppIntents/Unisono.AppIntents.csproj" />
     <Project Path="src/Unisono.AppIntents.Build/Unisono.AppIntents.Build.csproj" />
