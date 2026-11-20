@@ -23,6 +23,57 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
+## New: bring your own UI 🎨
+
+The choir has a new instrument! Your C# tool can now be **associated with an optional user interface**, without forcing every app to use the same UI framework.
+
+Start with ordinary `[McpServerTool]` methods. Add a UI provider only if you want one. The new `Unisono.McpApps` project keeps the contract separate from rendering technology: **Uno Platform, Blazor, or plain HTML** can eventually plug into the same registry.
+
+> **Current status:** the UI registry, provider interface, host capability checks, and a static HTML provider are implemented in source. **Embedded rendering in ChatGPT/Claude is not implemented yet.** The MCP host currently serves headless tools, not MCP Apps UI resources. Uno and Blazor providers, plugin packaging, and marketplace distribution are future work. This feature is in the repository source, not yet listed as a released NuGet package here.
+
+### A tiny story: three pupusas and one C# method 🫓
+
+**Act 1 — Give the assistant a skill.** A little calculator knows how much the pupusa party costs:
+
+```csharp
+[McpServerTool(Name = "calculate_pupusas", ReadOnly = true)]
+[Description("Calculate the total price of pupusas.")]
+public decimal CalculatePupusas(int quantity, decimal priceEach)
+    => quantity * priceEach;
+```
+
+The method is a normal MCP tool. An agent can call it with `quantity: 3` and `priceEach: 1.75`, receiving **$5.25**. No UI required.
+
+**Act 2 — Dress it up.** Load a small HTML card and associate it with the *same* tool:
+
+```csharp
+var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());
+var html = new StaticHtmlUiProvider()
+    .Add("ui://pupuseria/order-card", htmlSource);
+
+var ui = new UnisonoUiRegistry(tools)
+    .AddProvider(html)
+    .MapTool(
+        "calculate_pupusas",
+        "ui://pupuseria/order-card",
+        "html",
+        "Pupusa Party Calculator");
+```
+
+Here, `htmlSource` is a string containing your trusted HTML document, and `PupusaTools` is your tool class. `MapTool` checks that the tool and provider were registered. When a host cannot render a UI, the tool remains available on its own.
+
+**Act 3 — Try it locally.** The [UI Playground sample](samples/UiPlayground/README.md) demonstrates those calls, writes a local HTML preview, and runs the headless MCP server:
+
+```bash
+dotnet run --project samples/UiPlayground
+```
+
+Open the generated `pupusa-preview.html` in a browser to play with the card. The browser preview performs its calculation locally; it does **not** call MCP. You can test the real tool separately with the existing MCP smoke test. Follow the sample guide for exact commands and expected output.
+
+**Act 4 — Bring your favorite UI framework (coming next).** A future `Unisono.UI.Uno` provider could compile C# + XAML into web assets; `Unisono.UI.Blazor` could do the same for Razor. Both would implement `IUnisonoUiProvider`, leaving the tool and registry untouched. The MCP Apps protocol bridge and host compatibility still need implementation and validation.
+
+For the design and limitations, see [pluggable MCP Apps UI](docs/pluggable-mcp-apps-ui.md).
+
 ## Watch
 
 The implementation, start to finish (5:13):
@@ -85,6 +136,7 @@ What each layer needs from the app:
 | Path | What |
 |---|---|
 | `src/Unisono.Core` | `ToolRegistry`: discovers `[McpServerTool]` methods, binds JSON arguments, invokes one handler per tool. |
+| `src/Unisono.McpApps` | Optional, UI-framework-neutral provider registry. Currently resolves HTML assets; protocol-level MCP Apps rendering is not yet integrated. |
 | `src/Unisono.Mcp` | `UnisonoMcpHttpHost`: the registry as an MCP server over Streamable HTTP on `HttpListener` (no ASP.NET Core), so it runs inside a MAUI app. |
 | `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
 | `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
@@ -93,6 +145,7 @@ What each layer needs from the app:
 | `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. Its `AppIntents/` folder customises the generated Swift (due-date prompt, confirmations, phrases); the package generates the rest and builds the framework. |
 | `samples/UnisonoNotes` | Second demo app: notes whose `- [ ]` lines are action items; five tools, a `Note` entity, MCP on port 8789. With TaskTracker it tells the cross-app story (note → action items → tasks → note updated). Its Xcode project is generated. No hand-written Swift at all: every intent, the Note entity and the phrases are generated from the C# tools. |
 | `samples/Pupuseria` | Pupusería.net: ordering pupusas from Botilio, the .NET robot pupusero. Seven tools, a `Pupusa` entity, generated Siri intents plus three hand-written ones, AppFunctions on Android, and animations that play on every tool call whoever made it (Siri, MCP, Gemini). |
+| `samples/UiPlayground` | A gradual, runnable example: one C# pupusa-price tool, a UI provider, a local HTML preview, and headless MCP access. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
 | `scripts/mcp-smoke.sh`, `scripts/mcp-call.py` | Drive any Unisono endpoint from the shell: initialize, tools/list, tools/call, session delete. |
 | `scripts/s3-orchestrate.py`, `scripts/s3-agent-demo.sh` | The two-app scenario: scripted, and with Claude Code as the agent. |
