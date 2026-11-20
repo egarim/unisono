@@ -5,6 +5,7 @@
     <Project Path="src/Unisono.McpApps/Unisono.McpApps.csproj" />
     <Project Path="src/Unisono.UI.Uno/Unisono.UI.Uno.csproj" />
     <Project Path="src/Unisono.UI.Blazor/Unisono.UI.Blazor.csproj" />
+    <Project Path="src/Unisono.UI.React/Unisono.UI.React.csproj" />
     <Project Path="src/Unisono.AppIntents.Binding/Unisono.AppIntents.Binding.csproj" />
     <Project Path="src/Unisono.AppIntents/Unisono.AppIntents.csproj" />
     <Project Path="src/Unisono.AppIntents.Build/Unisono.AppIntents.Build.csproj" />
