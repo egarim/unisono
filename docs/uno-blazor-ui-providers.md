@@ -1,13 +1,14 @@
-# Plug in Uno or Blazor WebAssembly 🫓
+# Plug in Uno, Blazor, or React 🫓
 
 **Write your UI in C# + XAML (Uno) or C# + Razor (Blazor). Keep the same Unisono tool.**
 
-This feature introduces two providers:
+This feature introduces three providers:
 
 - `Unisono.UI.Uno.UnoUiProvider`
 - `Unisono.UI.Blazor.BlazorUiProvider`
+- `Unisono.UI.React.ReactUiProvider`
 
-Both implement `IUnisonoUiProvider` through `PublishedWebUiProvider`. They are **publish-output adapters**: each loads the WebAssembly app's published `wwwroot/index.html` and provides an MCP Apps HTML resource. The runtime files (`_framework`, WASM, JS, CSS and other dependencies) remain deployed to a trusted static HTTPS host.
+All three implement `IUnisonoUiProvider` through `PublishedWebUiProvider`. They are **publish-output adapters**: Uno and Blazor load a published WebAssembly `wwwroot/index.html`, while React loads Vite's `dist/index.html`. The JS, CSS, WASM, and other assets must be hosted at a trusted HTTPS origin.
 
 **Scope (important):** This does *not yet* implement MCP `resources/read`, tool `_meta.ui.resourceUri`, host security metadata, or MCP Apps JavaScript bridging. The adapter does not make an iframe work by itself. It allows a future protocol layer to obtain the right UI resource, preserving separation from any UI toolkit.
 
@@ -65,10 +66,26 @@ ui.AddProvider(provider)
 
 Use `dotnet new unoapp` or Uno's project wizard to obtain its current package versions. See [Uno WebAssembly publishing](https://platform.uno/docs/articles/uno-publishing-webassembly.html).
 
+## React + TypeScript + Vite
+
+See [React Pupusas](../samples/ReactPupusas/README.md) for an end-to-end example, including `npm install`, Vite production builds, and React provider registration. Configure `UNISONO_UI_BASE` to the final static asset URL when building: Vite emits script and CSS asset URLs based on its build-time base. Rewriting only the HTML `<base>` element does **not** correct Vite's absolute asset paths.
+
+```csharp
+using Unisono.UI.React;
+
+var provider = new ReactUiProvider(
+    "samples/ReactPupusas/dist",
+    new Uri("https://static.example.com/react-pupusas/"))
+    .Add("ui://pupuseria/react");
+
+ui.AddProvider(provider)
+  .MapTool("calculate_pupusas", "ui://pupuseria/react", "react");
+```
+
 ## Design details
 
 - **No frontend runtime dependency in the provider package.** The provider runs on server-side .NET 10 and loads already-published assets; it does not compile Uno or Blazor at runtime.
-- **One UI mapping per tool in the current registry.** To choose Uno vs. Blazor per host, build distinct mappings/registries or extend the UI registry to support variants.
+- **One UI mapping per tool in the current registry.** To choose Uno vs. Blazor vs. React per host, build distinct mappings/registries or extend the UI registry to support variants.
 - **Correct HTML base URL:** The provider replaces or inserts a `<base href="https://.../">` tag so relative framework assets load from the static origin in a sandboxed iframe.
 - **Security:** Asset URLs require HTTPS except for loopback development. The future MCP Apps resource handler must declare the asset origin in `_meta.ui.csp.resourceDomains`, and relevant `connectDomains` if the UI makes network calls. The host can impose stricter CSP. Serve framework JS/WASM with appropriate CORS and MIME types.
 - **HTML isn't enough for tool calls:** Real MCP Apps interactions require a JavaScript host bridge, secure command handling, and capability negotiation. Both UI samples deliberately calculate the total locally.
@@ -79,7 +96,7 @@ Use `dotnet new unoapp` or Uno's project wizard to obtain its current package ve
 1. Add `resources/list` and `resources/read` mappings to `UnisonoMcpHttpHost`.
 2. Add `_meta.ui.resourceUri` to mapped tool descriptors.
 3. Emit CSP metadata for `AssetBaseUri`.
-4. Implement MCP Apps JS ↔ C# bridging (Uno + Blazor).
+4. Implement MCP Apps JavaScript bridge and adapter integration (Uno + Blazor + React).
 5. Test sandbox loading, cross-origin bootstrap, lifecycle, tool calls, and headless fallback in real host environments.
 
-These projects and samples were authored without a .NET SDK in the editing environment; compile/publish tests are still required.
+These projects and samples were authored without a verified .NET/npm build in the editing environment; compile/publish tests are still required.
