@@ -23,13 +23,14 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
-## Uno and Blazor UIs for MCP Apps (experimental) 🫓
+## Uno, Blazor, and React UIs for MCP Apps (experimental) 🫓
 
-**Bring your own .NET UI:** the optional `Unisono.UI.Uno` and `Unisono.UI.Blazor` projects now adapt *published* WebAssembly applications to Unisono's `IUnisonoUiProvider` contract. No React is required.
+**Bring your own UI:** `Unisono.UI.Uno`, `Unisono.UI.Blazor`, and `Unisono.UI.React` adapt *published* WebAssembly or Vite applications to the same `IUnisonoUiProvider` contract. React is optional, not a dependency of `Unisono.Core`.
 
 - **Blazor:** [complete pupusa calculator application](samples/BlazorPupusas/), written with Razor and C#. Publish it using `dotnet publish samples/BlazorPupusas -c Release`.
 - **Uno:** [pupusa calculator XAML page](samples/UnoPupusas/), ready to place in an official Uno WebAssembly template project.
-- **Both:** register the published `wwwroot` directory with `BlazorUiProvider` or `UnoUiProvider`, plus the HTTPS origin where its static runtime assets are hosted.
+- **React:** [TypeScript + Vite pupusa calculator](samples/ReactPupusas/), with its own `ReactUiProvider` and production asset-base configuration.
+- **All three:** register a published `wwwroot` or `dist` directory with the matching provider, plus the HTTPS origin where its static runtime assets are hosted.
 
 ```csharp
 var provider = new BlazorUiProvider(
@@ -42,7 +43,7 @@ var ui = new UnisonoUiRegistry(tools)
     .MapTool("calculate_pupusas", "ui://pupuseria/blazor", "blazor");
 ```
 
-**Current boundary:** these are build-output providers, *not yet* complete ChatGPT/Claude embedded UIs. The MCP resource exposure, security metadata, and browser-side MCP Apps bridge still need to be wired. The sample calculators run locally in the browser; they do not call tools. See the [step-by-step Uno/Blazor guide](docs/uno-blazor-ui-providers.md) and the [core UI architecture](docs/pluggable-mcp-apps-ui.md).
+**Current boundary:** these are build-output providers, *not yet* complete ChatGPT/Claude embedded UIs. The MCP resource exposure, security metadata, and browser-side MCP Apps bridge still need to be wired. The sample calculators run locally in the browser; they do not call tools. See the [step-by-step UI provider guide](docs/uno-blazor-ui-providers.md) and [React example guide](samples/ReactPupusas/README.md) and the [core UI architecture](docs/pluggable-mcp-apps-ui.md).
 
 ## Watch
 
@@ -106,7 +107,7 @@ What each layer needs from the app:
 | Path | What |
 |---|---|
 | `src/Unisono.Core` | `ToolRegistry`: discovers `[McpServerTool]` methods, binds JSON arguments, invokes one handler per tool. |
-| `src/Unisono.UI.Uno`, `src/Unisono.UI.Blazor` | Optional providers for published Uno and Blazor WebAssembly output; no frontend toolkit dependencies in the core. |
+| `src/Unisono.UI.Uno`, `src/Unisono.UI.Blazor`, `src/Unisono.UI.React` | Optional providers for published Uno/Blazor WebAssembly and React/Vite output; no frontend toolkit dependencies in the core. |
 | `src/Unisono.Mcp` | `UnisonoMcpHttpHost`: the registry as an MCP server over Streamable HTTP on `HttpListener` (no ASP.NET Core), so it runs inside a MAUI app. |
 | `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
 | `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
@@ -115,6 +116,7 @@ What each layer needs from the app:
 | `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. Its `AppIntents/` folder customises the generated Swift (due-date prompt, confirmations, phrases); the package generates the rest and builds the framework. |
 | `samples/UnisonoNotes` | Second demo app: notes whose `- [ ]` lines are action items; five tools, a `Note` entity, MCP on port 8789. With TaskTracker it tells the cross-app story (note → action items → tasks → note updated). Its Xcode project is generated. No hand-written Swift at all: every intent, the Note entity and the phrases are generated from the C# tools. |
 | `samples/Pupuseria` | Pupusería.net: ordering pupusas from Botilio, the .NET robot pupusero. Seven tools, a `Pupusa` entity, generated Siri intents plus three hand-written ones, AppFunctions on Android, and animations that play on every tool call whoever made it (Siri, MCP, Gemini). |
+| `samples/ReactPupusas` | React + TypeScript + Vite pupusa calculator and deployment guide for the React provider. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
 | `scripts/mcp-smoke.sh`, `scripts/mcp-call.py` | Drive any Unisono endpoint from the shell: initialize, tools/list, tools/call, session delete. |
 | `scripts/s3-orchestrate.py`, `scripts/s3-agent-demo.sh` | The two-app scenario: scripted, and with Claude Code as the agent. |
