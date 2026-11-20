@@ -23,6 +23,27 @@ cross-app Shortcut "Note to Tasks" (Notes → action items → TaskTracker tasks
 Claude Code driving both Mac Catalyst apps over MCP (read the standup note, create the tasks, write back to the note).
 See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-design.md` for the design and the milestones.
 
+## Uno and Blazor UIs for MCP Apps (experimental) 🫓
+
+**Bring your own .NET UI:** the optional `Unisono.UI.Uno` and `Unisono.UI.Blazor` projects now adapt *published* WebAssembly applications to Unisono's `IUnisonoUiProvider` contract. No React is required.
+
+- **Blazor:** [complete pupusa calculator application](samples/BlazorPupusas/), written with Razor and C#. Publish it using `dotnet publish samples/BlazorPupusas -c Release`.
+- **Uno:** [pupusa calculator XAML page](samples/UnoPupusas/), ready to place in an official Uno WebAssembly template project.
+- **Both:** register the published `wwwroot` directory with `BlazorUiProvider` or `UnoUiProvider`, plus the HTTPS origin where its static runtime assets are hosted.
+
+```csharp
+var provider = new BlazorUiProvider(
+    "out/blazor/wwwroot",
+    new Uri("https://static.example.com/blazor-pupusas/"))
+    .Add("ui://pupuseria/blazor");
+
+var ui = new UnisonoUiRegistry(tools)
+    .AddProvider(provider)
+    .MapTool("calculate_pupusas", "ui://pupuseria/blazor", "blazor");
+```
+
+**Current boundary:** these are build-output providers, *not yet* complete ChatGPT/Claude embedded UIs. The MCP resource exposure, security metadata, and browser-side MCP Apps bridge still need to be wired. The sample calculators run locally in the browser; they do not call tools. See the [step-by-step Uno/Blazor guide](docs/uno-blazor-ui-providers.md) and the [core UI architecture](docs/pluggable-mcp-apps-ui.md).
+
 ## Watch
 
 The implementation, start to finish (5:13):
@@ -85,6 +106,7 @@ What each layer needs from the app:
 | Path | What |
 |---|---|
 | `src/Unisono.Core` | `ToolRegistry`: discovers `[McpServerTool]` methods, binds JSON arguments, invokes one handler per tool. |
+| `src/Unisono.UI.Uno`, `src/Unisono.UI.Blazor` | Optional providers for published Uno and Blazor WebAssembly output; no frontend toolkit dependencies in the core. |
 | `src/Unisono.Mcp` | `UnisonoMcpHttpHost`: the registry as an MCP server over Streamable HTTP on `HttpListener` (no ASP.NET Core), so it runs inside a MAUI app. |
 | `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
 | `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
