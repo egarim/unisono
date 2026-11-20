@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Unisono.UI.Uno</RootNamespace>
+    <Description>Uno Platform WebAssembly published-asset provider for pluggable Unisono MCP Apps UI.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Unisono.McpApps/Unisono.McpApps.csproj" />
+  </ItemGroup>
+</Project>
