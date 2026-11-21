@@ -25,12 +25,12 @@ See `docs/demo-plan.md` and `docs/images/`. See `docs/dotnet-siri-mcp-framework-
 
 ## Uno, Blazor, and React UIs for MCP Apps (experimental) 🫓
 
-**Bring your own UI:** `Unisono.UI.Uno`, `Unisono.UI.Blazor`, and `Unisono.UI.React` adapt *published* WebAssembly or Vite applications to the same `IUnisonoUiProvider` contract. React is optional, not a dependency of `Unisono.Core`.
+**Bring your own UI:** `Unisono.UI.Uno`, `Unisono.UI.Blazor`, and `Unisono.UI.React` adapt published WebAssembly or Vite applications to the same `IUnisonoUiProvider` contract. React is optional, not a dependency of `Unisono.Core`. The React sample compiles into **one self-contained HTML resource**.
 
 - **Blazor:** [complete pupusa calculator application](samples/BlazorPupusas/), written with Razor and C#. Publish it using `dotnet publish samples/BlazorPupusas -c Release`.
 - **Uno:** [pupusa calculator XAML page](samples/UnoPupusas/), ready to place in an official Uno WebAssembly template project.
-- **React:** [TypeScript + Vite pupusa calculator](samples/ReactPupusas/), with its own `ReactUiProvider` and production asset-base configuration.
-- **All three:** register a published `wwwroot` or `dist` directory with the matching provider, plus the HTTPS origin where its static runtime assets are hosted.
+- **React:** [TypeScript + Vite pupusa calculator](samples/ReactPupusas/), bundled into a standalone HTML MCP App resource.
+- **All three:** register a published `wwwroot` or `dist` directory with the matching provider. Uno and Blazor also require the HTTPS origin where their runtime files are hosted.
 
 ```csharp
 var provider = new BlazorUiProvider(
@@ -51,18 +51,17 @@ var ui = new UnisonoUiRegistry(tools)
 # Build a React MCP App with production absolute asset URLs
 cd samples/ReactPupusas
 npm install
-UNISONO_UI_BASE=https://YOUR_STATIC_HOST/react-pupusas/ npm run build
+npm run build
 
-# Deploy dist/ to that HTTPS asset URL.
+# React's dist/index.html is self-contained; no static upload is needed.
 # Back at the repository root, start the sample MCP server:
-dotnet run --project samples/McpAppsPupusasHost -- \
-  react samples/ReactPupusas/dist https://YOUR_STATIC_HOST/react-pupusas/
+dotnet run --project samples/McpAppsPupusasHost -- react samples/ReactPupusas/dist
 
 # With the server running, validate protocol support:
 python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
 ```
 
-Run inside an MCP Apps-compatible host to see the UI call C#; opening the static site in a regular browser will not provide an MCP host. For public ChatGPT/Claude testing, the MCP endpoint must be exposed through a suitable authenticated HTTPS deployment.
+Run inside an MCP Apps-compatible host to see the UI call C#; opening the HTML in a regular browser will not provide an MCP host. For public ChatGPT/Claude testing, the MCP endpoint must be exposed through a suitable authenticated HTTPS deployment.
 
 ## Watch
 
