@@ -82,6 +82,7 @@ A React application with external assets can still use `ReactUiProvider(path, pu
 
 - **No frontend runtime dependency in the provider package.** The provider runs on server-side .NET 10 and loads already-published assets; it does not compile Uno or Blazor at runtime.
 - **One UI mapping per tool in the current registry.** To choose Uno vs. Blazor vs. React per host, build distinct mappings/registries or extend the UI registry to support variants.
+- **One MCP host per registry.** The mapping is written as `_meta.ui.resourceUri` onto the registry's shared MCP tool objects, so a second host created from the same registry inherits the UI metadata.
 - **Correct HTML base URL:** The provider replaces or inserts a `<base href="https://.../">` tag so relative framework assets load from the static origin in a sandboxed iframe.
 - **Security:** Asset URLs require HTTPS except for loopback development. The MCP Apps resource handler declares the asset origin in `_meta.ui.csp.resourceDomains` and leaves `connectDomains` to the host if the UI makes network calls. The host can impose stricter CSP. Serve framework JS/WASM with appropriate CORS and MIME types.
 - **Actual tool calls:** React uses the MCP Apps SDK; Blazor and Uno sample buttons call through the shared JS bridge. UI host support and client capabilities must be verified in deployment.

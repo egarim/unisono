@@ -45,6 +45,14 @@ public static class UnisonoMcpAppsResources
         return resources;
     }
 
+    /// <summary>
+    /// Adds <c>_meta.ui.resourceUri</c> to every tool that has a UI mapping.
+    /// </summary>
+    /// <remarks>
+    /// The MCP tool objects are shared by the <see cref="ToolRegistry"/>, so the mapping is written onto
+    /// their protocol object. Create one MCP host per registry: a second host built from the same registry
+    /// (for example a tools-only one) would still advertise the UI metadata.
+    /// </remarks>
     public static void ApplyToolMetadata(
         UnisonoUiRegistry ui,
         IEnumerable<McpServerTool> tools)
