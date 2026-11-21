@@ -9,5 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Unisono.Core\Unisono.Core.csproj" />
+    <ProjectReference Include="..\Unisono.McpApps\Unisono.McpApps.csproj" />
   </ItemGroup>
 </Project>

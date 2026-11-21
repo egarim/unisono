@@ -31,5 +31,10 @@ local.properties
 # local package output
 artifacts/
 
+# built sample assets
+samples/McpAppsBridge/node_modules/
+samples/McpAppsBridge/dist/
+samples/BlazorPupusas/wwwroot/unisono-mcp-bridge.js
+
 # UI Playground preview written by samples/UiPlayground
 pupusa-preview.html

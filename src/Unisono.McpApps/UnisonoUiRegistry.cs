@@ -17,6 +17,12 @@ public sealed class UnisonoUiRegistry
 
     public IReadOnlyCollection<UnisonoUiDefinition> Definitions => _definitions.Values.ToArray();
 
+    /// <summary>Returns the registered provider for a UI framework.</summary>
+    public IUnisonoUiProvider GetProvider(string framework)
+        => _providers.TryGetValue(framework, out var provider)
+            ? provider
+            : throw new KeyNotFoundException($"No provider registered for '{framework}'.");
+
     public UnisonoUiRegistry AddProvider(IUnisonoUiProvider provider)
     {
         ArgumentNullException.ThrowIfNull(provider);

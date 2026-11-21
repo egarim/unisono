@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using Unisono.McpApps;
 
 namespace Unisono.Mcp;
 
@@ -44,6 +45,7 @@ public sealed class UnisonoMcpHttpHost : IAsyncDisposable
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger _log;
     private readonly McpServerPrimitiveCollection<McpServerTool> _tools;
+    private readonly McpServerResourceCollection? _uiResources;
     private readonly Dictionary<string, Session> _sessions = new(StringComparer.Ordinal);
     private readonly object _gate = new();
 
@@ -52,7 +54,7 @@ public sealed class UnisonoMcpHttpHost : IAsyncDisposable
     private Task? _acceptLoop;
     private int _port;
 
-    public UnisonoMcpHttpHost(ToolRegistry registry, UnisonoMcpHttpOptions? options = null, ILoggerFactory? loggerFactory = null)
+    public UnisonoMcpHttpHost(ToolRegistry registry, UnisonoMcpHttpOptions? options = null, ILoggerFactory? loggerFactory = null, UnisonoUiRegistry? ui = null)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _options = options ?? new UnisonoMcpHttpOptions();
@@ -63,6 +65,12 @@ public sealed class UnisonoMcpHttpHost : IAsyncDisposable
         _tools = new McpServerPrimitiveCollection<McpServerTool>(StringComparer.Ordinal);
         foreach (var tool in registry.McpTools)
             _tools.Add(tool);
+
+        if (ui is not null)
+        {
+            UnisonoMcpAppsResources.ApplyToolMetadata(ui, _tools);
+            _uiResources = UnisonoMcpAppsResources.CreateResources(ui);
+        }
     }
 
     /// <summary>The URL MCP clients should connect to.</summary>
@@ -290,6 +298,7 @@ public sealed class UnisonoMcpHttpHost : IAsyncDisposable
             ServerInfo = new Implementation { Name = _options.ServerName, Version = _options.ServerVersion },
             ServerInstructions = _options.Instructions,
             ToolCollection = _tools,
+            ResourceCollection = _uiResources,
         };
 
         var server = McpServer.Create(transport, options, _loggerFactory, null);

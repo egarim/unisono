@@ -1,0 +1,5 @@
+body { background: #fffaf4; color: #30271f; font: 16px system-ui, sans-serif; padding: 24px; }
+.card { max-width: 420px; margin: auto; border-radius: 20px; border: 1px solid #e4c9aa; padding: 24px; background: white; box-shadow: 0 5px 30px #0001; }
+h1 { margin-top: 0; } label { font-weight: 600; display: block; margin: 16px 0 6px; }
+input { padding: 10px; font: inherit; border-radius: 8px; border: 1px solid #aaa; width: 100%; box-sizing: border-box; }
+.note { color: #796656; font-size: 12px; }

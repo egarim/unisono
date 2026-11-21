@@ -2,7 +2,7 @@
 
 **One C# tool. One optional HTML card. No React, Uno, or Blazor required.**
 
-This is a runnable demonstration of the new `Unisono.McpApps` provider abstraction. It teaches *registration and resource resolution*, **not** a fully working embedded ChatGPT/Claude UI.
+This is a runnable demonstration of the `Unisono.McpApps` provider abstraction. It teaches *registration and resource resolution* and a local preview. To serve the same resource to an MCP host, see [the protocol host sample](../McpAppsPupusasHost/README.md).
 
 ## 1. Start with the tool
 
@@ -43,10 +43,21 @@ Open `pupusa-preview.html` in a web browser to play with the price calculator. T
 scripts/mcp-smoke.sh http://127.0.0.1:8791/mcp calculate_pupusas '{"quantity":3,"priceEach":1.75}'
 ```
 
-## 4. Understand the missing bridge
+## 4. From preview to a real MCP App
 
-Currently, `Unisono.McpApps` manages UI providers and resources in .NET, but `UnisonoMcpHttpHost` **does not yet publish** that resource through MCP's `resources/read` protocol or connect `_meta.ui.resourceUri` to a tool. There is no MCP Apps iframe bridge yet. That is why opening this sample in ChatGPT or Claude **will expose the tool, not the embedded card**.
+This playground stops at the local preview. The protocol part is now implemented: when a host is created with the
+registry, `UnisonoMcpHttpHost` publishes the mapped `ui://` resource through `resources/list` and `resources/read`,
+advertises `_meta.ui.resourceUri` on the tool and declares an asset origin in `_meta.ui.csp.resourceDomains`.
+`samples/McpAppsPupusasHost` does exactly that, with React, Blazor or Uno UIs, and `scripts/mcp-ui-smoke.py`
+verifies it.
 
-Next, we will add protocol exposure, verify host compatibility, and provide a real Uno Platform WebAssembly UI provider.
+Adding it here is one argument:
+
+```csharp
+await using var host = new UnisonoMcpHttpHost(tools, options, ui: ui);
+```
+
+Opening the HTML file in a browser still does not involve an MCP host; the card only becomes interactive inside an
+MCP Apps-compatible host. Real ChatGPT/Claude sandbox behavior remains unverified.
 
 More detail: [pluggable MCP Apps architecture](../../docs/pluggable-mcp-apps-ui.md).

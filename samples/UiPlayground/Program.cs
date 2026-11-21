@@ -1,6 +1,6 @@
 // UI Playground: one C# tool, one optional UI, zero frontend frameworks.
-// This example demonstrates the UI registry only. The current MCP host
-// exposes tools but does not yet advertise/serve MCP Apps UI resources.
+// This example stops at the registry and a local preview; pass the registry to
+// the host (see samples/McpAppsPupusasHost) to serve the resource over MCP.
 using System.ComponentModel;
 using System.Text;
 using ModelContextProtocol.Server;
@@ -29,7 +29,7 @@ var total = await tools.InvokeAsync<decimal>(
 Console.WriteLine($"Three pupusas cost ${total:0.00}.");
 
 // Resolve the UI resource and save a local preview to inspect in a browser.
-// This is NOT MCP Apps delivery to ChatGPT or Claude yet.
+// Serving it to a real host is one line away: new UnisonoMcpHttpHost(tools, ui: ui).
 var capabilities = new UnisonoUiHostCapabilities(SupportsMcpApps: true);
 if (ui.CanRender(toolName, capabilities))
 {
@@ -44,7 +44,7 @@ await using var host = new UnisonoMcpHttpHost(tools, new UnisonoMcpHttpOptions
 {
     Port = 8791,
     ServerName = "unisono-ui-playground",
-    Instructions = "Calculate pupusa prices with the C# tool. UI resource delivery is not implemented yet."
+    Instructions = "Calculate pupusa prices with the C# tool. This host serves tools only; the UI resource is previewable locally."
 });
 host.Start();
 Console.WriteLine($"Headless MCP tools available at {host.Url}");
