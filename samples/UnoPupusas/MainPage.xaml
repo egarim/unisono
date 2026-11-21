@@ -12,8 +12,9 @@
             <TextBlock Text="Price (USD)" />
             <NumberBox x:Name="PriceInput" Value="1.75" Minimum="0" SmallChange="0.25"
                        ValueChanged="OnValueChanged" />
-            <TextBlock x:Name="TotalText" Text="Total: $5.25" FontSize="22" />
-            <TextBlock Text="Local UI calculation; the MCP Apps tool bridge comes later."
+            <Button Content="Calculate with MCP" Click="Calculate_Click" />
+            <TextBlock x:Name="TotalText" Text="Server total: —" FontSize="22" />
+            <TextBlock Text="Requires an MCP Apps host and the bundled JavaScript bridge."
                        Opacity="0.6" TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>
