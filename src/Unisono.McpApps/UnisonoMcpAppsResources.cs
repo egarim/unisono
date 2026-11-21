@@ -70,7 +70,7 @@ public static class UnisonoMcpAppsResources
         UnisonoUiRegistry ui, UnisonoUiDefinition definition)
     {
         var uiMeta = new JsonObject();
-        if (ui.GetProvider(definition.Framework) is PublishedWebUiProvider hosted)
+        if (ui.GetProvider(definition.Framework) is PublishedWebUiProvider { AssetBaseUri: not null } hosted)
         {
             // MCP Apps CSP uses origins; do not include a path in resourceDomains.
             var origin = hosted.AssetBaseUri.GetLeftPart(UriPartial.Authority);
