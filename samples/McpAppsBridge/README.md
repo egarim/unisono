@@ -1,6 +1,6 @@
 # Unisono MCP Apps browser bridge
 
-Builds an **IIFE browser bundle** from the official MCP Apps SDK, for C# WebAssembly frontends (Blazor/Uno). It exposes `window.UnisonoMcpBridge.connect()` and `calculatePupusas(quantity, priceEach)` as promises.
+Builds an **IIFE browser bundle** from the official MCP Apps SDK, for C# WebAssembly frontends (Blazor/Uno). It exposes `window.UnisonoMcpBridge.connect()`, generic `callTool(name, args)`, and `calculatePupusas(quantity, priceEach)` as promises.
 
 ```bash
 cd samples/McpAppsBridge
@@ -12,4 +12,4 @@ Copy `dist/unisono-mcp-bridge.js` into the published UI's static asset root and 
 
 The bundle uses host-only postMessage transport; **there is no fallback direct HTTP request** to the MCP endpoint, and the bridge will not connect when opening the page as a normal browser tab.
 
-This is currently an example bridge with one `calculatePupusas` helper. A generic typed tool invoker and native Uno callback wiring are future improvements.
+The generic invoker returns the full MCP `CallToolResult` and works with any authorized tool on the same MCP server. The Pupusa convenience function demonstrates parsing a numeric result. Uno uses a browser WASM `[JSImport]` helper; cross-host sandbox behavior remains to be tested.
