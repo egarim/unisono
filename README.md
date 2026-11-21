@@ -55,7 +55,7 @@ UNISONO_UI_BASE=https://YOUR_STATIC_HOST/react-pupusas/ npm run build
 
 # Deploy dist/ to that HTTPS asset URL.
 # Back at the repository root, start the sample MCP server:
-dotnet run --project samples/McpAppsPupusasHost -- \\
+dotnet run --project samples/McpAppsPupusasHost -- \
   react samples/ReactPupusas/dist https://YOUR_STATIC_HOST/react-pupusas/
 
 # With the server running, validate protocol support:
