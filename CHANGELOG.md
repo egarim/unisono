@@ -22,9 +22,15 @@ All notable changes to the Unisono packages. Versions follow SemVer; previews ca
 - Source-only for now (not in the release workflow): optional `Unisono.UI.React`, `Unisono.UI.Blazor` and
   `Unisono.UI.Uno` providers adapt a published Vite `dist` or WebAssembly `wwwroot` to that contract; React bundles
   into one self-contained HTML resource. Browser iframe/CSP behavior in real ChatGPT/Claude hosts is not verified yet.
-- Samples: `samples/UiPlayground` (HTML-only walkthrough), `samples/McpAppsPupusasHost` (selectable react|blazor|uno),
-  `samples/ReactPupusas`, `samples/BlazorPupusas`, `samples/UnoPupusas` (drop-in page for an Uno scaffold) and
-  `samples/McpAppsBridge`; `scripts/mcp-ui-smoke.py` validates the UI protocol.
+- New source-only `Unisono.UI.Catalog`: the declarative path. `UnisonoUiDocumentBuilder` turns a tool's MCP input
+  schema into a JSON document (A2UI-shaped envelope, `createSurface`, 12 components, JSON Pointer bindings, one
+  action), and `CatalogUiProvider` serves it with a single self-contained renderer that speaks the MCP Apps
+  protocol, needs no external asset origin and renders results as text or a table. Forms, lists and tables
+  without a frontend project; array/object parameters are refused with a pointer to the framework providers.
+- Samples: `samples/UiPlayground` (HTML walkthrough, `--catalog` for the generated document), `samples/McpAppsPupusasHost`
+  (selectable react|blazor|uno|catalog), `samples/ReactPupusas`, `samples/BlazorPupusas`, `samples/UnoPupusas`
+  (drop-in page for an Uno scaffold) and `samples/McpAppsBridge`; `scripts/mcp-ui-smoke.py` validates the UI protocol.
+  Tests: `tests/Unisono.UI.Catalog.Tests` (xunit) and `tests/CatalogRenderer` (jsdom, simulated host).
 
 ## 0.1.0-preview.2 (2026-11-12)
 

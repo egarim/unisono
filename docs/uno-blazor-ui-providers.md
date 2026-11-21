@@ -1,5 +1,8 @@
 # Plug in Uno, Blazor, or React 🫓
 
+> For forms, lists and tables you may not need any of these: [`Unisono.UI.Catalog`](declarative-ui.md)
+> generates a declarative UI with no frontend project. The providers here are for tools that need a real UI.
+
 **Write your UI in C# + XAML (Uno) or C# + Razor (Blazor). Keep the same Unisono tool.**
 
 This feature introduces three providers:

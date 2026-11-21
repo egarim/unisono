@@ -15,6 +15,8 @@
 - Ship Uno, Blazor and React adapters on the same `IUnisonoUiProvider` contract
   (`Unisono.UI.Uno`, `Unisono.UI.Blazor`, `Unisono.UI.React`), plus a shared browser bridge for
   .NET WebAssembly frontends.
+- Offer a declarative provider (`Unisono.UI.Catalog`) that generates a JSON document from the tool's
+  input schema and serves one generic renderer, for tools that only need a form, list or table.
 
 A provider alone does not make the resource render in ChatGPT or Claude: the browser iframe,
 sandbox CSP and host/client capability negotiation still have to be verified against each real host.
@@ -41,6 +43,13 @@ if (ui.CanRender("create_order", new UnisonoUiHostCapabilities(SupportsMcpApps: 
 ```
 
 The `create_order` tool must exist in `ToolRegistry`, using its MCP tool name, not necessarily its C# method name.
+
+## Declarative UI for the common case
+
+Most tools need a form, a list or a table, not an application. `Unisono.UI.Catalog` generates the UI
+document from the tool's MCP input schema and serves a single renderer (`CatalogUiProvider`, framework
+name `catalog`). Use it first; reach for the framework providers when a tool needs more. See
+[declarative UI](declarative-ui.md).
 
 ## Adding an Uno or Blazor provider
 

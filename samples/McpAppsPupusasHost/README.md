@@ -1,6 +1,16 @@
 # Pupusa Party — real MCP Apps resource host
 
-Unlike the local HTML playground, this sample **registers a C# tool and an actual MCP UI resource** in `UnisonoMcpHttpHost`. Select a UI framework at startup. The existing C# business action is unchanged.
+Unlike the local HTML playground, this sample **registers a C# tool and an actual MCP UI resource** in `UnisonoMcpHttpHost`. Select a UI framework at startup, or `catalog` for the generated declarative UI. The existing C# business action is unchanged.
+
+## 0. The no-frontend path
+
+```bash
+dotnet run --project samples/McpAppsPupusasHost -- catalog
+python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
+```
+
+The `catalog` mode needs no npm, no published assets and no asset origin: the document is generated from the tool's
+input schema and served with the generic renderer. See [declarative UI](../../docs/declarative-ui.md).
 
 ## 1. Build the React UI
 

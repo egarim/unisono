@@ -29,7 +29,7 @@ The choir has a new instrument! Your C# tool can now be **associated with an opt
 
 Start with ordinary `[McpServerTool]` methods. Add a UI provider only if you want one. `Unisono.McpApps` keeps the contract separate from rendering technology: **Uno Platform, Blazor, React, or plain HTML** plug into the same registry.
 
-> **Current status:** the UI registry, the MCP Apps protocol exposure and the HTML, React, Blazor and Uno providers are implemented in source. `UnisonoMcpHttpHost(..., ui: ui)` publishes mapped `ui://` resources (`text/html;profile=mcp-app`), advertises `_meta.ui.resourceUri` on the matching tool, and declares the asset origin in `_meta.ui.csp.resourceDomains`; headless clients keep invoking the same tools. **Embedded rendering in a real ChatGPT/Claude host is not verified yet**, and the UI provider packages are not published to NuGet.
+> **Current status:** the UI registry, the MCP Apps protocol exposure and the HTML, React, Blazor, Uno and declarative catalog providers are implemented in source. `UnisonoMcpHttpHost(..., ui: ui)` publishes mapped `ui://` resources (`text/html;profile=mcp-app`), advertises `_meta.ui.resourceUri` on the matching tool, and declares the asset origin in `_meta.ui.csp.resourceDomains`; headless clients keep invoking the same tools. **Embedded rendering in a real ChatGPT/Claude host is not verified yet**, and the UI provider packages are not published to NuGet.
 
 ### A tiny story: three pupusas and one C# method 🫓
 
@@ -88,6 +88,15 @@ var ui = new UnisonoUiRegistry(tools)
 ```
 
 Blazor and Uno also need the HTTPS origin where their runtime files are hosted; React's single-file bundle does not. React calls the real C# tool through the official MCP Apps browser SDK; Blazor and Uno use the shared [`samples/McpAppsBridge`](samples/McpAppsBridge/README.md) bundle.
+
+**Act 5 — Skip the frontend entirely.** [`Unisono.UI.Catalog`](src/Unisono.UI.Catalog/README.md) generates a JSON document from the tool's input schema and serves one self-contained renderer. Twelve components (`Column`, `Row`, `Text`, `TextInput`, `NumberInput`, `Select`, `Checkbox`, `Button`, `List`, `Table`, `Image`, `Divider`), bindings as JSON Pointers, one submit action per tool, and results drawn as text or a table:
+
+```bash
+dotnet run --project samples/McpAppsPupusasHost -- catalog
+python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
+```
+
+The renderer uses no `innerHTML` or `eval`, refuses unknown components and documents from another catalog, and needs no external asset origin, so the MCP Apps CSP stays empty. See [declarative UI](docs/declarative-ui.md).
 
 ### Try the full UI-to-C# MCP path
 
@@ -173,6 +182,7 @@ What each layer needs from the app:
 | `src/Unisono.Core` | `ToolRegistry`: discovers `[McpServerTool]` methods, binds JSON arguments, invokes one handler per tool. |
 | `src/Unisono.McpApps` | Optional, UI-framework-neutral provider registry plus the MCP Apps adapter: mapped `ui://` resources, tool metadata and resource CSP. |
 | `src/Unisono.UI.Uno`, `src/Unisono.UI.Blazor`, `src/Unisono.UI.React` | Optional providers for published Uno/Blazor WebAssembly and React/Vite output; no frontend toolkit dependencies in the core. |
+| `src/Unisono.UI.Catalog` | Declarative path: generates a JSON document from a tool's input schema and serves one generic renderer; twelve components, no frontend project. |
 | `src/Unisono.Mcp` | `UnisonoMcpHttpHost`: the registry as an MCP server over Streamable HTTP on `HttpListener`, with optional mapped MCP Apps resources and tool metadata, so it runs inside a MAUI app. |
 | `src/Unisono.AppIntents` | The Apple front door: `native/UnisonoBridge.swift` (one generic JSON bridge, copied into each app's Swift intents framework), the C# host that answers it from the registry, and MSBuild targets that put `Metadata.appintents` into the bundle. |
 | `src/Unisono.AppIntents.Binding` | Static Objective-C binding of the bridge (`UnisonoHost`, `UnisonoBridge`). Written once; no per-app binding projects. |
@@ -181,12 +191,14 @@ What each layer needs from the app:
 | `samples/TaskTracker` | Redth's .NET MAUI + Siri App Intents sample, moved onto Unisono: the Swift intents only encode JSON and call the bridge; the MCP server and Siri both call the same `TaskTools` class. Its `AppIntents/` folder customises the generated Swift (due-date prompt, confirmations, phrases); the package generates the rest and builds the framework. |
 | `samples/UnisonoNotes` | Second demo app: notes whose `- [ ]` lines are action items; five tools, a `Note` entity, MCP on port 8789. With TaskTracker it tells the cross-app story (note → action items → tasks → note updated). Its Xcode project is generated. No hand-written Swift at all: every intent, the Note entity and the phrases are generated from the C# tools. |
 | `samples/Pupuseria` | Pupusería.net: ordering pupusas from Botilio, the .NET robot pupusero. Seven tools, a `Pupusa` entity, generated Siri intents plus three hand-written ones, AppFunctions on Android, and animations that play on every tool call whoever made it (Siri, MCP, Gemini). |
-| `samples/UiPlayground` | A gradual, runnable example: one C# pupusa-price tool, a UI provider, a local HTML preview, and headless MCP access. |
-| `samples/McpAppsPupusasHost` | Actual MCP resource/tool host sample with React, Blazor, or Uno UI selection. |
+| `samples/UiPlayground` | A gradual, runnable example: one C# pupusa-price tool, a UI provider, a local HTML preview (or a generated catalog document with `--catalog`), and headless MCP access. |
+| `samples/McpAppsPupusasHost` | Actual MCP resource/tool host sample with React, Blazor, Uno, or `catalog` UI selection. |
 | `samples/McpAppsBridge` | Browser bridge bundle for .NET WASM UI tool calls through MCP Apps. |
 | `samples/ReactPupusas` | React + TypeScript + Vite pupusa calculator and deployment guide for the React provider. |
 | `samples/BlazorPupusas` | Standalone Blazor WebAssembly pupusa calculator whose published `wwwroot` becomes the UI resource. |
 | `samples/ConsoleHost` | Smallest host: two demo tools over MCP on localhost. |
+| `tests/Unisono.UI.Catalog.Tests` | Generator, validator, renderer and provider tests (`dotnet test`). |
+| `tests/CatalogRenderer` | DOM tests for the catalog renderer with a simulated MCP Apps host (jsdom). |
 | `scripts/mcp-smoke.sh`, `scripts/mcp-call.py` | Drive any Unisono endpoint from the shell: initialize, tools/list, tools/call, session delete. |
 | `scripts/s3-orchestrate.py`, `scripts/s3-agent-demo.sh` | The two-app scenario: scripted, and with Claude Code as the agent. |
 | `scripts/make-banner.py` | Composes the README banner as SVG from the official dotnet-bot and drawn assistant characters. |

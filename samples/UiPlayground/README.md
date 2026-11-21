@@ -26,6 +26,8 @@ Requires the .NET 10 SDK. From the repository root:
 
 ```bash
 dotnet run --project samples/UiPlayground
+# or render the same tool from a generated JSON document instead of the HTML card:
+dotnet run --project samples/UiPlayground -- --catalog
 ```
 
 Expected console lines (paths vary):
@@ -51,11 +53,14 @@ advertises `_meta.ui.resourceUri` on the tool and declares an asset origin in `_
 `samples/McpAppsPupusasHost` does exactly that, with React, Blazor or Uno UIs, and `scripts/mcp-ui-smoke.py`
 verifies it.
 
-Adding it here is one argument:
+Adding it here is one argument (`--catalog` does exactly that):
 
 ```csharp
 await using var host = new UnisonoMcpHttpHost(tools, options, ui: ui);
 ```
+
+The `--catalog` run also prints the generated document and writes the rendered preview. It uses
+[`Unisono.UI.Catalog`](../../docs/declarative-ui.md) instead of `order-card.html`.
 
 Opening the HTML file in a browser still does not involve an MCP host; the card only becomes interactive inside an
 MCP Apps-compatible host. Real ChatGPT/Claude sandbox behavior remains unverified.
