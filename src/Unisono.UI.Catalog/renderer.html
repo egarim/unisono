@@ -119,10 +119,14 @@
         root.textContent = "This Unisono UI document is not valid JSON.";
         return;
       }
-      var transport = window.UnisonoCatalog.createTransport();
-      transport.start();
-      var app = window.UnisonoCatalog.createApp(root, documentData, transport);
-      app.start();
+      try {
+        var transport = window.UnisonoCatalog.createTransport();
+        transport.start();
+        var app = window.UnisonoCatalog.createApp(root, documentData, transport);
+        app.start();
+      } catch (error) {
+        root.textContent = "This Unisono UI could not start: " + (error && error.message ? error.message : String(error));
+      }
     })();
   </script>
 </body>

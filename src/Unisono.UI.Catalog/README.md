@@ -6,9 +6,8 @@ document, one small trusted renderer draws it, and the model can only compose th
 Reference the project today (the package is not published yet; the UI provider packages are source-only
 until they have survived a release cycle):
 
-```xml
-<ProjectReference Include="src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj" />
-```
+Add a project reference to `src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj` (adjust the relative path
+for your project), or pack it locally with `dotnet pack`.
 
 ```csharp
 var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());

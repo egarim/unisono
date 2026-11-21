@@ -60,7 +60,6 @@
       if (message.method === "ui/notifications/tool-result") emit("toolresult", params);
       else if (message.method === "ui/notifications/tool-input") emit("toolinput", params);
       else if (message.method === "ui/notifications/host-context-changed") hostContext = merge(hostContext, params);
-      else if (message.method === "ui/notifications/tool-cancelled") emit("toolinput", { arguments: {} });
     }
 
     function request(method, params) {
