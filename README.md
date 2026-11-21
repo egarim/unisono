@@ -141,7 +141,7 @@ dotnet run --project samples/ConsoleHost -- 8788
 scripts/mcp-smoke.sh http://127.0.0.1:8788/mcp add '{"a":2,"b":3}'
 ```
 
-Ready for a UI? Follow the [React example](docs/examples.md#3-react--typescript-actually-call-c-from-an-mcp-app-) to build a single-file interactive widget and [the MCP Apps host sample](samples/McpAppsPupusasHost/README.md) to expose it.
+Ready for a UI? Follow the [React example](samples/ReactPupusas/README.md) to build a single-file interactive widget and [the MCP Apps host sample](samples/McpAppsPupusasHost/README.md) to expose it.
 
 > **Validation:** The examples reflect repository source, including experimental UI integrations. Live rendering in ChatGPT and Claude, production authentication, and marketplace approval are **not** established by these examples.
 
