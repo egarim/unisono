@@ -23,6 +23,18 @@ jobs:
         run: dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
       - name: Publish Blazor WASM sample
         run: dotnet publish samples/BlazorPupusas/BlazorPupusas.csproj -c Release -o "$RUNNER_TEMP/blazor"
+      - name: Smoke-test live MCP UI tool and resource protocol
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --no-build -c Release --project samples/McpAppsPupusasHost -- blazor "$RUNNER_TEMP/blazor/wwwroot" https://static.example.com/blazor-pupusas/ > /tmp/unisono-mcp-ui.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true; cat /tmp/unisono-mcp-ui.log' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8792/mcp -o /dev/null 2>/dev/null; then break; fi
+            sleep 1
+          done
+          python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
   web:
     runs-on: ubuntu-latest
     strategy:
