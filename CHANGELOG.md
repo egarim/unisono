@@ -15,6 +15,16 @@ All notable changes to the Unisono packages. Versions follow SemVer; previews ca
 - New sample `samples/Pupuseria`: Pupusería.net, an ordering app with Botilio the robot pupusero, animations on every
   tool call, generated and hand-written Siri intents side by side, phrases declared in C# ("Where is my order",
   "Check my order", "Are my pupusas ready"...), MCP on port 8790 and AppFunctions on Android.
+- New `Unisono.McpApps` package: the framework-neutral `IUnisonoUiProvider` registry plus `UnisonoMcpAppsResources`.
+  `UnisonoMcpHttpHost(..., ui: ui)` now serves mapped `ui://` resources through `resources/list` and `resources/read`,
+  advertises `_meta.ui.resourceUri` on the tool, and declares the asset origin in `_meta.ui.csp.resourceDomains`.
+  Clients without UI support keep invoking the same tools.
+- Source-only for now (not in the release workflow): optional `Unisono.UI.React`, `Unisono.UI.Blazor` and
+  `Unisono.UI.Uno` providers adapt a published Vite `dist` or WebAssembly `wwwroot` to that contract; React bundles
+  into one self-contained HTML resource. Browser iframe/CSP behavior in real ChatGPT/Claude hosts is not verified yet.
+- Samples: `samples/UiPlayground` (HTML-only walkthrough), `samples/McpAppsPupusasHost` (selectable react|blazor|uno),
+  `samples/ReactPupusas`, `samples/BlazorPupusas`, `samples/UnoPupusas` (drop-in page for an Uno scaffold) and
+  `samples/McpAppsBridge`; `scripts/mcp-ui-smoke.py` validates the UI protocol.
 
 ## 0.1.0-preview.2 (2026-11-12)
 

@@ -83,7 +83,7 @@ A React application with external assets can still use `ReactUiProvider(path, pu
 - **No frontend runtime dependency in the provider package.** The provider runs on server-side .NET 10 and loads already-published assets; it does not compile Uno or Blazor at runtime.
 - **One UI mapping per tool in the current registry.** To choose Uno vs. Blazor vs. React per host, build distinct mappings/registries or extend the UI registry to support variants.
 - **Correct HTML base URL:** The provider replaces or inserts a `<base href="https://.../">` tag so relative framework assets load from the static origin in a sandboxed iframe.
-- **Security:** Asset URLs require HTTPS except for loopback development. The future MCP Apps resource handler must declare the asset origin in `_meta.ui.csp.resourceDomains`, and relevant `connectDomains` if the UI makes network calls. The host can impose stricter CSP. Serve framework JS/WASM with appropriate CORS and MIME types.
+- **Security:** Asset URLs require HTTPS except for loopback development. The MCP Apps resource handler declares the asset origin in `_meta.ui.csp.resourceDomains` and leaves `connectDomains` to the host if the UI makes network calls. The host can impose stricter CSP. Serve framework JS/WASM with appropriate CORS and MIME types.
 - **Actual tool calls:** React uses the MCP Apps SDK; Blazor and Uno sample buttons call through the shared JS bridge. UI host support and client capabilities must be verified in deployment.
 - **Size:** WebAssembly runtime files can be large for tiny cards; use plain HTML provider when startup speed matters.
 
@@ -95,4 +95,4 @@ A React application with external assets can still use `ReactUiProvider(path, pu
 4. Consider single-file HTML bundling to improve compatibility with hosts that restrict external runtime scripts and WebAssembly.
 5. Add automated host end-to-end tests and plugin distribution workflows.
 
-The code was authored without a verified .NET/npm/Uno build in the editing environment. A GitHub Actions workflow now checks .NET and React/bridge builds, but real-host compatibility is not established.
+The .NET adapters, the host sample, the Blazor publish and the React/bridge bundles are covered by `.github/workflows/mcp-apps-ui-ci.yml`. The Uno page is still a drop-in for a current official Uno scaffold, and real-host (ChatGPT/Claude) rendering is not established.

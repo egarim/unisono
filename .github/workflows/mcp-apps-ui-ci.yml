@@ -9,6 +9,9 @@ on:
       - 'samples/ReactPupusas/**'
       - 'samples/McpAppsBridge/**'
       - 'samples/McpAppsPupusasHost/**'
+      - 'samples/UiPlayground/**'
+      - 'scripts/mcp-ui-smoke.py'
+      - 'Unisono.slnx'
       - '.github/workflows/mcp-apps-ui-ci.yml'
   workflow_dispatch:
 jobs:
@@ -20,7 +23,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Build framework-neutral adapters and host sample
-        run: dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
+        run: |
+          dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
+          dotnet build samples/UiPlayground/UiPlayground.csproj -c Release
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

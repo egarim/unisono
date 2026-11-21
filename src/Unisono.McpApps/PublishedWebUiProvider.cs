@@ -75,11 +75,11 @@ public abstract class PublishedWebUiProvider : IUnisonoUiProvider
         // an absolute base so the framework's boot resources resolve correctly.
         if (_assetBaseUri is not null)
         {
-        var baseTag = "<base href=\"" + WebUtility.HtmlEncode(_assetBaseUri.AbsoluteUri) + "\">";
-        html = Regex.IsMatch(html, @"<base\s", RegexOptions.IgnoreCase)
-            ? Regex.Replace(html, @"<base\b[^>]*>", _ => baseTag, RegexOptions.IgnoreCase)
-            : Regex.Replace(html, @"<head\b[^>]*>", m => m.Value + baseTag,
-                RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+            var baseTag = "<base href=\"" + WebUtility.HtmlEncode(_assetBaseUri.AbsoluteUri) + "\">";
+            html = Regex.IsMatch(html, @"<base\s", RegexOptions.IgnoreCase)
+                ? Regex.Replace(html, @"<base\b[^>]*>", _ => baseTag, RegexOptions.IgnoreCase)
+                : Regex.Replace(html, @"<head\b[^>]*>", m => m.Value + baseTag,
+                    RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
         }
 
         return new UnisonoUiAsset(

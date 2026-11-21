@@ -29,10 +29,11 @@
         Error = null;
         try
         {
+            // .NET 10 binds a lone second argument to the CancellationToken overload,
+            // so pass the tool arguments as an explicit object[].
             Total = await JS.InvokeAsync<decimal>(
                 "UnisonoMcpBridge.calculatePupusas",
-                Math.Max(0, Quantity),
-                Math.Max(0, Price));
+                new object?[] { Math.Max(0, Quantity), Math.Max(0, Price) });
         }
         catch (Exception ex)
         {

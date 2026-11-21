@@ -48,7 +48,7 @@ var ui = new UnisonoUiRegistry(tools)
 ### Try the full UI-to-C# MCP path
 
 ```bash
-# Build a React MCP App with production absolute asset URLs
+# Build the self-contained React MCP App
 cd samples/ReactPupusas
 npm install
 npm run build
