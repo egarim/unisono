@@ -30,3 +30,6 @@ local.properties
 
 # local package output
 artifacts/
+
+# UI Playground preview written by samples/UiPlayground
+pupusa-preview.html
