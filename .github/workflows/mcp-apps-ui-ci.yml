@@ -21,6 +21,15 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Build framework-neutral adapters and host sample
         run: dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and embed the MCP Apps bridge in Blazor
+        run: |
+          cd samples/McpAppsBridge
+          npm install --no-audit --no-fund
+          npm run build
+          cp dist/unisono-mcp-bridge.js ../BlazorPupusas/wwwroot/unisono-mcp-bridge.js
       - name: Publish Blazor WASM sample
         run: dotnet publish samples/BlazorPupusas/BlazorPupusas.csproj -c Release -o "$RUNNER_TEMP/blazor"
       - name: Smoke-test live MCP UI tool and resource protocol
