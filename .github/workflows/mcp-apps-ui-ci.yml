@@ -31,7 +31,7 @@ jobs:
           pid=$!
           trap 'kill "$pid" 2>/dev/null || true; cat /tmp/unisono-mcp-ui.log' EXIT
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:8792/mcp -o /dev/null 2>/dev/null; then break; fi
+            if curl -sS http://127.0.0.1:8792/mcp -o /dev/null 2>/dev/null; then break; fi
             sleep 1
           done
           python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
