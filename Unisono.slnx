@@ -15,6 +15,7 @@
     <Project Path="samples/ConsoleHost/ConsoleHost.csproj" />
     <Project Path="samples/BlazorPupusas/BlazorPupusas.csproj" />
     <Project Path="samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj" />
+    <Project Path="samples/UiPlayground/UiPlayground.csproj" />
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
     <Project Path="samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj" />
     <Project Path="samples/Pupuseria/Pupuseria/Pupuseria.csproj" />

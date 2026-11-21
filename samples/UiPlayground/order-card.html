@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pupusa Party Calculator</title>
+  <style>
+    body { font: 16px system-ui,sans-serif; max-width: 480px; margin: 32px auto; padding: 0 20px; color: #232323; }
+    .card { border: 1px solid #dedede; border-radius: 18px; padding: 24px; }
+    h1 { font-size: 24px; margin-top: 0; }
+    label { display: block; margin: 16px 0 6px; font-weight: 600; }
+    input { box-sizing: border-box; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #aaa; }
+    output { display: block; font-size: 24px; margin: 24px 0 8px; font-weight: 700; }
+    small { color: #666; line-height: 1.5; display: block; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>🫓 The Pupusa Party</h1>
+    <p>How many pupusas does happiness cost?</p>
+    <label for="quantity">Pupusas</label>
+    <input id="quantity" type="number" min="0" value="3">
+    <label for="price">Price each (USD)</label>
+    <input id="price" type="number" min="0" step="0.01" value="1.75">
+    <output id="total">$5.25</output>
+    <small>Local preview only. This calculation runs in the browser;
+    it does not invoke the MCP tool. MCP Apps host integration comes later.</small>
+  </main>
+  <script>
+    const quantity = document.getElementById('quantity');
+    const price = document.getElementById('price');
+    const total = document.getElementById('total');
+    function render() {
+      const q = Math.max(0, Number(quantity.value) || 0);
+      const p = Math.max(0, Number(price.value) || 0);
+      total.textContent = '$' + (q * p).toFixed(2);
+    }
+    quantity.addEventListener('input', render);
+    price.addEventListener('input', render);
+  </script>
+</body>
+</html>
