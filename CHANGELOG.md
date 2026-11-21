@@ -2,7 +2,7 @@
 
 All notable changes to the Unisono packages. Versions follow SemVer; previews carry a `-preview.N` suffix.
 
-## 0.1.0-preview.3 (unreleased)
+## 0.1.0-preview.3 (2026-11-21)
 
 - `Unisono.AppIntents` now generates the Swift App Intents layer from the app's C# tools at build time (intents,
   AppEnums, Codable DTOs, AppEntity + query per `IEntityQuery<T>`, default App Shortcut phrases) and writes and builds
@@ -22,7 +22,7 @@ All notable changes to the Unisono packages. Versions follow SemVer; previews ca
 - Source-only for now (not in the release workflow): optional `Unisono.UI.React`, `Unisono.UI.Blazor` and
   `Unisono.UI.Uno` providers adapt a published Vite `dist` or WebAssembly `wwwroot` to that contract; React bundles
   into one self-contained HTML resource. Browser iframe/CSP behavior in real ChatGPT/Claude hosts is not verified yet.
-- New source-only `Unisono.UI.Catalog`: the declarative path. `UnisonoUiDocumentBuilder` turns a tool's MCP input
+- New `Unisono.UI.Catalog` package: the declarative path. `UnisonoUiDocumentBuilder` turns a tool's MCP input
   schema into a JSON document (A2UI-shaped envelope, `createSurface`, 12 components, JSON Pointer bindings, one
   action), and `CatalogUiProvider` serves it with a single self-contained renderer that speaks the MCP Apps
   protocol, needs no external asset origin and renders results as text or a table. Forms, lists and tables

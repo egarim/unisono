@@ -3,11 +3,11 @@
 Declarative UI for [Unisono](https://github.com/egarim/unisono) tools: the server authors a JSON
 document, one small trusted renderer draws it, and the model can only compose the components you allow.
 
-Reference the project today (the package is not published yet; the UI provider packages are source-only
-until they have survived a release cycle):
+```bash
+dotnet add package Unisono.UI.Catalog --prerelease
+```
 
-Add a project reference to `src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj` (adjust the relative path
-for your project), or pack it locally with `dotnet pack`.
+While working in this repository, reference `src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj` instead.
 
 ```csharp
 var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());

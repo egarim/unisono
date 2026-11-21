@@ -29,7 +29,7 @@ The choir has a new instrument! Your C# tool can now be **associated with an opt
 
 Start with ordinary `[McpServerTool]` methods. Add a UI provider only if you want one. `Unisono.McpApps` keeps the contract separate from rendering technology: **Uno Platform, Blazor, React, or plain HTML** plug into the same registry.
 
-> **Current status:** the UI registry, the MCP Apps protocol exposure and the HTML, React, Blazor, Uno and declarative catalog providers are implemented in source. `UnisonoMcpHttpHost(..., ui: ui)` publishes mapped `ui://` resources (`text/html;profile=mcp-app`), advertises `_meta.ui.resourceUri` on the matching tool, and declares the asset origin in `_meta.ui.csp.resourceDomains`; headless clients keep invoking the same tools. **Embedded rendering in a real ChatGPT/Claude host is not verified yet**, and the UI provider packages are not published to NuGet.
+> **Current status:** the UI registry, the MCP Apps protocol exposure and the HTML, React, Blazor, Uno and declarative catalog providers are implemented in source. `UnisonoMcpHttpHost(..., ui: ui)` publishes mapped `ui://` resources (`text/html;profile=mcp-app`), advertises `_meta.ui.resourceUri` on the matching tool, and declares the asset origin in `_meta.ui.csp.resourceDomains`; headless clients keep invoking the same tools. **Embedded rendering in a real ChatGPT/Claude host is not verified yet**. The declarative catalog ships as `Unisono.UI.Catalog`; the React, Blazor and Uno providers remain source-only for now.
 
 ### A tiny story: three pupusas and one C# method 🫓
 
