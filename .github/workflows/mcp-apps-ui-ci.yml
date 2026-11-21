@@ -26,6 +26,12 @@ jobs:
         run: |
           dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
           dotnet build samples/UiPlayground/UiPlayground.csproj -c Release
+      - name: Pack the packages that ship with this feature
+        # release.yml only packs on a tag; catch missing README/icon metadata on the PR.
+        run: |
+          dotnet pack src/Unisono.Core/Unisono.Core.csproj -c Release -o "$RUNNER_TEMP/nupkg"
+          dotnet pack src/Unisono.McpApps/Unisono.McpApps.csproj -c Release -o "$RUNNER_TEMP/nupkg"
+          dotnet pack src/Unisono.Mcp/Unisono.Mcp.csproj -c Release -o "$RUNNER_TEMP/nupkg"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
