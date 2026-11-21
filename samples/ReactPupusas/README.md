@@ -12,7 +12,7 @@ npm install
 npm run dev
 ```
 
-Open the Vite local URL to try the Pupusa Party calculator. This frontend calculates the total **locally in React**, not by invoking an MCP tool.
+The component now calls `app.callServerTool({ name: 'calculate_pupusas', arguments: ... })` via the official MCP Apps SDK. A plain Vite tab does **not** provide an MCP Apps host, so the button remains unavailable without a compatible host. Use the [real MCP server sample](../McpAppsPupusasHost/README.md) for integration testing.
 
 ## Step 2. Build for the static asset host
 
@@ -50,9 +50,9 @@ var asset = await ui.GetAssetAsync("calculate_pupusas");
 
 `PupusaTools` is the same tool class shown in `samples/UiPlayground/` (on the separate README-example PR). You must register a tool named `calculate_pupusas` before mapping its UI.
 
-## Step 4. Understand the remaining integration work
+## Step 4. Test MCP Apps integration
 
-This PR adds the **React build-output adapter**, not a working embedded ChatGPT/Claude widget. The MCP host still needs to advertise tool `_meta.ui.resourceUri`, implement MCP `resources/read` for `ui://` resources, declare CSP asset domains, and add the browser-side MCP Apps protocol bridge. Only then can the React UI invoke the C# tool through the host.
+The MCP host now publishes a mapped `ui://` resource, advertises tool `_meta.ui.resourceUri`, and declares hosted asset resourceDomains. The React component connects through the official `useApp` hook and invokes the real C# tool. Run [McpAppsPupusasHost](../McpAppsPupusasHost/README.md) and validate with `scripts/mcp-ui-smoke.py`. Actual ChatGPT and Claude rendering **still needs live verification**. Opening a regular website is not a substitute for a host.
 
 ## One application, three UI options
 
@@ -64,4 +64,4 @@ This PR adds the **React build-output adapter**, not a working embedded ChatGPT/
 
 All three implement the same `IUnisonoUiProvider` contract. The current registry maps **one provider per tool**; to switch dynamically by host, extend the registry rather than registering duplicate resource URIs.
 
-The React sample has not been npm-built or tested in ChatGPT/Claude in this environment.
+The React sample has not been npm-built or tested inside ChatGPT/Claude in this environment. Build CI and real-host testing are required.
