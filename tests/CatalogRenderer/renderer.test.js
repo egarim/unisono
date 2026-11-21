@@ -193,6 +193,8 @@ test("renders a JSON array result as a table", async () => {
   assert.equal(rows.length, 2);
   assert.match(table.textContent, /Milk/);
   assert.match(table.textContent, /Eggs/);
+  assert.match(table.textContent, /Yes/);
+  assert.match(table.textContent, /No/);
 });
 
 test("prefers structuredContent over text", async () => {

@@ -199,6 +199,7 @@
 
     function cellText(value) {
       if (value === null || value === undefined) return "";
+      if (typeof value === "boolean") return value ? "Yes" : "No";
       if (typeof value === "object") return JSON.stringify(value);
       return String(value);
     }

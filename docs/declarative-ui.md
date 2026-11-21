@@ -43,6 +43,18 @@ Or see the generated document and a browser preview in the playground:
 dotnet run --project samples/UiPlayground -- --catalog
 ```
 
+## What it looks like
+
+A generated form, after the host called `calculate_pupusas` (4 × $2.25):
+
+![Pupusa price form with a result](images/declarative-ui.png)
+
+An array result is drawn as a table, with booleans as Yes/No:
+
+![Task list rendered as a table](images/declarative-ui-table.png)
+
+Both are the same renderer and the same page shape; only the document differs.
+
 ## The document
 
 The envelope follows A2UI v1.0 (`version`, `createSurface`, adjacency-list components); the component
