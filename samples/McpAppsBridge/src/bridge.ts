@@ -14,12 +14,14 @@ export function connect(): Promise<void> {
   return connecting ??= app.connect();
 }
 
-export async function calculatePupusas(quantity: number, priceEach: number): Promise<number> {
+export async function callTool(name: string, args: Record<string, unknown> = {}) {
+  if (!name || !name.trim()) throw new Error("Tool name is required");
   await connect();
-  const result = await app.callServerTool({
-    name: "calculate_pupusas",
-    arguments: { quantity, priceEach },
-  });
+  return app.callServerTool({ name, arguments: args });
+}
+
+export async function calculatePupusas(quantity: number, priceEach: number): Promise<number> {
+  const result = await callTool("calculate_pupusas", { quantity, priceEach });
 
   if (result.isError) throw new Error("MCP tool calculation failed");
   const text = result.content?.find(c => c.type === "text");
