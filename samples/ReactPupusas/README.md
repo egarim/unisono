@@ -1,67 +1,67 @@
-# React Pupusas — third pluggable UI provider 🫓
+# React Pupusas — one C# tool, one interactive MCP App 🫓
 
-React is **optional** in Unisono: a React UI is built by Vite, while the .NET server only consumes the **published build output** using `Unisono.UI.React.ReactUiProvider`. The core tool definition remains the same regardless of UI framework.
+This example uses **React + TypeScript + Vite**, but React is completely optional in Unisono.
 
-## Step 1. Run it locally
+## Step 1. Build a self-contained MCP App
 
-Requirements: Node.js 20.19+ or 22.12+, npm.
+Requires Node.js and npm:
 
 ```bash
 cd samples/ReactPupusas
 npm install
-npm run dev
+npm run build
 ```
 
-The component now calls `app.callServerTool({ name: 'calculate_pupusas', arguments: ... })` via the official MCP Apps SDK. A plain Vite tab does **not** provide an MCP Apps host, so the button remains unavailable without a compatible host. Use the [real MCP server sample](../McpAppsPupusasHost/README.md) for integration testing.
+The Vite single-file plugin embeds the app's JavaScript and CSS into **`dist/index.html`**. That file can be returned directly by the MCP server as a `ui://` resource without a public static-asset origin.
 
-## Step 2. Build for the static asset host
+For local browser development you can run `npm run dev`, but the component will show **connecting to an MCP Apps host**. A normal website doesn't provide the host-side MCP postMessage protocol.
 
-A future ChatGPT/Claude MCP Apps host receives the `index.html` via an MCP `ui://` resource. Its compiled JS and CSS must still load from an allowed static asset origin, so generate **absolute asset URLs** at build time:
+## Step 2. Start the Unisono MCP server
+
+From the repository root:
 
 ```bash
-UNISONO_UI_BASE=https://static.example.com/react-pupusas/ npm run build
+dotnet run --project samples/McpAppsPupusasHost -- react samples/ReactPupusas/dist
 ```
 
-This produces `samples/ReactPupusas/dist/index.html` and `dist/assets/*`. Deploy the **whole dist directory contents** to the matching HTTPS URL. Don't serve just the HTML. Keep Vite's build base in sync with the public URL; a `<base>` tag alone does not rewrite Vite's absolute script URLs. Configure the host's resource CSP to allow this asset origin.
+This server binds the C# `calculate_pupusas` tool to the React UI and implements:
 
-## Step 3. Link the React build to a C# tool
+- `tools/list` with `_meta.ui.resourceUri`.
+- `resources/list` and `resources/read` for `ui://pupuseria/order`.
+- `tools/call`, unchanged for clients without interactive UI support.
 
-Reference `src/Unisono.UI.React/Unisono.UI.React.csproj` (until this package is published). In your .NET host:
+Use the protocol smoke test:
+
+```bash
+python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
+```
+
+## Step 3. Let the React component call C#
+
+The component uses the official `@modelcontextprotocol/ext-apps` React hook `useApp` and calls:
+
+```typescript
+const result = await app.callServerTool({
+  name: "calculate_pupusas",
+  arguments: { quantity: 3, priceEach: 1.75 }
+});
+```
+
+That request routes through the MCP Apps host to the same C# method used by regular MCP clients. The example parses the returned numeric text and displays the server-calculated total. It does **not** silently fall back to a local calculation if the host is absent.
+
+## Step 4. Publish to real assistant hosts
+
+For ChatGPT or Claude, use a compatible host and an authenticated HTTPS MCP server. Local loopback addresses generally aren't publicly reachable. Each host may enforce additional CSP, permissions, and review requirements.
+
+The adapter is still available if you want to host a multipage or externally loaded React site:
 
 ```csharp
-using Unisono;
-using Unisono.McpApps;
 using Unisono.UI.React;
-
-var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());
 var provider = new ReactUiProvider(
-    "samples/ReactPupusas/dist",
-    new Uri("https://static.example.com/react-pupusas/"))
-    .Add("ui://pupuseria/react");
-
-var ui = new UnisonoUiRegistry(tools)
-    .AddProvider(provider)
-    .MapTool("calculate_pupusas", "ui://pupuseria/react", "react");
-
-var asset = await ui.GetAssetAsync("calculate_pupusas");
-// asset.MimeType == "text/html;profile=mcp-app"
-// asset.Content contains Vite's HTML entrypoint with correct asset URLs.
+    "samples/ReactPupusas/dist")
+    .Add("ui://pupuseria/order");
 ```
 
-`PupusaTools` is the same tool class shown in `samples/UiPlayground/` (on the separate README-example PR). You must register a tool named `calculate_pupusas` before mapping its UI.
+Or use `new ReactUiProvider(distPath, httpsAssetBaseUri)` for a multi-file frontend with external resources.
 
-## Step 4. Test MCP Apps integration
-
-The MCP host now publishes a mapped `ui://` resource, advertises tool `_meta.ui.resourceUri`, and declares hosted asset resourceDomains. The React component connects through the official `useApp` hook and invokes the real C# tool. Run [McpAppsPupusasHost](../McpAppsPupusasHost/README.md) and validate with `scripts/mcp-ui-smoke.py`. Actual ChatGPT and Claude rendering **still needs live verification**. Opening a regular website is not a substitute for a host.
-
-## One application, three UI options
-
-| Provider | Frontend input | Published build | .NET package |
-| --- | --- | --- | --- |
-| React | TypeScript + JSX | Vite `dist/` | `Unisono.UI.React` |
-| Blazor | Razor + C# | WASM `wwwroot/` | `Unisono.UI.Blazor` |
-| Uno | XAML + C# | WASM `wwwroot/` | `Unisono.UI.Uno` |
-
-All three implement the same `IUnisonoUiProvider` contract. The current registry maps **one provider per tool**; to switch dynamically by host, extend the registry rather than registering duplicate resource URIs.
-
-The React sample has not been npm-built or tested inside ChatGPT/Claude in this environment. Build CI and real-host testing are required.
+**Validation:** Code and CI checks are included in the PR, but real ChatGPT/Claude end-to-end rendering and review approval have not been verified.
