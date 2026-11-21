@@ -7,9 +7,9 @@ using Unisono.UI.Blazor;
 using Unisono.UI.React;
 using Unisono.UI.Uno;
 
-// dotnet run --project samples/McpAppsPupusasHost -- react ./dist https://static.example.com/react-pupusas/
+// dotnet run --project samples/McpAppsPupusasHost -- react samples/ReactPupusas/dist
 if (args.Length < 2 || !new[] { "react", "blazor", "uno" }.Contains(args[0], StringComparer.OrdinalIgnoreCase)
-    || (args[0] != "react" && args.Length < 3)
+    || (!string.Equals(args[0], "react", StringComparison.OrdinalIgnoreCase) && args.Length < 3)
     || (args.Length >= 3 && !Uri.TryCreate(args[2], UriKind.Absolute, out _)))
 {
     Console.Error.WriteLine("Usage: McpAppsPupusasHost <react|blazor|uno> <published-assets-folder> [public-assets-https-url]");
