@@ -8,22 +8,24 @@ using Unisono.UI.React;
 using Unisono.UI.Uno;
 
 // dotnet run --project samples/McpAppsPupusasHost -- react ./dist https://static.example.com/react-pupusas/
-if (args.Length < 3 || !new[] { "react", "blazor", "uno" }.Contains(args[0], StringComparer.OrdinalIgnoreCase)
-    || !Uri.TryCreate(args[2], UriKind.Absolute, out var assetsUri))
+if (args.Length < 2 || !new[] { "react", "blazor", "uno" }.Contains(args[0], StringComparer.OrdinalIgnoreCase)
+    || (args[0] != "react" && args.Length < 3)
+    || (args.Length >= 3 && !Uri.TryCreate(args[2], UriKind.Absolute, out _)))
 {
-    Console.Error.WriteLine("Usage: McpAppsPupusasHost <react|blazor|uno> <published-assets-folder> <public-assets-https-url>");
+    Console.Error.WriteLine("Usage: McpAppsPupusasHost <react|blazor|uno> <published-assets-folder> [public-assets-https-url]");
     return;
 }
 
 var framework = args[0].ToLowerInvariant();
 var root = Path.GetFullPath(args[1]);
+Uri? assetsUri = args.Length >= 3 ? new Uri(args[2]) : null;
 const string resourceUri = "ui://pupuseria/order";
 var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());
 IUnisonoUiProvider provider = framework switch
 {
-    "react" => new ReactUiProvider(root, assetsUri).Add(resourceUri),
-    "blazor" => new BlazorUiProvider(root, assetsUri).Add(resourceUri),
-    "uno" => new UnoUiProvider(root, assetsUri).Add(resourceUri),
+    "react" => (assetsUri is null ? new ReactUiProvider(root) : new ReactUiProvider(root, assetsUri)).Add(resourceUri),
+    "blazor" => new BlazorUiProvider(root, assetsUri!).Add(resourceUri),
+    "uno" => new UnoUiProvider(root, assetsUri!).Add(resourceUri),
     _ => throw new ArgumentOutOfRangeException(nameof(framework))
 };
 
@@ -44,7 +46,9 @@ await using var host = new UnisonoMcpHttpHost(
 host.Start();
 Console.WriteLine($"MCP Apps host: {host.Url}");
 Console.WriteLine($"Framework: {framework} | Resource: {resourceUri}");
-Console.WriteLine("The static assets must already be reachable at " + assetsUri);
+Console.WriteLine(assetsUri is null
+    ? "Self-contained HTML resource; no static asset host required."
+    : "The static assets must already be reachable at " + assetsUri);
 Console.WriteLine("Press Ctrl+C to stop.");
 var stop = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 Console.CancelKeyPress += (_, e) => { e.Cancel = true; stop.TrySetResult(); };
