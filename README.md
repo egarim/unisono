@@ -118,6 +118,33 @@ Run inside an MCP Apps-compatible host to see the UI call C#; opening the HTML i
 
 For the design and limitations, see [pluggable MCP Apps UI](docs/pluggable-mcp-apps-ui.md) and the [Uno, Blazor and React provider guide](docs/uno-blazor-ui-providers.md).
 
+## Examples — choose your own adventure 🚀
+
+**New to Unisono?** Start small, then add one instrument at a time. The [full examples guide](docs/examples.md) walks through six implementation scenarios with commands, expected behavior, and honest notes about what still needs testing.
+
+| Example | What you build | Source |
+| --- | --- | --- |
+| **1. Tools only** 🧮 | A C# calculator called by any MCP client; no UI | [ConsoleHost](samples/ConsoleHost/Program.cs) |
+| **2. Plain HTML** 🫓 | A pupusa-price card attached to the same tool | [UiPlayground](samples/UiPlayground/README.md) |
+| **3. React** ⚛️ | A self-contained Vite MCP App calling a real C# tool | [ReactPupusas](samples/ReactPupusas/README.md) |
+| **4. Blazor** 🟣 | A Razor/Blazor WASM card using a shared MCP Apps bridge | [BlazorPupusas](samples/BlazorPupusas/PupusaCard.razor) |
+| **5. Uno Platform** 🪟 | A C# + XAML/WASM page with the same bridge | [UnoPupusas](samples/UnoPupusas/README.md) |
+| **6. Siri + MCP** 🎤 | Native tasks exposed through App Intents and MCP | [TaskTracker](samples/TaskTracker/) |
+
+### The quickest hello world
+
+```bash
+# Terminal 1: run a C# tool as an MCP server
+dotnet run --project samples/ConsoleHost -- 8788
+
+# Terminal 2: ask it to add 2 + 3
+scripts/mcp-smoke.sh http://127.0.0.1:8788/mcp add '{"a":2,"b":3}'
+```
+
+Ready for a UI? Follow the [React example](samples/ReactPupusas/README.md) to build a single-file interactive widget and [the MCP Apps host sample](samples/McpAppsPupusasHost/README.md) to expose it.
+
+> **Validation:** The examples reflect repository source, including experimental UI integrations. Live rendering in ChatGPT and Claude, production authentication, and marketplace approval are **not** established by these examples.
+
 ## Watch
 
 The implementation, start to finish (5:13):
