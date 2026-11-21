@@ -10,7 +10,7 @@ This feature introduces three providers:
 
 All three implement `IUnisonoUiProvider` through `PublishedWebUiProvider`. They are **publish-output adapters**: Uno and Blazor load a published WebAssembly `wwwroot/index.html`, while React loads Vite's `dist/index.html`. The JS, CSS, WASM, and other assets must be hosted at a trusted HTTPS origin.
 
-**Scope (important):** This does *not yet* implement MCP `resources/read`, tool `_meta.ui.resourceUri`, host security metadata, or MCP Apps JavaScript bridging. The adapter does not make an iframe work by itself. It allows a future protocol layer to obtain the right UI resource, preserving separation from any UI toolkit.
+**Integration (experimental):** `UnisonoMcpHttpHost` now exposes mapped resources through MCP, adds tool `_meta.ui.resourceUri`, and emits resource CSP metadata for hosted assets. React has an MCP Apps SDK tool call; Uno and Blazor samples invoke the shared browser bridge. Build/test validation and real-host sandbox compatibility still need verification. Authentication, HTTPS deployment, and publishing remain explicit deployment steps.
 
 ## Blazor: start with a complete sample
 
@@ -36,8 +36,7 @@ var ui = new UnisonoUiRegistry(tools)
     .MapTool("calculate_pupusas", "ui://pupuseria/blazor", "blazor");
 
 var resource = await ui.GetAssetAsync("calculate_pupusas");
-// The future MCP Apps resource handler will return resource.Content as
-// text/html;profile=mcp-app, together with suitable resource CSP metadata.
+// The MCP host exposes this via resources/read when created with ui: ui.
 ```
 
 `PupusaTools` is the tool class in the existing sample. Use the actual C# tool's MCP name, not its display name.
@@ -82,21 +81,37 @@ ui.AddProvider(provider)
   .MapTool("calculate_pupusas", "ui://pupuseria/react", "react");
 ```
 
+## Make the Blazor and Uno buttons invoke the actual C# MCP tool
+
+Both samples use a shared JavaScript MCP Apps bridge built from the official SDK:
+
+```bash
+cd samples/McpAppsBridge
+npm install
+npm run build
+```
+
+Copy `dist/unisono-mcp-bridge.js` to the **published static asset root** for Blazor or Uno, and make sure the HTML entry document loads that script *before* its WebAssembly bootstrap. The Blazor sample already includes the script tag in `wwwroot/index.html`; Uno requires adding it to the official generated Uno scaffold.
+
+Blazor uses `IJSRuntime.InvokeAsync<decimal>("UnisonoMcpBridge.calculatePupusas", ...)`; Uno uses `[JSImport("globalThis.UnisonoMcpBridge.calculatePupusas")]` on its browser WebAssembly target.
+
+`UnisonoMcpHttpHost` accepts an optional `ui:` registry. See [the selectable MCP server sample](../samples/McpAppsPupusasHost/README.md) for the complete host and protocol smoke test.
+
 ## Design details
 
 - **No frontend runtime dependency in the provider package.** The provider runs on server-side .NET 10 and loads already-published assets; it does not compile Uno or Blazor at runtime.
 - **One UI mapping per tool in the current registry.** To choose Uno vs. Blazor vs. React per host, build distinct mappings/registries or extend the UI registry to support variants.
 - **Correct HTML base URL:** The provider replaces or inserts a `<base href="https://.../">` tag so relative framework assets load from the static origin in a sandboxed iframe.
 - **Security:** Asset URLs require HTTPS except for loopback development. The future MCP Apps resource handler must declare the asset origin in `_meta.ui.csp.resourceDomains`, and relevant `connectDomains` if the UI makes network calls. The host can impose stricter CSP. Serve framework JS/WASM with appropriate CORS and MIME types.
-- **HTML isn't enough for tool calls:** Real MCP Apps interactions require a JavaScript host bridge, secure command handling, and capability negotiation. Both UI samples deliberately calculate the total locally.
+- **Actual tool calls:** React uses the MCP Apps SDK; Blazor and Uno sample buttons call through the shared JS bridge. UI host support and client capabilities must be verified in deployment.
 - **Size:** WebAssembly runtime files can be large for tiny cards; use plain HTML provider when startup speed matters.
 
-## To finish MCP Apps integration
+## What still needs testing and production hardening
 
-1. Add `resources/list` and `resources/read` mappings to `UnisonoMcpHttpHost`.
-2. Add `_meta.ui.resourceUri` to mapped tool descriptors.
-3. Emit CSP metadata for `AssetBaseUri`.
-4. Implement MCP Apps JavaScript bridge and adapter integration (Uno + Blazor + React).
-5. Test sandbox loading, cross-origin bootstrap, lifecycle, tool calls, and headless fallback in real host environments.
+1. Build and run the `.NET 10`, Vite and Uno scaffold samples in a supported environment.
+2. Verify sandbox loading, cross-origin bootstrap, lifecycle, CSP, host capability negotiation and tool calls in real ChatGPT and Claude hosts.
+3. Add OAuth, authorization, rate limits, and HTTPS public hosting for production connectors.
+4. Consider single-file HTML bundling to improve compatibility with hosts that restrict external runtime scripts and WebAssembly.
+5. Add automated host end-to-end tests and plugin distribution workflows.
 
-These projects and samples were authored without a verified .NET/npm build in the editing environment; compile/publish tests are still required.
+The code was authored without a verified .NET/npm/Uno build in the editing environment. A GitHub Actions workflow now checks .NET and React/bridge builds, but real-host compatibility is not established.
