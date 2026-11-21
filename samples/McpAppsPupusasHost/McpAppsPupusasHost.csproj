@@ -10,5 +10,6 @@
     <ProjectReference Include="../../src/Unisono.UI.React/Unisono.UI.React.csproj" />
     <ProjectReference Include="../../src/Unisono.UI.Blazor/Unisono.UI.Blazor.csproj" />
     <ProjectReference Include="../../src/Unisono.UI.Uno/Unisono.UI.Uno.csproj" />
+    <ProjectReference Include="../../src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj" />
   </ItemGroup>
 </Project>

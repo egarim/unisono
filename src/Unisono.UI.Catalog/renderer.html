@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__UNISONO_TITLE__</title>
+  <style>
+    :root {
+      --u-bg: #ffffff;
+      --u-fg: #1c1c1e;
+      --u-muted: #6b6b70;
+      --u-border: #d9d9de;
+      --u-field-bg: #ffffff;
+      --u-accent: #c2410c;
+      --u-accent-fg: #ffffff;
+      --u-error: #b3261e;
+      --u-radius: 12px;
+      --u-gap: 14px;
+      --u-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --u-bg: #1c1c1e;
+        --u-fg: #f2f2f7;
+        --u-muted: #a1a1a8;
+        --u-border: #3a3a3e;
+        --u-field-bg: #2c2c2e;
+        --u-accent: #f97316;
+        --u-accent-fg: #1c1c1e;
+        --u-error: #ff6b6b;
+      }
+    }
+    html, body {
+      margin: 0;
+      background: var(--u-bg);
+      color: var(--u-fg);
+      font: 16px/1.5 var(--u-font);
+    }
+    .unisono-root { max-width: 560px; margin: 0 auto; padding: 16px; }
+    .unisono-column { display: flex; flex-direction: column; gap: var(--u-gap); }
+    .unisono-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .unisono-gap-sm { --u-gap: 8px; }
+    .unisono-gap-md { --u-gap: 14px; }
+    .unisono-gap-lg { --u-gap: 22px; }
+    .unisono-title { font-size: 22px; font-weight: 700; line-height: 1.25; margin: 0; }
+    .unisono-body { margin: 0; }
+    .unisono-caption { color: var(--u-muted); font-size: 14px; margin: 0; }
+    .unisono-field { display: flex; flex-direction: column; gap: 6px; min-width: 120px; }
+    .unisono-field > label { font-size: 14px; font-weight: 600; }
+    .unisono-field input[type="text"],
+    .unisono-field input[type="date"],
+    .unisono-field input[type="email"],
+    .unisono-field input[type="number"],
+    .unisono-field select {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--u-border);
+      border-radius: 8px;
+      background: var(--u-field-bg);
+      color: var(--u-fg);
+      font: inherit;
+    }
+    .unisono-field input:focus-visible,
+    .unisono-field select:focus-visible,
+    .unisono-button:focus-visible {
+      outline: 2px solid var(--u-accent);
+      outline-offset: 2px;
+    }
+    .unisono-checkbox { flex-direction: row; align-items: center; }
+    .unisono-button {
+      align-self: flex-start;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--u-border);
+      background: transparent;
+      color: var(--u-fg);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .unisono-button[data-variant="primary"] {
+      background: var(--u-accent);
+      border-color: var(--u-accent);
+      color: var(--u-accent-fg);
+    }
+    .unisono-button:disabled { opacity: 0.55; cursor: progress; }
+    .unisono-status { color: var(--u-muted); font-size: 14px; margin: 0; }
+    .unisono-error { color: var(--u-error); font-size: 14px; margin: 0; }
+    .unisono-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .unisono-table th, .unisono-table td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--u-border);
+      vertical-align: top;
+    }
+    .unisono-table th { font-weight: 600; color: var(--u-muted); }
+    .unisono-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .unisono-list-subtitle { display: block; color: var(--u-muted); font-size: 13px; }
+    .unisono-divider { border: 0; border-top: 1px solid var(--u-border); margin: 4px 0; }
+    .unisono-image { max-width: 100%; border-radius: 8px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main id="unisono-root" class="unisono-root" aria-live="polite"></main>
+  <script>window.__UNISONO_CATALOG__ = { id: "__UNISONO_CATALOG_ID__", version: "__UNISONO_CATALOG_VERSION__" };</script>
+  <script id="unisono-document" type="application/json">__UNISONO_DOCUMENT__</script>
+  <script>__UNISONO_SCRIPT__</script>
+  <script>
+    (function () {
+      var node = document.getElementById("unisono-document");
+      var root = document.getElementById("unisono-root");
+      if (!node || !root || !window.UnisonoCatalog) return;
+      var documentData;
+      try {
+        documentData = JSON.parse(node.textContent || "{}");
+      } catch (error) {
+        root.textContent = "This Unisono UI document is not valid JSON.";
+        return;
+      }
+      var transport = window.UnisonoCatalog.createTransport();
+      transport.start();
+      var app = window.UnisonoCatalog.createApp(root, documentData, transport);
+      app.start();
+    })();
+  </script>
+</body>
+</html>

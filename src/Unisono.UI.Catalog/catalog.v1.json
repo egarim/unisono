@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unisono.dev/ui/catalog/v1/document.schema.json",
+  "title": "Unisono UI document v1",
+  "description": "A server-authored UI document: one surface made of catalog components bound to a data model. Envelope shape follows A2UI; the component vocabulary is the Unisono v1 catalog.",
+  "type": "object",
+  "required": ["version", "createSurface"],
+  "properties": {
+    "version": { "const": "1.0" },
+    "createSurface": { "$ref": "#/$defs/surface" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "surface": {
+      "type": "object",
+      "required": ["surfaceId", "catalogId", "components"],
+      "properties": {
+        "surfaceId": { "type": "string", "minLength": 1 },
+        "catalogId": { "const": "https://unisono.dev/ui/catalog/v1" },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/component" }
+        },
+        "dataModel": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "description": "A JSON Pointer into createSurface.dataModel.",
+      "required": ["@path"],
+      "properties": { "@path": { "type": "string", "pattern": "^/" } },
+      "additionalProperties": false
+    },
+    "value": {
+      "oneOf": [
+        { "$ref": "#/$defs/binding" },
+        { "type": ["string", "number", "boolean", "null"] }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "required": ["id", "component"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "component": {
+          "enum": [
+            "Column", "Row", "Text", "TextInput", "NumberInput", "Select",
+            "Checkbox", "Button", "List", "Table", "Image", "Divider"
+          ]
+        },
+        "children": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "text": { "$ref": "#/$defs/value" },
+        "value": { "$ref": "#/$defs/value" },
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "format": { "type": "string" },
+        "variant": { "type": "string" },
+        "gap": { "enum": ["sm", "md", "lg"] },
+        "required": { "type": "boolean" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "step": { "type": "number" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["value", "label"],
+            "properties": { "value": { "type": "string" }, "label": { "type": "string" } },
+            "additionalProperties": false
+          }
+        },
+        "action": {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/value" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "rows": { "$ref": "#/$defs/value" },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label"],
+            "properties": { "key": { "type": "string" }, "label": { "type": "string" } },
+            "additionalProperties": false
+          }
+        },
+        "items": { "$ref": "#/$defs/value" },
+        "titleField": { "type": "string" },
+        "subtitleField": { "type": "string" },
+        "src": { "type": "string" },
+        "alt": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "component": { "const": "Text" } } },
+          "then": { "required": ["text"] }
+        },
+        {
+          "if": { "properties": { "component": { "enum": ["Column", "Row"] } } },
+          "then": { "required": ["children"] }
+        },
+        {
+          "if": { "properties": { "component": { "const": "Button" } } },
+          "then": { "required": ["label", "action"] }
+        },
+        {
+          "if": { "properties": { "component": { "enum": ["TextInput", "NumberInput", "Select", "Checkbox"] } } },
+          "then": { "required": ["label", "value"] }
+        },
+        {
+          "if": { "properties": { "component": { "const": "Select" } } },
+          "then": { "required": ["options"] }
+        },
+        {
+          "if": { "properties": { "component": { "const": "Table" } } },
+          "then": { "required": ["rows"] }
+        },
+        {
+          "if": { "properties": { "component": { "const": "List" } } },
+          "then": { "required": ["items"] }
+        },
+        {
+          "if": { "properties": { "component": { "const": "Image" } } },
+          "then": { "required": ["src"] }
+        }
+      ]
+    }
+  }
+}

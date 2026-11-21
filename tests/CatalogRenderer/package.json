@@ -1,0 +1,13 @@
+{
+  "name": "unisono-catalog-renderer-tests",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "description": "DOM tests for the Unisono catalog renderer (jsdom, no MCP Apps host required).",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}
