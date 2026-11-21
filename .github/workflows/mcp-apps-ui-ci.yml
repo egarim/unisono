@@ -10,6 +10,7 @@ on:
       - 'samples/McpAppsBridge/**'
       - 'samples/McpAppsPupusasHost/**'
       - 'samples/UiPlayground/**'
+      - 'tests/**'
       - 'scripts/mcp-ui-smoke.py'
       - 'Unisono.slnx'
       - '.github/workflows/mcp-apps-ui-ci.yml'
@@ -26,12 +27,15 @@ jobs:
         run: |
           dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
           dotnet build samples/UiPlayground/UiPlayground.csproj -c Release
+      - name: Test the catalog generator, validator and provider
+        run: dotnet test tests/Unisono.UI.Catalog.Tests/Unisono.UI.Catalog.Tests.csproj -c Release
       - name: Pack the packages that ship with this feature
         # release.yml only packs on a tag; catch missing README/icon metadata on the PR.
         run: |
           dotnet pack src/Unisono.Core/Unisono.Core.csproj -c Release -o "$RUNNER_TEMP/nupkg"
           dotnet pack src/Unisono.McpApps/Unisono.McpApps.csproj -c Release -o "$RUNNER_TEMP/nupkg"
           dotnet pack src/Unisono.Mcp/Unisono.Mcp.csproj -c Release -o "$RUNNER_TEMP/nupkg"
+          dotnet pack src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj -c Release -o "$RUNNER_TEMP/nupkg"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -55,6 +59,33 @@ jobs:
             sleep 1
           done
           python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
+      - name: Smoke-test the declarative catalog host
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 2
+          dotnet run --no-build -c Release --project samples/McpAppsPupusasHost -- catalog > /tmp/unisono-catalog.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true; cat /tmp/unisono-catalog.log' EXIT
+          for i in {1..30}; do
+            if curl -sS http://127.0.0.1:8792/mcp -o /dev/null 2>/dev/null; then break; fi
+            sleep 1
+          done
+          python3 scripts/mcp-ui-smoke.py http://127.0.0.1:8792/mcp
+  renderer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tests/CatalogRenderer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Test the catalog renderer
+        run: npm test
   web:
     runs-on: ubuntu-latest
     strategy:

@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Unisono.McpApps/Unisono.McpApps.csproj" />
     <ProjectReference Include="../../src/Unisono.Mcp/Unisono.Mcp.csproj" />
+    <ProjectReference Include="../../src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="order-card.html" CopyToOutputDirectory="PreserveNewest" />

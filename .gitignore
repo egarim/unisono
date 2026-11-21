@@ -35,6 +35,7 @@ artifacts/
 samples/McpAppsBridge/node_modules/
 samples/McpAppsBridge/dist/
 samples/BlazorPupusas/wwwroot/unisono-mcp-bridge.js
+tests/CatalogRenderer/node_modules/
 
 # UI Playground preview written by samples/UiPlayground
 pupusa-preview.html

@@ -3,6 +3,7 @@
     <Project Path="src/Unisono.Core/Unisono.Core.csproj" />
     <Project Path="src/Unisono.Mcp/Unisono.Mcp.csproj" />
     <Project Path="src/Unisono.McpApps/Unisono.McpApps.csproj" />
+    <Project Path="src/Unisono.UI.Catalog/Unisono.UI.Catalog.csproj" />
     <Project Path="src/Unisono.UI.Uno/Unisono.UI.Uno.csproj" />
     <Project Path="src/Unisono.UI.Blazor/Unisono.UI.Blazor.csproj" />
     <Project Path="src/Unisono.UI.React/Unisono.UI.React.csproj" />
@@ -19,5 +20,8 @@
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
     <Project Path="samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj" />
     <Project Path="samples/Pupuseria/Pupuseria/Pupuseria.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Unisono.UI.Catalog.Tests/Unisono.UI.Catalog.Tests.csproj" />
   </Folder>
 </Solution>

@@ -7,6 +7,7 @@ using ModelContextProtocol.Server;
 using Unisono;
 using Unisono.Mcp;
 using Unisono.McpApps;
+using Unisono.UI.Catalog;
 
 const string toolName = "calculate_pupusas";
 const string resourceUri = "ui://pupuseria/order-card";
@@ -14,13 +15,27 @@ const string resourceUri = "ui://pupuseria/order-card";
 // First, give the assistant an ordinary C# tool.
 var tools = new ToolRegistry().AddToolsFrom(new PupusaTools());
 
-// Next, register an optional UI provider. This one serves prebuilt HTML;
-// a future Uno or Blazor adapter would implement the same IUnisonoUiProvider.
-var html = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "order-card.html"));
-var provider = new StaticHtmlUiProvider().Add(resourceUri, html);
+// Next, register an optional UI provider. By default it serves prebuilt HTML;
+// pass --catalog to render the same tool from a generated JSON document instead.
+var useCatalog = args.Contains("--catalog", StringComparer.OrdinalIgnoreCase);
+IUnisonoUiProvider provider;
+if (useCatalog)
+{
+    provider = new CatalogUiProvider().AddFromTool(
+        tools,
+        toolName,
+        resourceUri,
+        form => form.Title("Pupusa Party Calculator").SubmitLabel("Calculate"));
+}
+else
+{
+    var html = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "order-card.html"));
+    provider = new StaticHtmlUiProvider().Add(resourceUri, html);
+}
+
 var ui = new UnisonoUiRegistry(tools)
     .AddProvider(provider)
-    .MapTool(toolName, resourceUri, "html", "Pupusa Party Calculator");
+    .MapTool(toolName, resourceUri, provider.Framework, "Pupusa Party Calculator");
 
 // The UI is optional: headless clients still invoke the same tool.
 var total = await tools.InvokeAsync<decimal>(
@@ -37,6 +52,8 @@ if (ui.CanRender(toolName, capabilities))
     var preview = Path.Combine(Environment.CurrentDirectory, "pupusa-preview.html");
     await File.WriteAllTextAsync(preview, Encoding.UTF8.GetString(asset.Content.Span));
     Console.WriteLine($"UI mapping: {toolName} → {asset.ResourceUri} ({asset.MimeType})");
+    if (useCatalog && provider is CatalogUiProvider catalog && catalog.TryGetDocument(resourceUri, out var document))
+        Console.WriteLine("Generated document: " + UnisonoUiDocumentJson.Serialize(document!));
     Console.WriteLine($"Browser-only preview: {preview}");
 }
 
@@ -44,8 +61,10 @@ await using var host = new UnisonoMcpHttpHost(tools, new UnisonoMcpHttpOptions
 {
     Port = 8791,
     ServerName = "unisono-ui-playground",
-    Instructions = "Calculate pupusa prices with the C# tool. This host serves tools only; the UI resource is previewable locally."
-});
+    Instructions = useCatalog
+        ? "Calculate pupusa prices with the C# tool. It also serves the generated UI resource."
+        : "Calculate pupusa prices with the C# tool. This host serves tools only; the UI resource is previewable locally."
+}, ui: useCatalog ? ui : null);
 host.Start();
 Console.WriteLine($"Headless MCP tools available at {host.Url}");
 Console.WriteLine("Press Ctrl+C to stop.");
