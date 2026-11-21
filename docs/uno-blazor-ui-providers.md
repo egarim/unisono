@@ -67,35 +67,16 @@ Use `dotnet new unoapp` or Uno's project wizard to obtain its current package ve
 
 ## React + TypeScript + Vite
 
-See [React Pupusas](../samples/ReactPupusas/README.md) for an end-to-end example, including `npm install`, Vite production builds, and React provider registration. Configure `UNISONO_UI_BASE` to the final static asset URL when building: Vite emits script and CSS asset URLs based on its build-time base. Rewriting only the HTML `<base>` element does **not** correct Vite's absolute asset paths.
+The [React Pupusas](../samples/ReactPupusas/README.md) example uses `vite-plugin-singlefile` to put the component and MCP Apps SDK bridge into one `dist/index.html`. Register it directly without a static host:
 
 ```csharp
 using Unisono.UI.React;
-
-var provider = new ReactUiProvider(
-    "samples/ReactPupusas/dist",
-    new Uri("https://static.example.com/react-pupusas/"))
-    .Add("ui://pupuseria/react");
-
-ui.AddProvider(provider)
-  .MapTool("calculate_pupusas", "ui://pupuseria/react", "react");
+var provider = new ReactUiProvider("samples/ReactPupusas/dist")
+    .Add("ui://pupuseria/order");
+ui.AddProvider(provider).MapTool("calculate_pupusas", "ui://pupuseria/order", "react");
 ```
 
-## Make the Blazor and Uno buttons invoke the actual C# MCP tool
-
-Both samples use a shared JavaScript MCP Apps bridge built from the official SDK:
-
-```bash
-cd samples/McpAppsBridge
-npm install
-npm run build
-```
-
-Copy `dist/unisono-mcp-bridge.js` to the **published static asset root** for Blazor or Uno, and make sure the HTML entry document loads that script *before* its WebAssembly bootstrap. The Blazor sample already includes the script tag in `wwwroot/index.html`; Uno requires adding it to the official generated Uno scaffold.
-
-Blazor uses `IJSRuntime.InvokeAsync<decimal>("UnisonoMcpBridge.calculatePupusas", ...)`; Uno uses `[JSImport("globalThis.UnisonoMcpBridge.calculatePupusas")]` on its browser WebAssembly target.
-
-`UnisonoMcpHttpHost` accepts an optional `ui:` registry. See [the selectable MCP server sample](../samples/McpAppsPupusasHost/README.md) for the complete host and protocol smoke test.
+A React application with external assets can still use `ReactUiProvider(path, publicAssetBaseUrl)` and explicit CSP resource domains. Uno and Blazor generally need static WASM runtime hosting.
 
 ## Design details
 
