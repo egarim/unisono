@@ -13,6 +13,9 @@ namespace Unisono.UI.React;
 /// </remarks>
 public sealed class ReactUiProvider : PublishedWebUiProvider
 {
+    public ReactUiProvider(string publishedDistDirectory)
+        : base(publishedDistDirectory, null) { }
+
     public ReactUiProvider(string publishedDistDirectory, Uri assetBaseUri)
         : base(publishedDistDirectory, assetBaseUri) { }
 
