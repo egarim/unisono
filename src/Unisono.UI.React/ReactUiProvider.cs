@@ -4,7 +4,7 @@ namespace Unisono.UI.React;
 
 /// <summary>
 /// Exposes a prebuilt React application (such as a Vite dist folder) as a UI resource.
-/// Build React with Vite's base option matching <paramref name="assetBaseUri"/>
+/// Build React with Vite's base option matching the asset base URI passed to the constructor
 /// and publish the full dist folder at that URL before loading the MCP App.
 /// </summary>
 /// <remarks>
