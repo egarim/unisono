@@ -13,29 +13,28 @@ namespace Unisono.McpApps;
 public abstract class PublishedWebUiProvider : IUnisonoUiProvider
 {
     private readonly string _publishRoot;
-    private readonly Uri _assetBaseUri;
+    private readonly Uri? _assetBaseUri;
     private readonly Dictionary<string, string> _pages = new(StringComparer.Ordinal);
 
-    protected PublishedWebUiProvider(string publishRoot, Uri assetBaseUri)
+    protected PublishedWebUiProvider(string publishRoot, Uri? assetBaseUri)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(publishRoot);
-        ArgumentNullException.ThrowIfNull(assetBaseUri);
-        if (!assetBaseUri.IsAbsoluteUri ||
+        if (assetBaseUri is not null && (!assetBaseUri.IsAbsoluteUri ||
             (assetBaseUri.Scheme != Uri.UriSchemeHttps &&
-             !(assetBaseUri.Scheme == Uri.UriSchemeHttp && assetBaseUri.IsLoopback)))
+             !(assetBaseUri.Scheme == Uri.UriSchemeHttp && assetBaseUri.IsLoopback))))
             throw new ArgumentException("Asset base URI must be HTTPS (HTTP is allowed for loopback development only).",
                 nameof(assetBaseUri));
-        if (!string.IsNullOrEmpty(assetBaseUri.Query) || !string.IsNullOrEmpty(assetBaseUri.Fragment))
+        if (assetBaseUri is not null && (!string.IsNullOrEmpty(assetBaseUri.Query) || !string.IsNullOrEmpty(assetBaseUri.Fragment)))
             throw new ArgumentException("Asset base URI cannot contain a query or fragment.", nameof(assetBaseUri));
 
         _publishRoot = Path.GetFullPath(publishRoot);
-        _assetBaseUri = new Uri(assetBaseUri.AbsoluteUri.TrimEnd('/') + "/");
+        _assetBaseUri = assetBaseUri is null ? null : new Uri(assetBaseUri.AbsoluteUri.TrimEnd('/') + "/");
     }
 
     public abstract string Framework { get; }
 
     /// <summary>The origin that the MCP Apps host must allow for static resources.</summary>
-    public Uri AssetBaseUri => _assetBaseUri;
+    public Uri? AssetBaseUri => _assetBaseUri;
 
     /// <summary>
     /// Associates a UI resource with a relative HTML entrypoint (usually index.html).
@@ -74,11 +73,14 @@ public abstract class PublishedWebUiProvider : IUnisonoUiProvider
 
         // A sandboxed MCP App is not hosted at the static site's URL. Supply
         // an absolute base so the framework's boot resources resolve correctly.
+        if (_assetBaseUri is not null)
+        {
         var baseTag = "<base href=\"" + WebUtility.HtmlEncode(_assetBaseUri.AbsoluteUri) + "\">";
         html = Regex.IsMatch(html, @"<base\s", RegexOptions.IgnoreCase)
             ? Regex.Replace(html, @"<base\b[^>]*>", _ => baseTag, RegexOptions.IgnoreCase)
             : Regex.Replace(html, @"<head\b[^>]*>", m => m.Value + baseTag,
                 RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+        }
 
         return new UnisonoUiAsset(
             definition.ResourceUri,
