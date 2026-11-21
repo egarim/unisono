@@ -109,6 +109,31 @@ Run inside an MCP Apps-compatible host to see the UI call C#; opening the HTML i
 
 For the design and limitations, see [pluggable MCP Apps UI](docs/pluggable-mcp-apps-ui.md) and the [Uno, Blazor and React provider guide](docs/uno-blazor-ui-providers.md).
 
+## Examples — choose your own adventure 🚀
+
+**New to Unisono?** Start small and add one instrument at a time. The [full examples guide](docs/examples.md) walks through each scenario, with real commands, what to expect, and what remains experimental.
+
+| Example | What you build | Where to start |
+| --- | --- | --- |
+| **1. Tools only** 🧮 | A C# calculator that any MCP client can call; no UI | [ConsoleHost](samples/ConsoleHost/Program.cs) |
+| **2. Plain HTML** 🫓 | A pupusa-price card attached to the same tool | [UiPlayground](samples/UiPlayground/README.md) |
+| **3. React** ⚛️ | A Vite-built MCP App calling a real C# tool | [ReactPupusas](samples/ReactPupusas/README.md) |
+| **4. Blazor** 🟣 | A Razor/Blazor WASM card using a browser bridge | [BlazorPupusas](samples/BlazorPupusas/PupusaCard.razor) |
+| **5. Uno Platform** 🪟 | A XAML/WASM card with the shared bridge | [UnoPupusas](samples/UnoPupusas/README.md) |
+| **6. Siri + MCP** 🎤 | Native tasks exposed through App Intents and MCP | [TaskTracker](samples/TaskTracker/) |
+
+### Start in sixty seconds (tools only)
+
+```bash
+dotnet run --project samples/ConsoleHost -- 8788
+# In a separate terminal:
+scripts/mcp-smoke.sh http://127.0.0.1:8788/mcp add '{"a":2,"b":3}'
+```
+
+Then graduate to a full interactive MCP resource: build [ReactPupusas](samples/ReactPupusas/README.md), run [McpAppsPupusasHost](samples/McpAppsPupusasHost/README.md), and validate with `scripts/mcp-ui-smoke.py`.
+
+**Reality check:** the examples document implemented source paths, not a promise that all UI hosts have been tested. React, Blazor, and Uno embedded rendering in ChatGPT and Claude still needs validation, and marketplace submission/production OAuth are separate work.
+
 ## Watch
 
 The implementation, start to finish (5:13):
