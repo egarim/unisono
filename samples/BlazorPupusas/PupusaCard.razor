@@ -1,16 +1,47 @@
+@inject Microsoft.JSInterop.IJSRuntime JS
+
 <main class="card">
     <h1>🫓 Pupusa Party — Blazor</h1>
-    <p>Same C# idea, now with a Razor component.</p>
+    <p>Calculate with the C# MCP tool through the host bridge.</p>
     <label for="quantity">Pupusas</label>
     <input id="quantity" type="number" min="0" @bind="Quantity" @bind:event="oninput" />
     <label for="price">Price (USD)</label>
     <input id="price" type="number" min="0" step="0.01" @bind="Price" @bind:event="oninput" />
-    <h2>Total: @Total.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</h2>
-    <p class="note">Browser-side demo; MCP tool calls require the future host bridge.</p>
+    <button disabled="@Busy" @onclick="CalculateAsync">@(Busy ? "Calling the MCP tool…" : "Calculate with MCP")</button>
+    <h2>Server total: @(Total is null ? "—" : Total.Value.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US")))</h2>
+    @if (Error is not null)
+    {
+        <p role="alert">@Error</p>
+    }
+    <p class="note">The embedded UI needs a compatible MCP Apps host and the bridge bundle in wwwroot.</p>
 </main>
 
 @code {
     private int Quantity { get; set; } = 3;
     private decimal Price { get; set; } = 1.75m;
-    private decimal Total => Math.Max(0, Quantity) * Math.Max(0, Price);
+    private decimal? Total { get; set; }
+    private bool Busy { get; set; }
+    private string? Error { get; set; }
+
+    private async Task CalculateAsync()
+    {
+        Busy = true;
+        Error = null;
+        try
+        {
+            Total = await JS.InvokeAsync<decimal>(
+                "UnisonoMcpBridge.calculatePupusas",
+                Math.Max(0, Quantity),
+                Math.Max(0, Price));
+        }
+        catch (Exception ex)
+        {
+            Total = null;
+            Error = "MCP Apps tool call failed: " + ex.Message;
+        }
+        finally
+        {
+            Busy = false;
+        }
+    }
 }
