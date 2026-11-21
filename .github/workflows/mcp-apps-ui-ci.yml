@@ -1,0 +1,42 @@
+name: MCP Apps UI adapters
+on:
+  pull_request:
+    paths:
+      - 'src/Unisono.McpApps/**'
+      - 'src/Unisono.Mcp/**'
+      - 'src/Unisono.UI.*/**'
+      - 'samples/BlazorPupusas/**'
+      - 'samples/ReactPupusas/**'
+      - 'samples/McpAppsBridge/**'
+      - 'samples/McpAppsPupusasHost/**'
+      - '.github/workflows/mcp-apps-ui-ci.yml'
+  workflow_dispatch:
+jobs:
+  dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build framework-neutral adapters and host sample
+        run: dotnet build samples/McpAppsPupusasHost/McpAppsPupusasHost.csproj -c Release
+      - name: Publish Blazor WASM sample
+        run: dotnet publish samples/BlazorPupusas/BlazorPupusas.csproj -c Release -o "$RUNNER_TEMP/blazor"
+  web:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: [samples/ReactPupusas, samples/McpAppsBridge]
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Bundle
+        run: npm run build
