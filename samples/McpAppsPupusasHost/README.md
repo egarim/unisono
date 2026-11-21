@@ -7,22 +7,22 @@ Unlike the local HTML playground, this sample **registers a C# tool and an actua
 ```bash
 cd samples/ReactPupusas
 npm install
-UNISONO_UI_BASE=https://YOUR_STATIC_HOST/react-pupusas/ npm run build
+npm run build
 ```
 
-Deploy `dist/` **contents** to the public URL in `UNISONO_UI_BASE`. If using a local development asset host, use `UNISONO_UI_BASE=http://127.0.0.1:5173/` for a matching Vite dev server while testing; configure MCP Apps CSP and access carefully.
+This creates a self-contained `dist/index.html` with bundled JavaScript/CSS. No separate static asset origin is needed for the React sample.
 
 ## 2. Start the C# MCP server
 
 From the repository root:
 
 ```bash
-dotnet run --project samples/McpAppsPupusasHost -- react samples/ReactPupusas/dist https://YOUR_STATIC_HOST/react-pupusas/
+dotnet run --project samples/McpAppsPupusasHost -- react samples/ReactPupusas/dist
 ```
 
 The server listens at `http://127.0.0.1:8792/mcp` by default. Tool `calculate_pupusas` now advertises `_meta.ui.resourceUri = "ui://pupuseria/order"` and the server exposes a matching resource via `resources/list` and `resources/read`. Tool invocation continues to work headlessly.
 
-For Blazor or Uno, publish the WASM UI and substitute the framework name, published `wwwroot/` directory and corresponding static asset URL.
+For Blazor or Uno, publish the WASM UI and substitute the framework name, published `wwwroot/` directory, and corresponding **required** static asset URL.
 
 ## 3. Integrate with a host
 
