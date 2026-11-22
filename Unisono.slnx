@@ -20,10 +20,8 @@
     <Project Path="samples/TaskTracker/MauiAppIntentsSample/MauiAppIntentsSample.csproj" />
     <Project Path="samples/UnisonoNotes/UnisonoNotes/UnisonoNotes.csproj" />
     <Project Path="samples/Pupuseria/Pupuseria/Pupuseria.csproj" />
-    <Project Path="samples/VivariumCompanion/VivariumCompanion.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Unisono.UI.Catalog.Tests/Unisono.UI.Catalog.Tests.csproj" />
-    <Project Path="tests/VivariumCompanion.Tests/VivariumCompanion.Tests.csproj" />
   </Folder>
 </Solution>
