@@ -44,8 +44,11 @@ public static class Blocking
                 "MORE, Allowed agents, New: add claude-code (a lead edit in the app)"));
 
         var mine = tasks.Where(t => P(t)?["project"]?.GetValue<string>() == key).ToList();
-        var unstaffed = mine.Where(t => P(t)?["stage"]?.GetValue<string>() is { } s1 && OpenStages.Contains(s1)
-            && (string.IsNullOrEmpty(P(t)?["assignee"]?.GetValue<string>()) || string.IsNullOrEmpty(P(t)?["agent"]?.GetValue<string>()))).ToList();
+        // A planned task with nobody on it is the factory's queue, not a defect: the factory carries planned tasks
+        // itself. A task a person holds (claimed and beyond) with no assignee or agent can never run.
+        var held = mine.Where(t => P(t)?["stage"]?.GetValue<string>() is { } s && s != "planned" && OpenStages.Contains(s)).ToList();
+        var unstaffed = held.Where(t => string.IsNullOrEmpty(P(t)?["assignee"]?.GetValue<string>())
+            || string.IsNullOrEmpty(P(t)?["agent"]?.GetValue<string>())).ToList();
         if (unstaffed.Count > 0)
             gaps.Add(new Gap($"{unstaffed.Count} open task(s) without assignee or agent: {string.Join(", ", unstaffed.Take(5).Select(t => P(t)?["code"]?.GetValue<string>() ?? t!["key"]?.GetValue<string>() ?? "?"))}",
                 "open each task and set assignee and agent"));

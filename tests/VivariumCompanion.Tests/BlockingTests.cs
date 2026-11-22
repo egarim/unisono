@@ -86,6 +86,20 @@ public class BlockingTests
     }
 
     [Fact]
+    public void A_planned_unstaffed_task_is_the_factory_queue_not_a_gate()
+    {
+        var planned = new JsonArray(Doc("singular-t-fw-03", new JsonObject
+        {
+            ["project"] = "singular", ["code"] = "T-FW-03", ["stage"] = "planned",
+        }));
+        var gaps = Blocking.Compute(Project(), Baselines("signed"),
+            new JsonArray(Doc("g-1", new JsonObject { ["baseline"] = "singular-1.0" })),
+            new JsonArray(Doc("claude-code", new JsonObject())),
+            planned, Devices(true), new JsonArray(Doc("c", new JsonObject { ["kind"] = "setup" })), Now);
+        Assert.Empty(gaps);
+    }
+
+    [Fact]
     public void Four_minutes_is_online_and_five_is_not()
     {
         Assert.True(Blocking.WithinHeartbeats(Now.AddMinutes(-4).ToString("o"), Now));
