@@ -133,6 +133,30 @@ public class ClientTests
     }
 
     [Fact]
+    public async Task A_total_just_past_the_cap_is_refused_too()
+    {
+        // the cap holds with a total as well: 200,001 rows must not be handed back (review round 5)
+        using var client = Client(req =>
+        {
+            var (_, offset) = Page(req);
+            return Json(200, new JsonObject { ["items"] = Rows(500, offset), ["total"] = 200_001 });
+        });
+        var e = await Assert.ThrowsAsync<McpException>(() => client.ListAsync("tasks"));
+        Assert.Contains("companion's limit of 200000", e.Message);
+    }
+
+    [Fact]
+    public async Task A_total_at_the_cap_is_read_whole()
+    {
+        using var client = Client(req =>
+        {
+            var (_, offset) = Page(req);
+            return Json(200, new JsonObject { ["items"] = Rows(500, offset), ["total"] = 200_000 });
+        });
+        Assert.Equal(200_000, (await client.ListAsync("tasks")).Count);
+    }
+
+    [Fact]
     public async Task A_pairing_refused_by_the_token_endpoint_says_to_re_pair()
     {
         var api = new FakeApi(_ => Json(400, new JsonObject { ["error"] = "invalid_grant" }));

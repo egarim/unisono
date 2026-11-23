@@ -141,6 +141,9 @@ public sealed class VivariumClient : IDisposable
             var page = root?["items"] as JsonArray ?? new JsonArray();
             total ??= root?["total"] is JsonValue t && t.TryGetValue<int>(out var n) ? n : null;
             foreach (var it in page) items.Add(it?.DeepClone());
+            if (items.Count > MaxRows)  // the cap holds whether or not a total was reported (review round 5)
+                throw new McpException($"{collection}: read {items.Count} rows, past the companion's limit of {MaxRows}; " +
+                                       "refusing to read further");
             if (total is not null && items.Count > total)
                 throw new McpException($"{collection}: read {items.Count} rows against a reported total of {total}; " +
                                        "the API is repeating pages");
@@ -153,9 +156,6 @@ public sealed class VivariumClient : IDisposable
                 return items;  // nothing more to read
             }
             offset += page.Count;  // advance by what the server actually returned, never by the limit asked for
-            if (items.Count > MaxRows)
-                throw new McpException($"{collection}: read {items.Count} rows, past the companion's limit of {MaxRows}; " +
-                                       "refusing to read further");
         }
     }
 
