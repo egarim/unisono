@@ -23,27 +23,34 @@ public sealed class VivariumClient : IDisposable
         _ownsHttp = http is null;
     }
 
-    public string Api => (_state["hub"] ?? _state["api"])!.GetValue<string>().TrimEnd('/');
-    public string Tenant => _state["tenant"]?.GetValue<string>() ?? "vivarium-dev";
-    private string App => _state["app"]?.GetValue<string>() ?? "vivarium";
-    private string Auth => (_state["auth"] ?? _state["keycloak"])!.GetValue<string>().TrimEnd('/');
-    private string Realm => _state["realm"]?.GetValue<string>() ?? "xafplatform";
-    private string ClientId => _state["client"]!.GetValue<string>();
+    public string Api => (StringOf(_state, "hub", "api")
+        ?? throw new McpException("the pairing state has no hub address - re-pair this machine")).TrimEnd('/');
+    public string Tenant => StringOf(_state, "tenant") ?? "vivarium-dev";
+    private string App => StringOf(_state, "app") ?? "vivarium";
+    private string Auth => (StringOf(_state, "auth", "keycloak")
+        ?? throw new McpException("the pairing state has no sign-in address - re-pair this machine")).TrimEnd('/');
+    private string Realm => StringOf(_state, "realm") ?? "xafplatform";
+    private string ClientId => StringOf(_state, "client")
+        ?? throw new McpException("the pairing state has no client id - re-pair this machine");
 
     /// The keys a usable pairing must carry, as strings. Program refuses to start the server without them, with the
     /// reason instead of a NullReferenceException or a type error on the first call (review, 2026-11-23).
     public static IReadOnlyList<string> Missing(JsonObject state)
     {
         var missing = new List<string>();
-        if (!HasString(state, "hub", "api")) missing.Add("hub");
-        if (!HasString(state, "auth", "keycloak")) missing.Add("auth");
-        if (!HasString(state, "client")) missing.Add("client");
-        if (!HasString(state, "refresh")) missing.Add("refresh");
+        if (StringOf(state, "hub", "api") is null) missing.Add("hub");
+        if (StringOf(state, "auth", "keycloak") is null) missing.Add("auth");
+        if (StringOf(state, "client") is null) missing.Add("client");
+        if (StringOf(state, "refresh") is null) missing.Add("refresh");
         return missing;
     }
 
-    private static bool HasString(JsonObject state, params string[] keys) =>
-        keys.Any(k => state[k] is JsonValue v && v.TryGetValue<string>(out var text) && !string.IsNullOrWhiteSpace(text));
+    /// The first key of `keys` whose value is a non-blank JSON string. The check and the accessors share it, so a
+    /// state that passes the startup refusal reads the same way here (review round 3: {"hub": 1, "api": "…"}).
+    private static string? StringOf(JsonObject state, params string[] keys) =>
+        keys.Select(k => state[k] as JsonValue)
+            .Select(v => v is not null && v.TryGetValue<string>(out var text) ? text : null)
+            .FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
 
     /// Where a machine keeps its pairing for a team, mirroring creatura_device.team_state_path: the first team
     /// paired keeps device.json, every further team gets teams/&lt;team&gt;.json.
@@ -110,16 +117,16 @@ public sealed class VivariumClient : IDisposable
     }
 
     /// Every page of a collection, newest-safe: the caller orders what it reads. The walk ends at the server's
-    /// total, at an empty page, at a short page when the server reports no total, or at the page cap. The offset
-    /// advances by the rows the server actually returned, so a server that clamps the page size is fully read
-    /// instead of silently truncated (review, 2026-11-23); one that ignores the offset is reported, not repeated.
+    /// total or at an empty page (a server that clamps the page size is still read whole, because the offset
+    /// advances by the rows actually returned), and a server that repeats pages is reported instead of looped
+    /// (review, 2026-11-23).
     public async Task<JsonArray> ListAsync(string collection, string? filter = null, CancellationToken ct = default)
     {
-        const int Page = 500, MaxPages = 200;
+        const int Page = 500, MaxRows = 200_000;
         var items = new JsonArray();
         var offset = 0;
         int? total = null;
-        for (var pageIndex = 0; pageIndex < MaxPages; pageIndex++)
+        while (items.Count < MaxRows)
         {
             var q = $"limit={Page}&offset={offset}" + (filter is null ? "" : $"&{filter}");
             using var req = new HttpRequestMessage(HttpMethod.Get, $"{Api}/api/app/data/{collection}?{q}");
@@ -134,18 +141,20 @@ public sealed class VivariumClient : IDisposable
             var page = root?["items"] as JsonArray ?? new JsonArray();
             total ??= root?["total"] is JsonValue t && t.TryGetValue<int>(out var n) ? n : null;
             foreach (var it in page) items.Add(it?.DeepClone());
-            if (total is not null)
+            if (total is not null && items.Count > total)
+                throw new McpException($"{collection}: read {items.Count} rows against a reported total of {total}; " +
+                                       "the API is repeating pages");
+            if (total is not null && items.Count >= total) return items;   // the total is the contract
+            if (page.Count == 0)
             {
-                if (items.Count > total)
-                    throw new McpException($"{collection}: read {items.Count} rows against a reported total of {total}; " +
-                                           "the API is ignoring the offset and repeating pages");
-                if (items.Count >= total) return items;
+                if (total is not null)  // fewer rows than the server itself promised
+                    throw new McpException($"{collection}: the API reported {total} rows but answered an empty page " +
+                                           $"at offset {offset}");
+                return items;  // nothing more to read
             }
-            if (page.Count == 0) return items;  // nothing more to read
-            if (total is null && page.Count < Page) return items;  // no total to verify: a short page is the end
-            offset += page.Count;
+            offset += page.Count;  // advance by what the server actually returned, never by the limit asked for
         }
-        throw new McpException($"{collection}: gave up after {MaxPages} pages of up to {Page}; the API is ignoring the offset");
+        throw new McpException($"{collection}: refused to read more than {MaxRows} rows; the API is not advancing the offset");
     }
 
     public void Dispose()

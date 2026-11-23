@@ -76,10 +76,38 @@ public class ClientTests
     }
 
     [Fact]
-    public async Task Without_a_total_a_short_page_is_the_end()
+    public async Task Without_a_total_a_clamped_server_is_still_read_whole()
     {
-        using var client = Client(_ => Json(200, new JsonObject { ["items"] = Rows(300, 0) }));
-        Assert.Equal(300, (await client.ListAsync("tasks")).Count);
+        // A server that honors the offset but answers fewer rows per page than asked: the walk ends at the empty page.
+        using var client = Client(req =>
+        {
+            var (_, offset) = Page(req);
+            return Json(200, new JsonObject { ["items"] = Rows(Math.Max(0, Math.Min(300, 1200 - offset)), offset) });
+        });
+        Assert.Equal(1200, (await client.ListAsync("tasks")).Count);
+    }
+
+    [Fact]
+    public async Task An_empty_first_page_is_an_empty_collection()
+    {
+        using var client = Client(_ => Json(200, new JsonObject { ["items"] = new JsonArray() }));
+        Assert.Empty(await client.ListAsync("tasks"));
+    }
+
+    [Fact]
+    public async Task An_empty_page_before_the_reported_total_is_an_error()
+    {
+        using var client = Client(req =>
+        {
+            var (_, offset) = Page(req);
+            return Json(200, new JsonObject
+            {
+                ["items"] = offset == 0 ? Rows(500, 0) : new JsonArray(),
+                ["total"] = 1200,
+            });
+        });
+        var e = await Assert.ThrowsAsync<McpException>(() => client.ListAsync("tasks"));
+        Assert.Contains("empty page", e.Message);
     }
 
     [Fact]
@@ -87,7 +115,7 @@ public class ClientTests
     {
         using var client = Client(_ => Json(200, new JsonObject { ["items"] = Rows(500, 0), ["total"] = 1200 }));
         var e = await Assert.ThrowsAsync<McpException>(() => client.ListAsync("tasks"));
-        Assert.Contains("ignoring the offset", e.Message);
+        Assert.Contains("repeating pages", e.Message);
     }
 
     [Fact]
@@ -122,22 +150,22 @@ public class ClientTests
         Assert.Contains("revoked", e.Message);
     }
 
+    /// A server whose one page holds `items` at offset 0 and is empty afterwards (a correct end-of-walk).
+    private static HttpResponseMessage? ServeOnce(JsonArray items, HttpRequestMessage req) => Page(req).Offset == 0
+        ? Json(200, new JsonObject { ["items"] = items })
+        : Json(200, new JsonObject { ["items"] = new JsonArray() });
+
     [Fact]
     public async Task Tasks_emit_only_matching_rows_and_never_nulls()
     {
-        var api = new FakeApi(req => req.Method == HttpMethod.Post
-            ? TokenOk()
-            : Json(200, new JsonObject
-            {
-                ["items"] = new JsonArray(
-                    new JsonObject { ["key"] = "a", ["payload"] = new JsonObject { ["project"] = "p", ["stage"] = "claimed", ["code"] = "A" } },
-                    new JsonObject { ["key"] = "b", ["payload"] = new JsonObject { ["project"] = "q", ["stage"] = "claimed", ["code"] = "B" } }),
-            }));
-        using var client = new VivariumClient(State, new HttpClient(api));
+        var rows = new JsonArray(
+            new JsonObject { ["key"] = "a", ["payload"] = new JsonObject { ["project"] = "p", ["stage"] = "claimed", ["code"] = "A" } },
+            new JsonObject { ["key"] = "b", ["payload"] = new JsonObject { ["project"] = "q", ["stage"] = "claimed", ["code"] = "B" } });
+        using var client = Client(req => ServeOnce(rows, req));
         var tools = new VivariumTools(client);
-        var rows = JsonNode.Parse(await tools.Tasks(project: "p"))!.AsArray();
-        Assert.Single(rows);
-        Assert.Equal("a", rows[0]!["key"]!.GetValue<string>());
+        var emitted = JsonNode.Parse(await tools.Tasks(project: "p"))!.AsArray();
+        Assert.Single(emitted);
+        Assert.Equal("a", emitted[0]!["key"]!.GetValue<string>());
     }
 
     [Fact]
@@ -145,6 +173,55 @@ public class ClientTests
     {
         var state = JsonNode.Parse("{\"hub\":1,\"auth\":2,\"client\":3,\"refresh\":4}")!.AsObject();
         Assert.Equal(new[] { "hub", "auth", "client", "refresh" }, VivariumClient.Missing(state));
+    }
+
+    [Fact]
+    public async Task An_alias_with_a_non_string_first_key_falls_through_to_the_working_one()
+    {
+        // {"hub": 1, "api": "…"} passes the startup refusal through "api" and must read through the same choice
+        var state = JsonNode.Parse("{\"hub\":1,\"api\":\"https://api.example\",\"auth\":\"https://auth.example\"," +
+                                   "\"client\":\"c\",\"refresh\":\"r\"}")!.AsObject();
+        Assert.Empty(VivariumClient.Missing(state));
+        using (var owned = new VivariumClient(state)) Assert.Equal("https://api.example", owned.Api);
+        var api = new FakeApi(req => req.Method == HttpMethod.Post
+            ? TokenOk()
+            : Json(200, new JsonObject { ["items"] = new JsonArray() }));
+        using var client = new VivariumClient(state, new HttpClient(api));
+        Assert.Empty(await client.ListAsync("tasks"));
+    }
+
+    [Fact]
+    public async Task An_injected_http_client_is_left_to_its_caller_on_dispose()
+    {
+        var api = new FakeApi(req => req.Method == HttpMethod.Post ? TokenOk() : ServeOnce(Rows(1, 0), req)!);
+        using var http = new HttpClient(api);
+        var client = new VivariumClient(State, http);
+        Assert.Single(await client.ListAsync("tasks"));
+        client.Dispose();
+        // the injected client must still work: an unconditional dispose would throw ObjectDisposedException here
+        var second = new VivariumClient(State, http);
+        Assert.Single(await second.ListAsync("tasks"));
+    }
+
+    [Fact]
+    public async Task Guardrails_are_emitted_as_values_not_encoded_strings()
+    {
+        var rows = new JsonArray(new JsonObject
+        {
+            ["key"] = "g-1",
+            ["payload"] = new JsonObject
+            {
+                ["baseline"] = "singular-1.0",
+                ["checks"] = new JsonArray("dotnet build", "dotnet test"),
+                ["deniedCommands"] = new JsonArray("git push"),
+                ["tokenBudget"] = 8000000,
+            },
+        });
+        using var client = Client(req => ServeOnce(rows, req));
+        var emitted = JsonNode.Parse(await new VivariumTools(client).Guardrails())!.AsArray();
+        Assert.Single(emitted);
+        Assert.IsType<JsonArray>(emitted[0]!["checks"]);
+        Assert.Equal(8000000, emitted[0]!["tokenBudget"]!.GetValue<int>());
     }
 
     [Fact]
