@@ -15,8 +15,8 @@ public sealed class VivariumTools
 
     public VivariumTools(VivariumClient v) => _v = v;
 
-    private static string Rows(JsonArray items, Func<JsonObject, JsonObject> shape) =>
-        JsonSerializer.Serialize(items.OfType<JsonObject>().Select(shape).ToArray(), Json);
+    private static string Rows(JsonArray items, Func<JsonObject, JsonObject?> shape) =>
+        JsonSerializer.Serialize(items.OfType<JsonObject>().Select(shape).OfType<JsonObject>().ToArray(), Json);
 
     [McpServerTool(Name = "vivarium_projects", ReadOnly = true, Destructive = false)]
     [Description("Every project of the team: key, name, current baseline, status.")]
@@ -43,6 +43,7 @@ public sealed class VivariumTools
                 ["version"] = d["payload"]?["version"]?.GetValue<string>(),
                 ["status"] = d["payload"]?["status"]?.GetValue<string>(),
                 ["signedBy"] = d["payload"]?["signedBy"]?.GetValue<string>(),
+                ["signedAt"] = d["payload"]?["signedAt"]?.GetValue<string>(),
             }).ToArray();
         return JsonSerializer.Serialize(rows, Json);
     }
@@ -56,8 +57,8 @@ public sealed class VivariumTools
         return Rows(items, d =>
         {
             var p = d["payload"]?.AsObject();
-            if (project is not null && p?["project"]?.GetValue<string>() != project) return null!;
-            if (stage is not null && p?["stage"]?.GetValue<string>() != stage) return null!;
+            if (project is not null && p?["project"]?.GetValue<string>() != project) return null;
+            if (stage is not null && p?["stage"]?.GetValue<string>() != stage) return null;
             return new JsonObject
             {
                 ["key"] = d["key"]?.GetValue<string>(),
@@ -74,7 +75,7 @@ public sealed class VivariumTools
     }
 
     [McpServerTool(Name = "vivarium_runs", ReadOnly = true, Destructive = false)]
-    [Description("The team's runs, newest first: number, task, status, started, ended, device, tokens vs budget.")]
+    [Description("The team's newest 50 runs: number, task, status, started, ended, device, tokens, budget.")]
     public async Task<string> Runs([Description("Task key to limit to")] string? task = null, CancellationToken ct = default)
     {
         var items = await _v.ListAsync("runs", ct: ct);
@@ -85,12 +86,14 @@ public sealed class VivariumTools
             .Select(d => new JsonObject
             {
                 ["key"] = d["key"]?.GetValue<string>(),
+                ["number"] = d["payload"]?["number"]?.GetValue<int>(),
                 ["task"] = d["payload"]?["task"]?.GetValue<string>(),
                 ["status"] = d["payload"]?["status"]?.GetValue<string>(),
                 ["started"] = d["payload"]?["startedAt"]?.GetValue<string>(),
                 ["ended"] = d["payload"]?["endedAt"]?.GetValue<string>(),
                 ["device"] = d["payload"]?["device"]?.GetValue<string>(),
                 ["tokens"] = d["payload"]?["tokensTotal"]?.GetValue<int>(),
+                ["budget"] = d["payload"]?["tokenBudget"]?.GetValue<int>(),
             }).ToArray();
         return JsonSerializer.Serialize(rows, Json);
     }
@@ -126,8 +129,20 @@ public sealed class VivariumTools
             ["title"] = d["payload"]?["title"]?.GetValue<string>(),
         });
 
+    [McpServerTool(Name = "vivarium_guardrails", ReadOnly = true, Destructive = false)]
+    [Description("The guardrails of each baseline: its baseline, the checks a run must pass, the blocked command patterns, the token budget.")]
+    public async Task<string> Guardrails(CancellationToken ct = default) =>
+        Rows(await _v.ListAsync("guardrails", ct: ct), d => new JsonObject
+        {
+            ["key"] = d["key"]?.GetValue<string>(),
+            ["baseline"] = d["payload"]?["baseline"]?.GetValue<string>(),
+            ["checks"] = d["payload"]?["checks"]?.ToJsonString(),
+            ["deniedCommands"] = d["payload"]?["deniedCommands"]?.ToJsonString(),
+            ["tokenBudget"] = d["payload"]?["tokenBudget"]?.GetValue<int>(),
+        });
+
     [McpServerTool(Name = "vivarium_what_is_blocking", ReadOnly = true, Destructive = false)]
-    [Description("The gates a project must pass before work can run, in order, each with the one action that clears it: signed baseline, guardrails, a setup conversation, agent kinds, staffed tasks, linked conversations, a paired and online machine with a clone. Start here.")]
+    [Description("The gates a project must pass before work can run, in order, each with the one action that clears it: a setup conversation with Curator (where the baseline and guardrails are proposed), a signed baseline, guardrails, agent kinds, staffed tasks, linked conversations, a paired and online machine with a clone. Start here.")]
     public async Task<string> WhatIsBlocking([Description("Project key, as vivarium_projects shows it")] string project, CancellationToken ct = default)
     {
         try

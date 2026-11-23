@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Nodes;
 
 namespace Unisono.Samples.VivariumCompanion;
@@ -20,6 +21,12 @@ public static class Blocking
         var key = project["key"]?.GetValue<string>() ?? "";
         var version = P(project)?["currentBaseline"]?.GetValue<string>();
 
+        // The setup conversation comes first: it is how the baseline and the guardrails are proposed, so the gaps
+        // below are impossible to clear without it (review, 2026-11-23).
+        if (!conversations.Any(c => P(c)?["kind"]?.GetValue<string>() == "setup"))
+            gaps.Add(new Gap("the team has no setup conversation with Curator: the baseline and guardrails are proposed there",
+                "Conversations place, Setup group, Start setup with Curator"));
+
         var baseline = baselines.FirstOrDefault(b => P(b)?["project"]?.GetValue<string>() == key
             && (version is null || P(b)?["version"]?.GetValue<string>() == version));
         var bp = P(baseline);
@@ -34,10 +41,6 @@ public static class Blocking
         if (baselineKey is not null && !guardrails.Any(g => P(g)?["baseline"]?.GetValue<string>() == baselineKey))
             gaps.Add(new Gap($"no guardrails for baseline {version} of {key}",
                 "ask Curator in the setup conversation to propose them (set_guardrails) and approve the card"));
-
-        if (!conversations.Any(c => P(c)?["kind"]?.GetValue<string>() == "setup"))
-            gaps.Add(new Gap("the team has no setup conversation with Curator, so nothing can propose a baseline or guardrails",
-                "Conversations place, Setup group, Start setup with Curator"));
 
         if (agentKinds.Count == 0)
             gaps.Add(new Gap("no agent kinds exist, so no task can name an agent",
@@ -70,8 +73,8 @@ public static class Blocking
             if (online.Count == 0)
                 gaps.Add(new Gap($"{paired.Count} paired machine(s) but none online",
                     "start the listener: creatura_device.py run on the machine"));
-            else if (!paired.Any(d => !string.IsNullOrEmpty(P(d)?["repoPath"]?.GetValue<string>())))
-                gaps.Add(new Gap("no machine has a clone attached",
+            else if (!online.Any(d => !string.IsNullOrEmpty(P(d)?["repoPath"]?.GetValue<string>())))
+                gaps.Add(new Gap("no online machine has a clone attached",
                     $"creatura_device.py clone {key} <folder> on the machine that will run it"));
         }
         return gaps;
@@ -81,5 +84,7 @@ public static class Blocking
     /// heartbeats make a machine offline - a 3-minute window, strict. A second definition here would let the
     /// companion and the app disagree about the same machine (review, 2026-11-23).
     public static bool WithinHeartbeats(string? lastSeen, DateTime now) =>
-        lastSeen is not null && now - DateTime.Parse(lastSeen).ToUniversalTime() < TimeSpan.FromMinutes(3);
+        lastSeen is not null
+        && DateTimeOffset.TryParse(lastSeen, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var seen)
+        && now - seen.UtcDateTime < TimeSpan.FromMinutes(3);
 }
