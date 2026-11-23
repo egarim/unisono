@@ -77,7 +77,9 @@ public static class Blocking
         return gaps;
     }
 
-    /// deviceOnline on the wire: three missed one-minute heartbeats make a machine offline.
+    /// deviceOnline on the wire, exactly as the app defines it (deviceOnline.ts): three missed one-minute
+    /// heartbeats make a machine offline - a 3-minute window, strict. A second definition here would let the
+    /// companion and the app disagree about the same machine (review, 2026-11-23).
     public static bool WithinHeartbeats(string? lastSeen, DateTime now) =>
-        lastSeen is not null && now - DateTime.Parse(lastSeen).ToUniversalTime() <= TimeSpan.FromMinutes(4);
+        lastSeen is not null && now - DateTime.Parse(lastSeen).ToUniversalTime() < TimeSpan.FromMinutes(3);
 }

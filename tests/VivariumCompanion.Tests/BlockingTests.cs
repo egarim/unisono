@@ -100,10 +100,10 @@ public class BlockingTests
     }
 
     [Fact]
-    public void Four_minutes_is_online_and_five_is_not()
+    public void Just_under_three_minutes_is_online_and_just_over_is_not()
     {
-        Assert.True(Blocking.WithinHeartbeats(Now.AddMinutes(-4).ToString("o"), Now));
-        Assert.False(Blocking.WithinHeartbeats(Now.AddMinutes(-5).ToString("o"), Now));
+        Assert.True(Blocking.WithinHeartbeats(Now.AddSeconds(-179).ToString("o"), Now));
+        Assert.False(Blocking.WithinHeartbeats(Now.AddSeconds(-181).ToString("o"), Now));
         Assert.False(Blocking.WithinHeartbeats(null, Now));
     }
 }
