@@ -4,6 +4,7 @@ on:
     paths:
       - 'src/Unisono.McpApps/**'
       - 'src/Unisono.Mcp/**'
+      - 'src/Unisono.Core/**'
       - 'src/Unisono.UI.*/**'
       - 'samples/BlazorPupusas/**'
       - 'samples/ReactPupusas/**'

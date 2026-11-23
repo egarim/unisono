@@ -126,7 +126,7 @@ public sealed class VivariumClient : IDisposable
         var items = new JsonArray();
         var offset = 0;
         int? total = null;
-        while (items.Count < MaxRows)
+        while (true)
         {
             var q = $"limit={Page}&offset={offset}" + (filter is null ? "" : $"&{filter}");
             using var req = new HttpRequestMessage(HttpMethod.Get, $"{Api}/api/app/data/{collection}?{q}");
@@ -153,8 +153,10 @@ public sealed class VivariumClient : IDisposable
                 return items;  // nothing more to read
             }
             offset += page.Count;  // advance by what the server actually returned, never by the limit asked for
+            if (items.Count > MaxRows)
+                throw new McpException($"{collection}: read {items.Count} rows, past the companion's limit of {MaxRows}; " +
+                                       "refusing to read further");
         }
-        throw new McpException($"{collection}: refused to read more than {MaxRows} rows; the API is not advancing the offset");
     }
 
     public void Dispose()

@@ -119,6 +119,20 @@ public class ClientTests
     }
 
     [Fact]
+    public async Task Past_the_row_cap_the_refusal_names_the_cap_not_the_offset()
+    {
+        // a server paging correctly forever still stops, and the message says what actually happened (review round 4)
+        using var client = Client(req =>
+        {
+            var (_, offset) = Page(req);
+            return Json(200, new JsonObject { ["items"] = Rows(500, offset) });
+        });
+        var e = await Assert.ThrowsAsync<McpException>(() => client.ListAsync("tasks"));
+        Assert.Contains("companion's limit of 200000", e.Message);
+        Assert.DoesNotContain("offset", e.Message);
+    }
+
+    [Fact]
     public async Task A_pairing_refused_by_the_token_endpoint_says_to_re_pair()
     {
         var api = new FakeApi(_ => Json(400, new JsonObject { ["error"] = "invalid_grant" }));
