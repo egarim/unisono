@@ -136,8 +136,8 @@ public sealed class VivariumTools
         {
             ["key"] = d["key"]?.GetValue<string>(),
             ["baseline"] = d["payload"]?["baseline"]?.GetValue<string>(),
-            ["checks"] = d["payload"]?["checks"]?.ToJsonString(),
-            ["deniedCommands"] = d["payload"]?["deniedCommands"]?.ToJsonString(),
+            ["checks"] = d["payload"]?["checks"]?.DeepClone(),
+            ["deniedCommands"] = d["payload"]?["deniedCommands"]?.DeepClone(),
             ["tokenBudget"] = d["payload"]?["tokenBudget"]?.GetValue<int>(),
         });
 
