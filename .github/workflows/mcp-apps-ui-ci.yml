@@ -4,12 +4,14 @@ on:
     paths:
       - 'src/Unisono.McpApps/**'
       - 'src/Unisono.Mcp/**'
+      - 'src/Unisono.Core/**'
       - 'src/Unisono.UI.*/**'
       - 'samples/BlazorPupusas/**'
       - 'samples/ReactPupusas/**'
       - 'samples/McpAppsBridge/**'
       - 'samples/McpAppsPupusasHost/**'
       - 'samples/UiPlayground/**'
+      - 'samples/VivariumCompanion/**'
       - 'tests/**'
       - 'scripts/mcp-ui-smoke.py'
       - 'Unisono.slnx'
@@ -29,6 +31,10 @@ jobs:
           dotnet build samples/UiPlayground/UiPlayground.csproj -c Release
       - name: Test the catalog generator, validator and provider
         run: dotnet test tests/Unisono.UI.Catalog.Tests/Unisono.UI.Catalog.Tests.csproj -c Release
+      - name: Build the Vivarium companion and test its client
+        run: |
+          dotnet build samples/VivariumCompanion/VivariumCompanion.csproj -c Release
+          dotnet test tests/VivariumCompanion.Tests/VivariumCompanion.Tests.csproj -c Release
       - name: Pack the packages that ship with this feature
         # release.yml only packs on a tag; catch missing README/icon metadata on the PR.
         run: |
