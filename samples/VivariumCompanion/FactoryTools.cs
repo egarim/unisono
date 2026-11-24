@@ -76,7 +76,7 @@ public sealed class FactoryTools(VivariumClient v)
     };
 
     [McpServerTool(Name = "vivarium_factory_job", ReadOnly = true, Destructive = false)]
-    [Description("One factory job: its state, what it asks, and its moves with the evidence that justified each (spec, verdicts, gate, decision, answers), newest evidence first within a length limit; a cut text says so, and `move` reads that one whole." + Untrusted)]
+    [Description("One factory job: its state, what it asks, and its moves with the evidence that justified each (spec, verdicts, gate, decision, answers), newest first within a length limit: a cut text says so, `olderMoves` counts the moves left out, and `move` reads one whole." + Untrusted)]
     public async Task<string> Job([Description("Job key, or its code when only one job has it")] string job,
         [Description("Only this move, with its whole text")] int? move = null, CancellationToken ct = default)
     {
@@ -87,31 +87,41 @@ public sealed class FactoryTools(VivariumClient v)
         var task = S(doc, "task") is { } t && VivariumClient.IsKey(t) ? await v.GetAsync("tasks", t, ct) : null;
         var nameOf = Names(await v.ListAsync("profiles", ct: ct));
 
+        // The budget is of the JSON that is returned, names and escapes included.
+        var wanted = moves.AsEnumerable().Reverse().Where(m => move is null || N(m, "n") == move).ToList();
         var left = EvidenceBudget;
         var shown = new List<JsonNode>();
-        foreach (var m in moves.AsEnumerable().Reverse().Where(m => move is null || N(m, "n") == move))
+        foreach (var m in wanted)
         {
-            var text = S(m, "text") ?? "";
-            var max = move is not null ? MoveMax : Math.Min(MoveDefault, left);
-            var part = Clip(text, max);
-            left -= Math.Min(text.Length, max);
-            shown.Add(new JsonObject
-            {
-                ["n"] = N(m, "n"), ["at"] = S(m, "at"), ["from"] = S(m, "fromStage"), ["to"] = S(m, "toStage"), ["by"] = OneLine(S(m, "by"), 120),
-                ["round"] = N(m, "round"), ["artifact"] = S(m, "artifact"), ["text"] = part, ["cut"] = text.Length > max,
-            });
+            var max = move is not null ? MoveMax : MoveDefault;
+            var entry = Entry(m, max);
+            while (move is null && max > 0 && Text(entry).Length + 1 > left) entry = Entry(m, max /= 2);
+            if (move is null && Text(entry).Length + 1 > left) break;
+            left -= Text(entry).Length + 1;
+            shown.Add(entry);
         }
-        shown.Reverse();
         var row = Row(doc, task, nameOf);
         row["why"] = Clip(S(doc, "escalated"), 2000);
         row["question"] = Waits(doc) ? Clip(QuestionOf(moves, S(doc, "stage")), 4000) : null;
         row["takesAnswer"] = Waits(doc) && !BeforeFirstBuild(doc);
-        row["branch"] = S(doc, "branch");
-        row["commit"] = S(doc, "commit");
-        row["surfaces"] = S(doc, "surfaces");
+        row["branch"] = Clip(S(doc, "branch"), 200);
+        row["commit"] = Clip(S(doc, "commit"), 200);
+        row["surfaces"] = Clip(S(doc, "surfaces"), 200);
         row["route"] = Clip(S(doc, "route"), 2000);
+        row["olderMoves"] = wanted.Count - shown.Count;
         row["evidence"] = new JsonArray(shown.ToArray());
         return Text(row);
+    }
+
+    private static JsonObject Entry(JsonObject m, int max)
+    {
+        var text = S(m, "text") ?? "";
+        return new JsonObject
+        {
+            ["n"] = N(m, "n"), ["at"] = OneLine(S(m, "at"), 40), ["from"] = OneLine(S(m, "fromStage"), 40), ["to"] = OneLine(S(m, "toStage"), 40),
+            ["by"] = OneLine(S(m, "by"), 120), ["round"] = N(m, "round"), ["artifact"] = OneLine(S(m, "artifact"), 200),
+            ["text"] = max > 0 ? Clip(text, max) : "", ["cut"] = text.Length > max,
+        };
     }
 
     [McpServerTool(Name = "vivarium_needs_you", ReadOnly = true, Destructive = false)]
@@ -200,11 +210,11 @@ public sealed class FactoryTools(VivariumClient v)
         var args = S(await v.GetAsync("proposals", "models-current", ct), "args");
         try
         {
-            if (JsonNode.Parse(args ?? "") is JsonObject o && o["settings"] is JsonObject s)
+            if (JsonNode.Parse(args ?? "") is JsonObject o && o["settings"] is JsonObject s && Choice(s["curator"]) is { } curator
+                && Choice(s["factory"]) is { } factory && Number(s["budgetUsd"]) is { } budget)
                 return Text(new JsonObject
                 {
-                    ["curator"] = s["curator"]?.DeepClone(), ["factory"] = s["factory"]?.DeepClone(), ["budgetUsd"] = s["budgetUsd"]?.DeepClone(),
-                    ["spentUsd"] = o["spentUsd"] is JsonValue n && n.GetValueKind() == JsonValueKind.Number ? n.DeepClone() : null,
+                    ["curator"] = curator, ["factory"] = factory, ["budgetUsd"] = budget, ["spentUsd"] = Number(o["spentUsd"]),
                     ["hubHasClaude"] = o["claude"] is JsonValue c && c.GetValueKind() == JsonValueKind.True,
                 });
         }
@@ -213,5 +223,27 @@ public sealed class FactoryTools(VivariumClient v)
             // not readable as that: the same answer as not published
         }
         throw new McpException("the hub has not published its models in a form this companion reads");
+    }
+
+    private static JsonNode? Number(JsonNode? n) => n is JsonValue v && v.GetValueKind() == JsonValueKind.Number ? v.DeepClone() : null;
+
+    private static string? Name(JsonNode? n) => n is JsonValue v && v.TryGetValue<string>(out var s) ? OneLine(s, 100) : null;
+
+    /// A model and its fallback (none, one, or a list: factory/models.py), and nothing else that may be beside them.
+    private static JsonObject? Choice(JsonNode? n)
+    {
+        if (n is not JsonObject o || Name(o["model"]) is not { } model) return null;
+        JsonNode? fallback = null;
+        if (o["fallback"] is JsonArray many)
+        {
+            if (many.Any(x => Name(x) is null)) return null;
+            fallback = new JsonArray(many.Take(20).Select(x => (JsonNode?)JsonValue.Create(Name(x))).ToArray());
+        }
+        else if (o["fallback"] is { } one)
+        {
+            if (Name(one) is not { } name) return null;
+            fallback = JsonValue.Create(name);
+        }
+        return new JsonObject { ["model"] = model, ["fallback"] = fallback };
     }
 }

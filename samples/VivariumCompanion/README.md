@@ -20,7 +20,7 @@ There is no key to paste: do not put tokens in the command, in `--env` or in `.m
 | Tool | Shows |
 |---|---|
 | `vivarium_factory_jobs` | the jobs: stage, round, risk, moves, why each stopped, who it waits for |
-| `vivarium_factory_job` | one job: its question, and its moves with their evidence (long texts are cut and say so; `move` reads one whole) |
+| `vivarium_factory_job` | one job: its question, and its moves with their evidence, newest first (long texts are cut and say so; `olderMoves` counts those left out; `move` reads one whole) |
 | `vivarium_needs_you` | what waits for a person, in every project |
 | `vivarium_machines` | the computers: online, last seen, tasks, how many at build, what runs now |
 | `vivarium_models` | the models in force, the spend limit and what is spent |
@@ -41,6 +41,11 @@ Nothing, until you make `~/.creatura/mcp-grants.json` yourself:
 ```
 
 - `answer_job`: `vivarium_answer_job` answers a job that waits for a person.
+  Each of its `decisions` becomes a `Decision: ...` line. When the paired person is a lead (or the team's
+  administrator) and the job is at needs-human, the factory tells its reviewers these lines, so a decision weighs on
+  what they accept. Nobody else's do, nor those of an answer to a question before the spec; there they are only text.
+  Granting this to an agent on a lead's computer lets it speak with a lead's decisions: grant it knowing that.
+  The answer goes to the conversation of the task's own person.
 - `move_task`: `vivarium_move_task` moves a task to another paired computer of the task's own person.
 
 The file is read at every call and again right before the write. Change `true` to `false`, or delete the file, and the

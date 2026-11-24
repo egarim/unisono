@@ -15,6 +15,8 @@ public sealed class Grants(string path)
 
     public bool Allows(string grant)
     {
+        // With no user profile the path would be relative: a file of whatever folder this runs in grants nothing.
+        if (!Path.IsPathFullyQualified(path)) return false;
         try
         {
             using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);

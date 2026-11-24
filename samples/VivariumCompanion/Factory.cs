@@ -34,7 +34,10 @@ public static class Factory
         return t[..end] + "…";
     }
 
-    public static string OneLine(string? text, int max) => Clip(Regex.Replace(text ?? "", @"\s+", " ").Trim(), max);
+    public static string OneLine(string? text, int max) => Clip(Regex.Replace(text ?? "", @"[\s\p{Cc}]+", " ").Trim(), max);
+
+    /// Every break Python's splitlines knows, as \n: the hub reads an answer's lines with it.
+    public static string PlainBreaks(string text) => Regex.Replace(text, @"\r\n|[\r\v\f\x1c-\x1e\x85\u2028\u2029]", "\n");
 
     public static bool Over(string? taskStage) => taskStage is "merged" or "cancelled";
 
