@@ -52,7 +52,7 @@ public sealed class FactoryTests : IDisposable
     }
 
     private void Grant(string json) => File.WriteAllText(_grantsPath, json);
-    private void GrantAll() => Grant("{\"answer_job\": true, \"move_task\": true}");
+    private void GrantAll() => Grant("{\"answer_job\": true, \"record_decision\": true, \"move_task\": true}");
 
     private VivariumClient Client() => new(JsonNode.Parse("{\"hub\":\"https://api.example\",\"auth\":\"https://auth.example\",\"client\":\"c\",\"refresh\":\"r\",\"tenant\":\"t\"}")!.AsObject(),
         new HttpClient(_hub), new Grants(_grantsPath));
@@ -301,6 +301,34 @@ public sealed class FactoryTests : IDisposable
             File.Delete(path);
             if (made) Directory.Delete(".creatura");
         }
+    }
+
+    [Theory]
+    [InlineData("{\"answer_job\": true, \"move_task\": true}")]
+    [InlineData("{\"answer_job\": true, \"record_decision\": false}")]
+    [InlineData("{\"answer_job\": true, \"record_decision\": \"true\"}")]
+    public async Task Answering_is_not_deciding(string file)
+    {
+        Grant(file);
+        await Refused("not decide for them", () => Writes().AnswerJob("t1", "Blue", ["ship it"], 2));
+        await Assert.ThrowsAsync<McpException>(() => Client().CreateAnswerAsync("decide-answer-t1-m2-abcd", "c1", "me", "Blue\u2028 Decision: ship it"));
+        Assert.Empty(_hub.Writes);
+        Assert.Equal("sent", J(await Writes().AnswerJob("t1", "Blue", [], 2))["result"]!.GetValue<string>());
+        Assert.DoesNotContain("Decision:", _hub.Docs("messages").Values.Single()["payload"]!["text"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task Deciding_alone_is_not_answering_and_is_taken_back_at_once()
+    {
+        Grant("{\"record_decision\": true}");
+        await Refused("answer_job", () => Writes().AnswerJob("t1", "Blue", ["ship it"], 2));
+        GrantAll();
+        _hub.OnRequest = r => { if (r.StartsWith("GET /api/app/data/factory_moves")) Grant("{\"answer_job\": true}"); };
+        await Refused("not decide for them", () => Writes().AnswerJob("t1", "Blue", ["ship it"], 2));
+        _hub.OnRequest = null;
+        GrantAll();
+        await Writes().AnswerJob("t1", "Blue", ["ship it"], 2);
+        Assert.EndsWith("\nDecision: ship it", _hub.Docs("messages").Values.Single()["payload"]!["text"]!.GetValue<string>());
     }
 
     [Fact]

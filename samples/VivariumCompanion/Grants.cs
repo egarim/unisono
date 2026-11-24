@@ -9,7 +9,7 @@ namespace Unisono.Samples.VivariumCompanion;
 /// that is missing, unreadable or not a JSON object, and any value but the literal true, allow nothing.
 public sealed class Grants(string path)
 {
-    public const string AnswerJob = "answer_job", MoveTask = "move_task";
+    public const string AnswerJob = "answer_job", RecordDecision = "record_decision", MoveTask = "move_task";
 
     public static string DefaultPath(string home) => Path.Combine(home, ".creatura", "mcp-grants.json");
 
@@ -36,5 +36,12 @@ public sealed class Grants(string path)
         if (!Allows(grant))
             throw new McpException($"not allowed: this computer's person has not granted {grant} (mcp-grants.json). " +
                                    "Ask them; do not change that file yourself.");
+    }
+
+    public void RequireDecision()
+    {
+        if (!Allows(RecordDecision))
+            throw new McpException("not allowed: this computer's person lets you answer, not decide for them (record_decision in mcp-grants.json). " +
+                                   "Leave `decisions` out, or let the person write the decision in the app.");
     }
 }

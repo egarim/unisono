@@ -40,12 +40,13 @@ Nothing, until you make `~/.creatura/mcp-grants.json` yourself:
 { "answer_job": true, "move_task": true }
 ```
 
-- `answer_job`: `vivarium_answer_job` answers a job that waits for a person.
-  Each of its `decisions` becomes a `Decision: ...` line. When the paired person is a lead (or the team's
+- `answer_job`: `vivarium_answer_job` answers a job that waits for a person. The answer goes to the conversation of the
+  task's own person. It does not include deciding.
+- `record_decision`: with `answer_job`, the answer may also carry `decisions`. It is a grant of its own, not in the
+  example above: without it an answer with decisions is refused and a plain one still works. Each decision becomes a `Decision: ...` line. When the paired person is a lead (or the team's
   administrator) and the job is at needs-human, the factory tells its reviewers these lines, so a decision weighs on
   what they accept. Nobody else's do, nor those of an answer to a question before the spec; there they are only text.
   Granting this to an agent on a lead's computer lets it speak with a lead's decisions: grant it knowing that.
-  The answer goes to the conversation of the task's own person.
 - `move_task`: `vivarium_move_task` moves a task to another paired computer of the task's own person.
 
 The file is read at every call and again right before the write. Change `true` to `false`, or delete the file, and the

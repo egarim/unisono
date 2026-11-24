@@ -221,6 +221,7 @@ public sealed class VivariumClient : IDisposable
     public async Task<bool> CreateAnswerAsync(string key, string conversation, string author, string text, CancellationToken ct = default)
     {
         if (!Factory.IsAnswerKey(key)) throw new McpException("that is not an answer's key");
+        if (Factory.HasDecision(text)) (_grants ?? throw new McpException("this companion writes nothing")).RequireDecision();
         return await WriteAsync(Grants.AnswerJob, "messages", key, new JsonObject
         {
             ["conversation"] = conversation, ["author"] = author, ["role"] = "person",

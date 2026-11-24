@@ -36,6 +36,10 @@ public static class Factory
 
     public static string OneLine(string? text, int max) => Clip(Regex.Replace(text ?? "", @"[\s\p{Cc}]+", " ").Trim(), max);
 
+    /// A line the hub could read as a decision (a line of a lead's answer that starts with "Decision:").
+    public static bool HasDecision(string text) =>
+        Regex.IsMatch(PlainBreaks(text), @"^[\s\p{Cc}]*decision\s*:", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
     /// Every break Python's splitlines knows, as \n: the hub reads an answer's lines with it.
     public static string PlainBreaks(string text) => Regex.Replace(text, @"\r\n|[\r\v\f\x1c-\x1e\x85\u2028\u2029]", "\n");
 

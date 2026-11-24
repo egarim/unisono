@@ -4,7 +4,7 @@
 //
 // It authenticates with the pairing this machine already has (creatura_device's state file: the same refresh grant
 // the device daemon uses), so there is no new secret and no new server surface. Reads, and two writes that are off until
-// the person grants them on this machine (~/.creatura/mcp-grants.json): answering a job and moving a task.
+// the person grants them on this machine (~/.creatura/mcp-grants.json): answering a job (its decisions apart) and moving a task.
 // Signing, merging, approvals and passkeys stay in the app. See README.md.
 using System.Text.Json;
 using System.Text.Json.Nodes;
