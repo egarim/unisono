@@ -19,7 +19,7 @@ public sealed class VivariumTools
         JsonSerializer.Serialize(items.OfType<JsonObject>().Select(shape).OfType<JsonObject>().ToArray(), Json);
 
     [McpServerTool(Name = "vivarium_projects", ReadOnly = true, Destructive = false)]
-    [Description("Every project of the team: key, name, current baseline, status.")]
+    [Description("Every project of the team: key, name, current baseline, status." + FactoryTools.Untrusted)]
     public async Task<string> Projects(CancellationToken ct = default) =>
         Rows(await _v.ListAsync("projects", ct: ct), d => new JsonObject
         {
@@ -30,7 +30,7 @@ public sealed class VivariumTools
         });
 
     [McpServerTool(Name = "vivarium_baselines", ReadOnly = true, Destructive = false)]
-    [Description("The baselines of one project (or all): version, status, signedBy, signedAt. A draft baseline blocks every run.")]
+    [Description("The baselines of one project (or all): version, status, signedBy, signedAt. A draft baseline blocks every run." + FactoryTools.Untrusted)]
     public async Task<string> Baselines([Description("Project key, as vivarium_projects shows it")] string? project = null, CancellationToken ct = default)
     {
         var items = await _v.ListAsync("baselines", ct: ct);
@@ -49,7 +49,7 @@ public sealed class VivariumTools
     }
 
     [McpServerTool(Name = "vivarium_tasks", ReadOnly = true, Destructive = false)]
-    [Description("Tasks of one project (or all), optionally one stage: code, title, stage, assignee, agent, device, branch.")]
+    [Description("Tasks of one project (or all), optionally one stage: code, title, stage, assignee, agent, device, branch." + FactoryTools.Untrusted)]
     public async Task<string> Tasks([Description("Project key")] string? project = null,
         [Description("Stage: planned, claimed, running, checks, review, merged, cancelled")] string? stage = null, CancellationToken ct = default)
     {
@@ -75,7 +75,7 @@ public sealed class VivariumTools
     }
 
     [McpServerTool(Name = "vivarium_runs", ReadOnly = true, Destructive = false)]
-    [Description("The team's newest 50 runs: number, task, status, started, ended, device, tokens, budget.")]
+    [Description("The team's newest 50 runs: number, task, status, started, ended, device, tokens, budget." + FactoryTools.Untrusted)]
     public async Task<string> Runs([Description("Task key to limit to")] string? task = null, CancellationToken ct = default)
     {
         var items = await _v.ListAsync("runs", ct: ct);
@@ -99,7 +99,7 @@ public sealed class VivariumTools
     }
 
     [McpServerTool(Name = "vivarium_devices", ReadOnly = true, Destructive = false)]
-    [Description("The team's machines: name, os, status, online (three missed one-minute heartbeats make it offline), agents, clone path, last seen.")]
+    [Description("The team's machines: name, os, status, online (three missed one-minute heartbeats make it offline), agents, clone path, last seen." + FactoryTools.Untrusted)]
     public async Task<string> Devices(CancellationToken ct = default)
     {
         var now = DateTime.UtcNow;
@@ -119,7 +119,7 @@ public sealed class VivariumTools
     }
 
     [McpServerTool(Name = "vivarium_conversations", ReadOnly = true, Destructive = false)]
-    [Description("The team's conversations: key, kind (setup, task, free), task, title.")]
+    [Description("The team's conversations: key, kind (setup, task, free), task, title." + FactoryTools.Untrusted)]
     public async Task<string> Conversations(CancellationToken ct = default) =>
         Rows(await _v.ListAsync("conversations", ct: ct), d => new JsonObject
         {
@@ -130,7 +130,7 @@ public sealed class VivariumTools
         });
 
     [McpServerTool(Name = "vivarium_guardrails", ReadOnly = true, Destructive = false)]
-    [Description("The guardrails of each baseline: its baseline, the checks a run must pass, the blocked command patterns, the token budget.")]
+    [Description("The guardrails of each baseline: its baseline, the checks a run must pass, the blocked command patterns, the token budget." + FactoryTools.Untrusted)]
     public async Task<string> Guardrails(CancellationToken ct = default) =>
         Rows(await _v.ListAsync("guardrails", ct: ct), d => new JsonObject
         {
@@ -142,7 +142,7 @@ public sealed class VivariumTools
         });
 
     [McpServerTool(Name = "vivarium_what_is_blocking", ReadOnly = true, Destructive = false)]
-    [Description("The gates a project must pass before work can run, in order, each with the one action that clears it: a setup conversation with Curator (where the baseline and guardrails are proposed), a signed baseline, guardrails, agent kinds, staffed tasks, linked conversations, a paired and online machine with a clone. Start here.")]
+    [Description("The gates a project must pass before work can run, in order, each with the one action that clears it: a setup conversation with Curator (where the baseline and guardrails are proposed), a signed baseline, guardrails, agent kinds, staffed tasks, linked conversations, a paired and online machine with a clone. Start here." + FactoryTools.Untrusted)]
     public async Task<string> WhatIsBlocking([Description("Project key, as vivarium_projects shows it")] string project, CancellationToken ct = default)
     {
         try
